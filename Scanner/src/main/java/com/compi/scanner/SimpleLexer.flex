@@ -15,6 +15,9 @@ import static com.compi.scanner.Token.*;
 
 %%
 
+// TODO: Añadir expresiones regulares para los tokens
+// Ver ejemplo https://github.com/ernesto-si/proyectocomppiladores2021/blob/master/src/codigo/Lexer.flex
+
 "+"           {lexeme=yytext(); return PLUS; }
 "-"           {lexeme=yytext(); return MINUS; }
 "*"           {lexeme=yytext(); return MULTIPLY; }
