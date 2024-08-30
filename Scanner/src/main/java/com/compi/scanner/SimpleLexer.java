@@ -6,7 +6,7 @@
 
 package com.compi.scanner;
 
-import static com.compi.scanner.Token.*;
+import static com.compi.scanner.Tokens.*;
 
 @SuppressWarnings("fallthrough")
 public class SimpleLexer {
@@ -63,9 +63,9 @@ public class SimpleLexer {
    */
   private static final int[] ZZ_CMAP_BLOCKS = zzUnpackcmap_blocks();
 
-  private static final String ZZ_CMAP_BLOCKS_PACKED_0 = "\11\0\2\1\2\2\1\1\22\0\1\1\11\0\1\3" +
-      "\1\4\1\0\1\5\1\0\1\6\12\7\113\0\1\2" +
-      "\u01a2\0\2\2\326\0\u0100\2";
+  private static final String ZZ_CMAP_BLOCKS_PACKED_0 = "\11\0\1\1\1\2\2\3\1\2\22\0\1\1\11\0" +
+      "\1\4\4\0\1\5\12\6\7\0\32\7\6\0\32\7" +
+      "\12\0\1\3\u01a2\0\2\3\326\0\u0100\3";
 
   private static int[] zzUnpackcmap_blocks() {
     int[] result = new int[1024];
@@ -93,10 +93,11 @@ public class SimpleLexer {
    */
   private static final int[] ZZ_ACTION = zzUnpackAction();
 
-  private static final String ZZ_ACTION_PACKED_0 = "\1\0\1\1\1\2\1\3\1\4\1\5\1\6\1\7";
+  private static final String ZZ_ACTION_PACKED_0 = "\1\0\1\1\1\2\2\1\1\3\1\0\1\2\1\0" +
+      "\1\4\1\0";
 
   private static int[] zzUnpackAction() {
-    int[] result = new int[8];
+    int[] result = new int[11];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -121,10 +122,11 @@ public class SimpleLexer {
    */
   private static final int[] ZZ_ROWMAP = zzUnpackRowMap();
 
-  private static final String ZZ_ROWMAP_PACKED_0 = "\0\0\0\10\0\20\0\10\0\10\0\10\0\10\0\30";
+  private static final String ZZ_ROWMAP_PACKED_0 = "\0\0\0\10\0\10\0\20\0\30\0\40\0\50\0\60" +
+      "\0\30\0\70\0\100";
 
   private static int[] zzUnpackRowMap() {
-    int[] result = new int[8];
+    int[] result = new int[11];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -146,11 +148,13 @@ public class SimpleLexer {
    */
   private static final int[] ZZ_TRANS = zzUnpacktrans();
 
-  private static final String ZZ_TRANS_PACKED_0 = "\1\2\1\3\1\0\1\4\1\5\1\6\1\7\1\10" +
-      "\11\0\1\3\15\0\1\10";
+  private static final String ZZ_TRANS_PACKED_0 = "\1\2\2\3\1\0\1\2\1\4\1\5\1\6\14\0" +
+      "\1\7\1\10\10\0\1\11\1\12\6\0\2\6\4\7" +
+      "\1\13\3\7\2\10\2\0\4\10\6\0\2\12\4\7" +
+      "\1\13\1\3\2\7";
 
   private static int[] zzUnpacktrans() {
-    int[] result = new int[32];
+    int[] result = new int[72];
     int offset = 0;
     offset = zzUnpacktrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -193,10 +197,10 @@ public class SimpleLexer {
    */
   private static final int[] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
-  private static final String ZZ_ATTRIBUTE_PACKED_0 = "\1\0\1\11\1\1\4\11\1\1";
+  private static final String ZZ_ATTRIBUTE_PACKED_0 = "\1\0\2\11\3\1\1\0\1\1\1\0\1\1\1\0";
 
   private static int[] zzUnpackAttribute() {
-    int[] result = new int[8];
+    int[] result = new int[11];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -286,7 +290,22 @@ public class SimpleLexer {
   private boolean zzEOFDone;
 
   /* user code: */
-  public String lexeme;
+  public int getLineNumber() {
+    if (yyline == 0) {
+      yyline++;
+    }
+    // cut the buffer to the correct size
+    String str = new String(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
+
+    // count the number of \n in the matched text
+    for (int i = 0; i < str.length(); i++) {
+      if (str.charAt(i) == '\n') {
+        yyline++;
+      }
+    }
+
+    return yyline;
+  }
 
   /**
    * Creates a new scanner
@@ -641,51 +660,28 @@ public class SimpleLexer {
       } else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: {
-            lexeme = yytext();
-            return UNKNOWN;
+            return new Token(ERROR, yytext(), getLineNumber());
+          }
+          // fall through
+          case 5:
+            break;
+          case 2: {
+            getLineNumber();
+          }
+          // fall through
+          case 6:
+            break;
+          case 3: {
+            return new Token(IDENTIFICADOR, yytext(), getLineNumber());
+          }
+          // fall through
+          case 7:
+            break;
+          case 4: {
+            return new Token(ERROR, yytext(), getLineNumber());
           }
           // fall through
           case 8:
-            break;
-          case 2: { /* Ignore whitespace */
-          }
-          // fall through
-          case 9:
-            break;
-          case 3: {
-            lexeme = yytext();
-            return MULTIPLY;
-          }
-          // fall through
-          case 10:
-            break;
-          case 4: {
-            lexeme = yytext();
-            return PLUS;
-          }
-          // fall through
-          case 11:
-            break;
-          case 5: {
-            lexeme = yytext();
-            return MINUS;
-          }
-          // fall through
-          case 12:
-            break;
-          case 6: {
-            lexeme = yytext();
-            return DIVIDE;
-          }
-          // fall through
-          case 13:
-            break;
-          case 7: {
-            lexeme = yytext();
-            return INTEGER;
-          }
-          // fall through
-          case 14:
             break;
           default:
             zzScanError(ZZ_NO_MATCH);

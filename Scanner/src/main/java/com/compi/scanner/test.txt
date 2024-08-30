@@ -1,1 +1,19 @@
-3 + 5 * 10 - 2 / 4
+// Comentario
+
+/* Comentario
+de 
+bloque
+
+*/
+
+
+hola como estan
+
+probando
+las 
+lineas 
+del 
+editor
++23
+233
+2hola

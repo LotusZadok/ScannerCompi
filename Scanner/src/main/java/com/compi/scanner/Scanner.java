@@ -15,7 +15,6 @@ import java.io.FileReader;
 public class Scanner {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
 
         try {
             // Ruta del archivo a leer
@@ -30,7 +29,8 @@ public class Scanner {
             Token token = lexer.yylex();
             while (token != null) {
                 // TODO: Implementar la lista de tokens y de errores
-                System.out.println(token);
+                System.out.println(token.getValue() + " " + token.getToken() + " " +
+                        token.getLineNumber());
                 token = lexer.yylex();
             }
 
