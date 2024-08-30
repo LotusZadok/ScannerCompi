@@ -8,6 +8,7 @@ import static com.compi.scanner.Tokens.*;
 %unicode
 %public
 %type Token
+%line
 
 L = [a-zA-Z]
 D = [0-9]
@@ -15,22 +16,7 @@ Alfanumerico = {L}({L}|{D})* // Letra seguida de letras o digitos
 Entero = {D}+ 
 
 %{
-public int getLineNumber() {
-    if (yyline == 0) {
-      yyline++;
-    }
-    // cut the buffer to the correct size
-    String str = new String(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
-
-    // count the number of \n in the matched text
-    for (int i = 0; i < str.length(); i++) {
-      if (str.charAt(i) == '\n') {
-        yyline++;
-      }
-    }
-
-    return yyline;
-}
+    
 %}
 
 
@@ -39,12 +25,12 @@ public int getLineNumber() {
 // TODO: Añadir expresiones regulares para los tokens
 // Ver ejemplo https://github.com/ernesto-si/proyectocomppiladores2021/blob/master/src/codigo/Lexer.flex
 
-[ \t\n\r]    { getLineNumber(); }
+[ \t\n\r]    { /* ignore */ }
 
 // 1. OMITIR COMENTARIOS 
 
-"//".* { getLineNumber(); }
-"/*"([^*]|\*+[^*/])*"*"+"/" { getLineNumber(); }
+"//".* { /* ignore */ }
+"/*"([^*]|\*+[^*/])*"*"+"/" { /* ignore */ }
 
 // 2. PALABRAS RESERVADAS
 
@@ -56,7 +42,7 @@ public int getLineNumber() {
 
 
 // 5. IDENTIFICADORES  
-{Entero}{Alfanumerico} {return new Token(ERROR, yytext(), getLineNumber()); }
-{Alfanumerico} {return new Token(IDENTIFICADOR, yytext(),  getLineNumber()); }
+{Entero}{Alfanumerico} {return new Token(ERROR, yytext(), yyline); }
+{Alfanumerico} {return new Token(IDENTIFICADOR, yytext(),  yyline); }
 
-.             {return new Token(ERROR, yytext(),  getLineNumber()); }
+.             {return new Token(ERROR, yytext(),  yyline); }

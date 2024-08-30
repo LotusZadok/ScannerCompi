@@ -8,7 +8,7 @@ public class Token {
     public Token(Tokens token, String value, int lineNumber) {
         this.token = token;
         this.value = value;
-        this.lineNumber = lineNumber;
+        this.lineNumber = lineNumber + 1;
     }
 
     public Tokens getToken() {
