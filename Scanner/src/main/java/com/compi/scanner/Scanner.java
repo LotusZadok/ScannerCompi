@@ -19,9 +19,7 @@ public class Scanner {
         try {
             // Ruta del archivo a leer
             // TODO: Usar un archivo .c
-            FileReader reader = new FileReader("C:\\Users\\n" + //
-                    "cque\\Downloads\\tec\\ci\\Scanner\\Scanner\\src\\main\\java\\com\\compi\\scanner\\test.txt");
-
+            FileReader reader = new FileReader("C:\\Users\\vmrjo\\Documents\\GitHub\\Scanner\\Scanner\\src\\main\\java\\com\\compi\\scanner\\test.txt");
             // Instancia de la clase SimpleLexer (JFlex)
             SimpleLexer lexer = new SimpleLexer(reader);
 
@@ -39,7 +37,7 @@ public class Scanner {
         }
 
     }
-
+    
     // FIXME: Usar el plugin de JFlex para generar el lexer
     // public static void generateLexer(String path) {
     // String[] lexer = {path};

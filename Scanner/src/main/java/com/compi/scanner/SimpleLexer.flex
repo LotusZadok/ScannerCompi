@@ -16,7 +16,7 @@ Alfanumerico = {L}({L}|{D})* // Letra seguida de letras o digitos
 Entero = {D}+ 
 
 %{
-    
+    public String lexeme;
 %}
 
 
@@ -28,20 +28,29 @@ Entero = {D}+
 [ \t\n\r]    { /* ignore */ }
 
 // 1. OMITIR COMENTARIOS 
-
 "//".* { /* ignore */ }
 "/*"([^*]|\*+[^*/])*"*"+"/" { /* ignore */ }
 
 // 2. PALABRAS RESERVADAS
+auto | break | case | char | const | continue | default | do | double | else | enum | extern | float | for |
+goto | if | int | long | register | return | short | signed | sizeof | static | struct | switch | typedef |
+union | unsigned | void | volatile | while {return new Token(PALABRA_RESERVADA, yytext(), yyline);}
 
 // 3. NUMEROS
 
+
 // 4. OPERADORES
+"," | ";" | "++" | "--" | "==" | ">=" | ">" | "?" | "<=" | "<" | "!=" | "||" | "&&" | "!" | "=" | "+" | "-" | 
+"*" | "/" | "%" | "(" | ")" | "[" | "]" | "{" | "}" | ":" | "." | "+=" | "-=" | "*=" | "/=" | "&" | "^" | "|" | 
+">>" | "<<" | "~" | "%=" | "&=" | "^=" | "|=" | "<<=" | ">>=" | "->" {return new Token(OPERADOR, yytext(), yyline);}
 
+// 5. STRINGS
+"\""([^\"\\\n]|\\[\"\\bfnrt])*"\"" {return new Token(LITERAL, yytext(), yyline);}
+"\""(.[^\n]*)"\"" {return new Token(ERROR, yytext(), yyline);}
+"#"{Entero} {return new Token(LITERAL, yytext(), yyline);}
+"#"[^ \t\n\r]* {return new Token(ERROR, yytext(), yyline);}
 
-
-
-// 5. IDENTIFICADORES  
+// 6. IDENTIFICADORES  
 {Entero}{Alfanumerico} {return new Token(ERROR, yytext(), yyline); }
 {Alfanumerico} {return new Token(IDENTIFICADOR, yytext(),  yyline); }
 

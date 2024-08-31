@@ -17,3 +17,16 @@ editor
 +23
 233
 2hola
+
+return
+#probando otra cosa
+#0.1111
+#109889
+
+"This is an invalid string
+"This string is not valid
+because it contains a newline directly."
+"This is an invalid escape sequence: \q"
+"He said, "Hello!" and left."
+
+"Valor de var: %d\n"
