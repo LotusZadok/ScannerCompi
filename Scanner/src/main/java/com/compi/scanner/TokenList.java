@@ -29,8 +29,15 @@ public class TokenList {
 
     // Other methods for managing the token list
     public void printTokens() {
+        System.out.println(
+                "--------------------------------------------------------------------------------------------------------------------");
+        System.out.format("| %-17s | %-75s | %-15s |%n", "Token", "Tipo de Token", "Línea");
+        System.out.println(
+                "--------------------------------------------------------------------------------------------------------------------");
         for (Token t : tokens) {
-            System.out.format("%-17s | %-75s | %-15s %n", t.getToken(), t.getValue(), t.getLineNumbers());
+            System.out.format("| %-17s | %-75s | %-15s |%n", t.getToken(), t.getValue(), t.getLineNumbers());
+            System.out.println(
+                    "--------------------------------------------------------------------------------------------------------------------");
         }
     }
 }
