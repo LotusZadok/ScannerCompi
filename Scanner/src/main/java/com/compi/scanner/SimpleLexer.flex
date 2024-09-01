@@ -12,6 +12,10 @@ import static com.compi.scanner.TokenTypes.*;
 
 L = [a-zA-Z]
 D = [0-9]
+H = [a-fA-F0-9]
+OCTAL = 0[0-7]+ 
+HEX = 0[xX]{H}+ 
+EXPONENT = [eE][+-]?{D}+
 Alfanumerico = {L}({L}|{D})* // Letra seguida de letras o digitos
 Entero = {D}+ 
 
@@ -37,7 +41,12 @@ goto | if | int | long | register | return | short | signed | sizeof | static | 
 union | unsigned | void | volatile | while {tokenList.insertToken(PALABRA_RESERVADA, yytext(), yyline);}
 
 // 3. NUMEROS
-
+{HEX} { tokenList.insertToken(LITERAL, yytext(), yyline); }
+{OCTAL} { tokenList.insertToken(LITERAL, yytext(), yyline); }
+{D}+("."{D}*)?{EXPONENT} | {D}*"."{D}+{EXPONENT} { tokenList.insertToken(LITERAL, yytext(), yyline); }
+{D}+"."{D}+ { tokenList.insertToken(LITERAL, yytext(), yyline); }
+{D}+ { tokenList.insertToken(LITERAL, yytext(), yyline); }
+"."{D}+ | {D}+"." { tokenList.insertToken(ERROR, "Error: Número malformado -> " + yytext(), yyline); }
 
 // 4. OPERADORES
 "," | ";" | "++" | "--" | "==" | ">=" | ">" | "?" | "<=" | "<" | "!=" | "||" | "&&" | "!" | "=" | "+" | "-" | 

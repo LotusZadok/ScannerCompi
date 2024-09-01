@@ -1,0 +1,72 @@
+// Comentario de una línea
+
+/* Comentario
+de 
+bloque que debe ser ignorado por el lexer.
+*/
+
+/* Comentario bloque no cerrado (debería causar un error)
+int x = 5; 
+
+// Números enteros
+12345678
+0      // Esto debería ser reconocido como un entero (no octal)
+0777   // Octal válido
+00001  // Octal con ceros a la izquierda
+
+// Números hexadecimales
+0x1A3F
+0XFF
+0x0  // Hexadecimal con valor 0
+
+// Números flotantes
+5.0
+0.123456
+.456    // Malformado, debe dar error
+123.    // Malformado, debe dar error
+1.5e10
+3.0E-5
+3E8    // Flotante en notación científica sin punto decimal
+
+// Operadores y símbolos
++ - * / % = == != <= >= && || ++ -- += -= *= /= %=
+<< >> & | ^ ~ -> : ; , . ?
+
+// Identificadores y palabras reservadas
+int variable1;
+float x_y_z;
+if (x > 0) return;
+identificadorValido123;
+_invalid_identifier;  // Error: empieza con _
+9identificadorInvalido; // Error: empieza con un número
+
+// Literales de caracteres (valores ASCII)
+#65   // Representa 'A'
+#97   // Representa 'a'
+#48   // Representa '0'
+#InvalidLiteral   // Error: malformado
+
+// Strings y errores en strings
+"Esta es una cadena de texto válida"
+"Este string tiene un salto de línea directo:
+y debería causar un error"
+"Escapes inválidos como \q deberían causar errores"
+"He said, \"Hello!\" and left."  // String válido con comillas escapadas
+"String con escape \n"  // String válido con un carácter de escape
+
+// Prueba de todos los casos y errores posibles
+auto
+break
+case
+const
+while
+void
+sizeof
+
+_underscore  // Error: comienza con un subrayado
+123IdentificadorMalformado  // Error: comienza con un número
+0x123FG  // Error: 'G' no es válido en un hexadecimal
+07778  // Error: dígito '8' no es válido en octal
+
+"Sin cerrar este string
+"This string is "malformado""  // Error: comillas dentro sin escapar
