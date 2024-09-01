@@ -16,7 +16,7 @@ H = [a-fA-F0-9]
 OCTAL = 0[0-7]+ 
 HEX = 0[xX]{H}+ 
 EXPONENT = [eE][+-]?{D}+
-Alfanumerico = {L}({L}|{D})* // Letra seguida de letras o digitos
+Alfanumerico = ({L}|_)({L}|{D}|_)* // Letra seguida de letras o digitos
 Entero = {D}+ 
 
 %{
@@ -34,6 +34,8 @@ Entero = {D}+
 // 1. OMITIR COMENTARIOS 
 "//".* { /* ignore */ }
 "/*"([^*]|\*+[^*/])*"*"+"/" { /* ignore */ }
+"/*"[^\n\r]* {tokenList.insertToken(ERROR, "Error: Comentario no cerrado -> " + yytext(), yyline);}
+
 
 // 2. PALABRAS RESERVADAS
 auto | break | case | char | const | continue | default | do | double | else | enum | extern | float | for |
