@@ -1,17 +1,20 @@
 package com.compi.scanner;
 
-public class Token {
-    private Tokens token;
-    private String value;
-    private int lineNumber;
+import java.util.ArrayList;
 
-    public Token(Tokens token, String value, int lineNumber) {
+public class Token {
+    private TokenTypes token;
+    private String value;
+    private ArrayList<Occurrences> lineNumbers;
+
+    public Token(TokenTypes token, String value, int lineNumber) {
         this.token = token;
         this.value = value;
-        this.lineNumber = lineNumber + 1;
+        this.lineNumbers = new ArrayList<>();
+        this.lineNumbers.add(new Occurrences(lineNumber + 1));
     }
 
-    public Tokens getToken() {
+    public TokenTypes getToken() {
         return token;
     }
 
@@ -19,8 +22,18 @@ public class Token {
         return value;
     }
 
-    public int getLineNumber() {
-        return lineNumber;
+    public ArrayList<Occurrences> getLineNumbers() {
+        return lineNumbers;
+    }
+
+    public void addLineNumber(int lineNumber) {
+        for (Occurrences o : lineNumbers) {
+            if (o.getLineNumber() == lineNumber + 1) {
+                o.incrementOccurrences();
+                return;
+            }
+        }
+        lineNumbers.add(new Occurrences(lineNumber));
     }
 
 }

@@ -6,15 +6,16 @@ bloque
 
 */
 
+2222
 
-hola como estan
+hola como estan hola
 
 probando
 las 
 lineas 
 del 
 editor
-+23
++2
 233
 2hola
 

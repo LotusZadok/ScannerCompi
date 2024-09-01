@@ -1,7 +1,6 @@
 package com.compi.scanner;
 
-public enum Tokens {
-    // TODO: Implementar los tokens del lenguaje c
+public enum TokenTypes {
     IDENTIFICADOR,
     PALABRA_RESERVADA,
     OPERADOR,
