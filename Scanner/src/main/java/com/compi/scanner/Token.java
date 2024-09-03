@@ -33,7 +33,7 @@ public class Token {
                 return;
             }
         }
-        lineNumbers.add(new Occurrences(lineNumber));
+        lineNumbers.add(new Occurrences(lineNumber+1));
     }
 
 }
