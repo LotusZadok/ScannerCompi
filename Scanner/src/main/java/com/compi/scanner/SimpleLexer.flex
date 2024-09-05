@@ -12,22 +12,26 @@ import static com.compi.scanner.TokenTypes.*;
 
 L = [a-zA-Z]
 D = [0-9]
-H = [a-fA-F0-9]
-OCTAL = 0[0-7]+ 
-HEX = 0[xX]{H}+ 
-EXPONENT = [eE][+-]?{D}+
+
 Alfanumerico = ({L}|_)({L}|{D}|_)* // Letra seguida de letras o digitos
-Entero = {D}+ 
+
+ZERO    = 0
+DECIMAL = [1-9][0-9]*       
+OCTAL   = 0[0-7]+          
+HEX     = "0"[xX][0-9A-Fa-f]+  
+INT     = ( {ZERO} | {DECIMAL} | {OCTAL} | {HEX} ) [lL]?  
+
+EXP             = [eE][\+\-]?[0-9]+  
+DECPART         = \.[0-9]+      
+OPTIONALDECPART = \.?[0-9]+ //parte opcional antes del exponente
+FLOATSUFFIX     = [fFdD]?       //sufijo de exponente opcional
+FLOAT           = {INT}({DECPART} {EXP}? | {OPTIONALDECPART}{EXP}) {FLOATSUFFIX}
 
 %{
     TokenList tokenList = TokenList.getInstance();
 %}
 
-
 %%
-
-// TODO: Añadir expresiones regulares para los tokens
-// Ver ejemplo https://github.com/ernesto-si/proyectocomppiladores2021/blob/master/src/codigo/Lexer.flex
 
 [ \t\n\r]+    { /* ignore */ }
 
@@ -36,19 +40,18 @@ Entero = {D}+
 "/*"([^*]|\*+[^*/])*"*"+"/" { /* ignore */ }
 "/*"[^\n\r]* {tokenList.insertToken(ERROR, "Error: Comentario no cerrado -> " + yytext(), yyline);}
 
-
 // 2. PALABRAS RESERVADAS
 auto | break | case | char | const | continue | default | do | double | else | enum | extern | float | for |
 goto | if | int | long | register | return | short | signed | sizeof | static | struct | switch | typedef |
 union | unsigned | void | volatile | while {tokenList.insertToken(PALABRA_RESERVADA, yytext(), yyline);}
 
 // 3. NUMEROS
-{HEX} { tokenList.insertToken(LITERAL, yytext(), yyline); }
-{OCTAL} { tokenList.insertToken(LITERAL, yytext(), yyline); }
-{D}+("."{D}*)?{EXPONENT} | {D}*"."{D}+{EXPONENT} { tokenList.insertToken(LITERAL, yytext(), yyline); }
-{D}+"."{D}+ { tokenList.insertToken(LITERAL, yytext(), yyline); }
-{D}+ { tokenList.insertToken(LITERAL, yytext(), yyline); }
-"."{D}+ | {D}+"." { tokenList.insertToken(ERROR, "Error: Número malformado -> " + yytext(), yyline); }
+{INT}                            { return new Literal(yyline, yytext()); }
+{FLOAT}                          { return new Literal(yyline, yytext()); }
+"0"[xX][^0-9A-Fa-f]+             { tokenList.insertToken(ERROR, "Error: Hexadecimal mal formado -> " + yytext(), yyline); } //caracteres hex no validos
+0[0-7]*[89]+                     { tokenList.insertToken(ERROR, "Error: Octal mal formado -> " + yytext(), yyline); } //caracteres octales no validos
+({DECIMAL}|{ZERO})[eE][^\+\-0-9] { tokenList.insertToken(ERROR, "Error: Exponente mal formado -> " + yytext(), yyline); } 
+{DECIMAL}\.[^0-9]+               { tokenList.insertToken(ERROR, "Error: Flotante mal formado -> " + yytext(), yyline); }
 
 // 4. OPERADORES
 "," | ";" | "++" | "--" | "==" | ">=" | ">" | "?" | "<=" | "<" | "!=" | "||" | "&&" | "!" | "=" | "+" | "-" | 
@@ -60,13 +63,8 @@ union | unsigned | void | volatile | while {tokenList.insertToken(PALABRA_RESERV
 "\""(.[^\n]*)"\"" {tokenList.insertToken(ERROR, "Error: String no valido -> " + yytext(), yyline);}
 "\""[^\n\r]* {tokenList.insertToken(ERROR, "Error: String no cerrado -> " + yytext(), yyline);}
 
-
-
-"#"{Entero} {tokenList.insertToken(LITERAL, yytext(), yyline);}
-"#"[^ \t\n\r]* {tokenList.insertToken(ERROR, yytext(), yyline);}
-
 // 6. IDENTIFICADORES  
-{Entero}{Alfanumerico} {tokenList.insertToken(ERROR,"Error: Identificador no puede empezar con un número ->" + yytext(), yyline); }
+{INT}{Alfanumerico} {tokenList.insertToken(ERROR,"Error: Identificador no puede empezar con un número ->" + yytext(), yyline); }
 {Alfanumerico} {tokenList.insertToken(IDENTIFICADOR, yytext(),  yyline); }
 
 .             {tokenList.insertToken(ERROR, "Error: Desconocido -> " + yytext(),  yyline); }
