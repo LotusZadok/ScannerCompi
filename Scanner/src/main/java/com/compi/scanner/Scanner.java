@@ -3,9 +3,15 @@ package com.compi.scanner;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import jflex.exceptions.SilentExit;
+
+import jflex.Main;
+
 public class Scanner {
 
     public static void main(String[] args) {
+
+        generateLexer();
 
         try {
             Reader reader = new InputStreamReader(
@@ -34,9 +40,14 @@ public class Scanner {
 
     }
 
-    // FIXME: Usar el plugin de JFlex para generar el lexer
-    // public static void generateLexer(String path) {
-    // String[] lexer = {path};
-    // jflex.Main.main(lexer);
-    // }
+    public static void generateLexer() {
+        String projectDir = System.getProperty("user.dir");
+        String entrada = projectDir + "/Scanner/src/main/java/com/compi/scanner/SimpleLexer.flex";
+        try {
+            Main.generate(new String[] { entrada });
+        } catch (SilentExit e) {
+            System.out.println("SilentExit occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
