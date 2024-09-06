@@ -7,6 +7,7 @@ bloque que debe ser ignorado por el lexer.
 
 /* Comentario bloque no cerrado (debería causar un error)
 int x = 5; 
+*/
 
 // Números enteros
 12345678
@@ -53,6 +54,7 @@ y debería causar un error"
 "Escapes inválidos como \q deberían causar errores"
 "He said, \"Hello!\" and left."  // String válido con comillas escapadas
 "String con escape \n"  // String válido con un carácter de escape
+"Hola" == "Hola"
 
 // Prueba de todos los casos y errores posibles
 auto
@@ -68,5 +70,5 @@ _underscore  // Error: comienza con un subrayado
 0x123FG  // Error: 'G' no es válido en un hexadecimal
 07778  // Error: dígito '8' no es válido en octal
 
-"Sin cerrar este string
+"Sin cerrar este string 
 "This string is "malformado""  // Error: comillas dentro sin escapar

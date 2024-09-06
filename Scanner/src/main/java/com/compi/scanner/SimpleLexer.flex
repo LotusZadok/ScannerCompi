@@ -29,6 +29,7 @@ FLOAT           = {INT}({DECPART} {EXP}? | {OPTIONALDECPART}{EXP}) {FLOATSUFFIX}
 
 %{
     TokenList tokenList = TokenList.getInstance();
+    ErrorList errorList = ErrorList.getInstance();
 %}
 
 %%
@@ -46,12 +47,12 @@ goto | if | int | long | register | return | short | signed | sizeof | static | 
 union | unsigned | void | volatile | while {tokenList.insertToken(PALABRA_RESERVADA, yytext(), yyline);}
 
 // 3. NUMEROS
-{INT}                            { return new Literal(yyline, yytext()); }
-{FLOAT}                          { return new Literal(yyline, yytext()); }
-"0"[xX][^0-9A-Fa-f]+             { tokenList.insertToken(ERROR, "Error: Hexadecimal mal formado -> " + yytext(), yyline); } //caracteres hex no validos
-0[0-7]*[89]+                     { tokenList.insertToken(ERROR, "Error: Octal mal formado -> " + yytext(), yyline); } //caracteres octales no validos
-({DECIMAL}|{ZERO})[eE][^\+\-0-9] { tokenList.insertToken(ERROR, "Error: Exponente mal formado -> " + yytext(), yyline); } 
-{DECIMAL}\.[^0-9]+               { tokenList.insertToken(ERROR, "Error: Flotante mal formado -> " + yytext(), yyline); }
+{INT}                            { tokenList.insertToken(LITERAL, yytext(), yyline); }
+{FLOAT}                          { tokenList.insertToken(LITERAL, yytext(), yyline); }
+"0"[xX][^0-9A-Fa-f]+             { errorList.insertError(ERROR, "Hexadecimal mal formado -> " + yytext(), yyline); } //caracteres hex no validos
+0[0-7]*[89]+                     { errorList.insertError(ERROR, "Octal mal formado -> " + yytext(), yyline); } //caracteres octales no validos
+({DECIMAL}|{ZERO})[eE][^\+\-0-9] { errorList.insertError(ERROR, "Exponente mal formado -> " + yytext(), yyline); } 
+{DECIMAL}\.[^0-9]+               { errorList.insertError(ERROR, "Flotante mal formado -> " + yytext(), yyline); }
 
 // 4. OPERADORES
 "," | ";" | "++" | "--" | "==" | ">=" | ">" | "?" | "<=" | "<" | "!=" | "||" | "&&" | "!" | "=" | "+" | "-" | 
@@ -60,11 +61,11 @@ union | unsigned | void | volatile | while {tokenList.insertToken(PALABRA_RESERV
 
 // 5. STRINGS
 "\""([^\"\\\n]|\\[\"\\bfnrt])*"\"" {tokenList.insertToken(LITERAL, yytext(), yyline);}
-"\""(.[^\n]*)"\"" {tokenList.insertToken(ERROR, "Error: String no valido -> " + yytext(), yyline);}
-"\""[^\n\r]* {tokenList.insertToken(ERROR, "Error: String no cerrado -> " + yytext(), yyline);}
+"\""(.[^\n]*)"\"" {errorList.insertError(ERROR, "String no valido -> " + yytext(), yyline);}
+"\""[^\n\r]* {errorList.insertError(ERROR, "String no cerrado -> " + yytext(), yyline);}
 
 // 6. IDENTIFICADORES  
-{INT}{Alfanumerico} {tokenList.insertToken(ERROR,"Error: Identificador no puede empezar con un número ->" + yytext(), yyline); }
+{INT}{Alfanumerico} {errorList.insertError(ERROR,"Identificador no puede empezar con un número -> " + yytext(), yyline); }
 {Alfanumerico} {tokenList.insertToken(IDENTIFICADOR, yytext(),  yyline); }
 
-.             {tokenList.insertToken(ERROR, "Error: Desconocido -> " + yytext(),  yyline); }
+.             {errorList.insertError(ERROR, "Desconocido -> " + yytext(),  yyline); }

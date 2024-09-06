@@ -7,31 +7,32 @@ public class Scanner {
 
     public static void main(String[] args) {
 
-    try {
-        Reader reader = new InputStreamReader(
-                Scanner.class.getResourceAsStream("/com/compi/scanner/test.txt"));
-        
-        // Instancia de la clase SimpleLexer (JFlex)
-        SimpleLexer lexer = new SimpleLexer(reader);
+        try {
+            Reader reader = new InputStreamReader(
+                    Scanner.class.getResourceAsStream("/com/compi/scanner/input.c"));
 
-        // Instancia de la lista de tokens
-        TokenList tokenList = TokenList.getInstance();
+            // Instancia de la clase SimpleLexer (JFlex)
+            SimpleLexer lexer = new SimpleLexer(reader);
 
-        // Ciclo para leer tokens
-        Token token = lexer.yylex();
-        while (token != null) {
-            token = lexer.yylex();
+            // Instancia de la lista de tokens
+            TokenList tokenList = TokenList.getInstance();
+            ErrorList errorList = ErrorList.getInstance();
+
+            // Ciclo para leer tokens
+            Token token = lexer.yylex();
+            while (token != null) {
+                token = lexer.yylex();
+            }
+
+            tokenList.printTokens();
+            errorList.printErrors();
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
         }
 
-        tokenList.printTokens();
-
-    } catch (Exception e) {
-        System.out.println("Error: " + e.getMessage());
-        e.printStackTrace();
     }
-
-}
-
 
     // FIXME: Usar el plugin de JFlex para generar el lexer
     // public static void generateLexer(String path) {
