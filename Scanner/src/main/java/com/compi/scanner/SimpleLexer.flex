@@ -49,8 +49,8 @@ union | unsigned | void | volatile | while {tokenList.insertToken(PALABRA_RESERV
 // 3. NUMEROS
 {INT}                            { tokenList.insertToken(LITERAL, yytext(), yyline); }
 {FLOAT}                          { tokenList.insertToken(LITERAL, yytext(), yyline); }
-"0"[xX][^0-9A-Fa-f]+             { errorList.insertError(ERROR, "Hexadecimal mal formado -> " + yytext(), yyline); } //caracteres hex no validos
-0[0-7]*[89]+                     { errorList.insertError(ERROR, "Octal mal formado -> " + yytext(), yyline); } //caracteres octales no validos
+0[xX][0-9A-Za-z]+                { errorList.insertError(ERROR, "Hexadecimal mal formado -> " + yytext(), yyline); } //caracteres hex no validos
+0[0-9]+                     { errorList.insertError(ERROR, "Octal mal formado -> " + yytext(), yyline); } //caracteres octales no validos
 ({DECIMAL}|{ZERO})[eE][^\+\-0-9] { errorList.insertError(ERROR, "Exponente mal formado -> " + yytext(), yyline); } 
 {DECIMAL}\.[^0-9]+               { errorList.insertError(ERROR, "Flotante mal formado -> " + yytext(), yyline); }
 
@@ -61,7 +61,9 @@ union | unsigned | void | volatile | while {tokenList.insertToken(PALABRA_RESERV
 
 // 5. STRINGS
 \"([^\"\\\n]|\\.)*\" {tokenList.insertToken(LITERAL, yytext(), yyline);}
+// \"([^\"\\\n]|\\.)*\"[^ \t\n\r]* {errorList.insertError(ERROR, "String invalido -> " + yytext(), yyline);}
 \"([^\"\\\n]|\\.)* {errorList.insertError(ERROR, "String no cerrado -> " + yytext(), yyline);}
+
 "#"{DECIMAL} {tokenList.insertToken(LITERAL, yytext(), yyline);}
 "#"[^ \t\n\r]* {errorList.insertError(ERROR, "Caracter invalido -> " + yytext(), yyline);}
 

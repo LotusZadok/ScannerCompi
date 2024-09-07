@@ -49,6 +49,7 @@ _invalid_identifier;  // Error: empieza con _
 
 // Strings y errores en strings
 "Esta es una cadena de texto válida"
+
 "Este string tiene un salto de línea directo:
 y deberia causar un error"
 "String con \q"
@@ -68,7 +69,9 @@ sizeof
 _underscore  // Error: comienza con un subrayado
 123IdentificadorMalformado  // Error: comienza con un número
 0x123FG  // Error: 'G' no es válido en un hexadecimal
-07778  // Error: dígito '8' no es válido en octal
+07877  // Error: dígito '8' no es válido en octal
 
+
+"string"adsa 
 "Sin cerrar este string
 "This string is "malformado""  // Error: comillas dentro sin escapar
