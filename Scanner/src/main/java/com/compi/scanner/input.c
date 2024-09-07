@@ -50,8 +50,8 @@ _invalid_identifier;  // Error: empieza con _
 // Strings y errores en strings
 "Esta es una cadena de texto válida"
 "Este string tiene un salto de línea directo:
-y debería causar un error"
-"Escapes inválidos como \q deberían causar errores"
+y deberia causar un error"
+"String con \q"
 "He said, \"Hello!\" and left."  // String válido con comillas escapadas
 "String con escape \n"  // String válido con un carácter de escape
 "Hola" == "Hola"
@@ -70,5 +70,5 @@ _underscore  // Error: comienza con un subrayado
 0x123FG  // Error: 'G' no es válido en un hexadecimal
 07778  // Error: dígito '8' no es válido en octal
 
-"Sin cerrar este string 
+"Sin cerrar este string
 "This string is "malformado""  // Error: comillas dentro sin escapar

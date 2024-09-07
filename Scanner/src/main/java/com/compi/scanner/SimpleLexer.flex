@@ -60,12 +60,10 @@ union | unsigned | void | volatile | while {tokenList.insertToken(PALABRA_RESERV
 ">>" | "<<" | "~" | "%=" | "&=" | "^=" | "|=" | "<<=" | ">>=" | "->" {tokenList.insertToken(OPERADOR, yytext(), yyline);}
 
 // 5. STRINGS
-"\""([^\"\\\n]|\\[\"\\bfnrt])*"\"" {tokenList.insertToken(LITERAL, yytext(), yyline);}
-"\""(.[^\n]*)"\"" {errorList.insertError(ERROR, "String no valido -> " + yytext(), yyline);}
-"\""[^\n\r]* {errorList.insertError(ERROR, "String no cerrado -> " + yytext(), yyline);}
-
+\"([^\"\\\n]|\\.)*\" {tokenList.insertToken(LITERAL, yytext(), yyline);}
+\"([^\"\\\n]|\\.)* {errorList.insertError(ERROR, "String no cerrado -> " + yytext(), yyline);}
 "#"{DECIMAL} {tokenList.insertToken(LITERAL, yytext(), yyline);}
-"#"[^ \t\n\r]* {tokenList.insertToken(ERROR, yytext(), yyline);}
+"#"[^ \t\n\r]* {errorList.insertError(ERROR, "Caracter invalido -> " + yytext(), yyline);}
 
 
 // 6. IDENTIFICADORES  
