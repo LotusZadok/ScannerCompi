@@ -32,6 +32,10 @@ int x = 5;
 // Operadores y símbolos
 + - * / % = == != <= >= && || ++ -- += -= *= /= %=
 << >> & | ^ ~ -> : ; , . ?
+*0      // operador seguido de numero
++cero   // operador seguido de identificador
+/case   // operador seguido de palara reservada
+-#32    // operador seguido de literal
 
 // Identificadores y palabras reservadas
 int variable1;
@@ -49,23 +53,25 @@ _invalid_identifier;  // Error: empieza con _
 
 // Strings y errores en strings
 "Esta es una cadena de texto válida"
-
 "Este string tiene un salto de línea directo:
 y deberia causar un error"
 "String con \q"
 "He said, \"Hello!\" and left."  // String válido con comillas escapadas
 "String con escape \n"  // String válido con un carácter de escape
 "Hola" == "Hola"
+"string"adsa 
+"Sin cerrar este string
+"This string is "malformado""  // Error: comillas dentro sin escapar
 
-// Prueba de todos los casos y errores posibles
-auto
-break
+// Palabras reservadas
+Auto        // es case sentitive, lo va a reconocer como id
+break   
 case
 const
-while
-void
-sizeof
+while void  // reconoce palabras resrvadas seguidas separadas por un espacio
+whilevoid   // no hay espacio entre las palabras reservadas, lo va a reconocer como id
 
+// Prueba de todos los casos y errores posibles
 _underscore  // Error: comienza con un subrayado
 123IdentificadorMalformado  // Error: comienza con un número
 0x123FG  // Error: 'G' no es válido en un hexadecimal
