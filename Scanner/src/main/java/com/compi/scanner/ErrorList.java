@@ -25,7 +25,10 @@ public class ErrorList {
     public void printErrors() {
 
         for (Token t : errors) {
-            System.out.format("Error: %s (línea %d)%n", t.getValue(), t.getLineNumbers().get(0).getLineNumber());
+            String value = t.getValue();
+            int lineNumber = t.getLineNumbers().get(0).getLineNumber();
+            System.out.println("Error at line " + lineNumber + ": " + value);
+
         }
     }
 }
