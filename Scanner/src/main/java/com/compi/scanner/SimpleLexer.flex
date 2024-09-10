@@ -39,7 +39,7 @@ FLOAT           = {INT}({DECPART} {EXP}? | {OPTIONALDECPART}{EXP}) {FLOATSUFFIX}
 // 1. OMITIR COMENTARIOS 
 "//".* { /* ignore */ }
 "/*"([^*]|\*+[^*/])*"*"+"/" { /* ignore */ }
-"/*"[^\n\r]* {tokenList.insertToken(ERROR, "Error: Comentario no cerrado -> " + yytext(), yyline);}
+"/*"[^\n\r]* {errorList.insertError(ERROR, "Comentario no cerrado -> " + yytext(), yyline);}
 
 // 2. PALABRAS RESERVADAS
 auto | break | case | char | const | continue | default | do | double | else | enum | extern | float | for |
