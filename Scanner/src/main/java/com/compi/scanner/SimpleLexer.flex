@@ -65,8 +65,13 @@ union | unsigned | void | volatile | while {tokenList.insertToken(PALABRA_RESERV
 
 // 5. STRINGS
 \"([^\"\\\n]|\\.)*\" {tokenList.insertToken(LITERAL, yytext(), yyline);}
+\'([^\'\\\n]|\\[\'\"\\ntr0])\' {tokenList.insertToken(LITERAL, yytext(), yyline);}      // linea anadida despues de la revision
+
 // \"([^\"\\\n]|\\.)*\"[^ \t\n\r]* {errorList.insertError(ERROR, "String invalido -> " + yytext(), yyline);}
+
 \"([^\"\\\n]|\\.)* {errorList.insertError(ERROR, "String no cerrado -> " + yytext(), yyline);}
+\'([^\'\\\n]|\\[\'\"\\ntr0]) {errorList.insertError(ERROR, "Caracter no cerrado -> " + yytext(), yyline);}  // linea anadida despues de la revision
+\'([^\'\\\n]|\\.)+\' {errorList.insertError(ERROR, "Caracter mal formado -> " + yytext(), yyline);}         // linea anadida despues de la revision
 
 "#"{DECIMAL} {tokenList.insertToken(LITERAL, yytext(), yyline);}
 "#"[^ \t\n\r]* {errorList.insertError(ERROR, "Caracter invalido -> " + yytext(), yyline);}

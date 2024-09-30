@@ -81,3 +81,42 @@ _underscore  // Error: comienza con un subrayado
 "string"adsa 
 "Sin cerrar este string
 "This string is "malformado""  // Error: comillas dentro sin escapar
+
+// copia del archivo pruebas.txt que envio la profe:
+/// Prueba de Errores y comentarios
+/// Debe reconocer errores de simbolos no reconocidos
+/// Comillas sin cerrar, etc.
+
+
+" un string de 
+varias lineas"  // deberia dar error
+
+int main()
+{
+ 
+  char *x = "ljhgsdkjaghsdf ;   //String sin cerrar
+  char y = '\b ';  //char mal construido
+ 
+  int 3var //error de identificador   
+  
+  a = .78 // error en la construccion del numero
+    
+  /*
+ Prueba de comentarios de Bloque
+ "hola soysf "
+ char y = '\b ';
+ char z = '\b ;  */
+ 
+
+ ///  ERRORES DE SIMBOLOS NO CONOCIDOS
+
+  int árbol;  // error
+  º // error
+ 
+  'A'
+  'AB'
+  'prueba de caracteres'
+  "uno dentro de 'otro'"
+  'ABs
+  '
+}
