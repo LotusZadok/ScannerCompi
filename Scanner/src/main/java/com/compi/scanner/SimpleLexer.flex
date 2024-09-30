@@ -53,7 +53,7 @@ union | unsigned | void | volatile | while {tokenList.insertToken(PALABRA_RESERV
 "-"?{FLOAT}   { tokenList.insertToken(LITERAL, yytext(), yyline); }
 \.[0-9]+                         { errorList.insertError(ERROR, "Flotante mal formado -> " + yytext(), yyline); } // Captura casos como .456
 [0-9]+\.[0-9]+\.[0-9]+           { errorList.insertError(ERROR, "Flotante mal formado -> " + yytext(), yyline); }
-0[xX][0-9A-Za-z]+                { errorList.insertError(ERROR, "Hexadecimal mal formado -> " + yytext(), yyline); } //caracteres hex no validos
+0[xX][^0-9A-Fa-f]+ { errorList.insertError(ERROR, "Hexadecimal mal formado -> " + yytext(), yyline); }
 0[0-9]+                          { errorList.insertError(ERROR, "Octal mal formado -> " + yytext(), yyline); } //caracteres octales no validos
 ({DECIMAL}|{ZERO})[eE][^\+\-0-9] { errorList.insertError(ERROR, "Exponente mal formado -> " + yytext(), yyline); } 
 {DECIMAL}\.[^0-9]+               { errorList.insertError(ERROR, "Flotante mal formado -> " + yytext(), yyline); } //casos como 123.

@@ -1,122 +1,30 @@
-// Comentario de una línea
+"Este es un String "
+'\0'
+'H','o','l','a','\0'
 
-/* Comentario
-de 
-bloque que debe ser ignorado por el lexer.
-*/
+123
+5.4 
 
-/* Comentario bloque no cerrado (debería causar un error)
-int x = 5; 
-*/
+.7 // error
+6. // error
 
-// Números enteros
-12345678
-0      // Esto debería ser reconocido como un entero (no octal)
-0777   // Octal válido
-00001  // Octal con ceros a la izquierda
+01234567
+0XAA20F243
++01234567
 
-// Números hexadecimales
-0x1A3F
-0XFF
-0x0  // Hexadecimal con valor 0
+1.23f
+123.345
+123E10
+123.22E10
 
-// Números flotantes
-5.0
-0.123456
-.456    // Malformado, debe dar error
-123.    // Malformado, debe dar error
-1.5e10
-3.0E-5
-3E8    // Flotante en notación científica sin punto decimal
+.22E10
+.E10   //se separara en OPERADOR ., ID E y numero 10 o error
 
-// Operadores y símbolos
-+ - * / % = == != <= >= && || ++ -- += -= *= /= %=
-<< >> & | ^ ~ -> : ; , . ?
-*0      // operador seguido de numero
-+cero   // operador seguido de identificador
-/case   // operador seguido de palara reservada
--#32    // operador seguido de literal
++1.23f
+-123.345
+-123E10
 
-// Identificadores y palabras reservadas
-int variable1;
-float x_y_z;
-if (x > 0) return;
-identificadorValido123;
-_invalid_identifier;  // Error: empieza con _
-9identificadorInvalido; // Error: empieza con un número
-
-// Literales de caracteres (valores ASCII)
-#65   // Representa 'A'
-#97   // Representa 'a'
-#48   // Representa '0'
-#InvalidLiteral   // Error: malformado
-
-// Strings y errores en strings
-"Esta es una cadena de texto válida"
-"Este string tiene un salto de línea directo:
-y deberia causar un error"
-"String con \q"
-"He said, \"Hello!\" and left."  // String válido con comillas escapadas
-"String con escape \n"  // String válido con un carácter de escape
-"Hola" == "Hola"
-"string"adsa 
-"Sin cerrar este string
-"This string is "malformado""  // Error: comillas dentro sin escapar
-
-// Palabras reservadas
-Auto        // es case sentitive, lo va a reconocer como id
-break   
-case
-const
-while void  // reconoce palabras resrvadas seguidas separadas por un espacio
-whilevoid   // no hay espacio entre las palabras reservadas, lo va a reconocer como id
-
-// Prueba de todos los casos y errores posibles
-_underscore  // Error: comienza con un subrayado
-123IdentificadorMalformado  // Error: comienza con un número
-0x123FG  // Error: 'G' no es válido en un hexadecimal
-07877  // Error: dígito '8' no es válido en octal
-
-
-"string"adsa 
-"Sin cerrar este string
-"This string is "malformado""  // Error: comillas dentro sin escapar
-
-// copia del archivo pruebas.txt que envio la profe:
-/// Prueba de Errores y comentarios
-/// Debe reconocer errores de simbolos no reconocidos
-/// Comillas sin cerrar, etc.
-
-
-" un string de 
-varias lineas"  // deberia dar error
-
-int main()
-{
- 
-  char *x = "ljhgsdkjaghsdf ;   //String sin cerrar
-  char y = '\b ';  //char mal construido
- 
-  int 3var //error de identificador   
-  
-  a = .78 // error en la construccion del numero
-    
-  /*
- Prueba de comentarios de Bloque
- "hola soysf "
- char y = '\b ';
- char z = '\b ;  */
- 
-
- ///  ERRORES DE SIMBOLOS NO CONOCIDOS
-
-  int árbol;  // error
-  º // error
- 
-  'A'
-  'AB'
-  'prueba de caracteres'
-  "uno dentro de 'otro'"
-  'ABs
-  '
-}
+0XAA20FGGG  //se espera que separe el hexadecimal del IDENTIFICADOR GGG
+123r  //error 
+ID123  //se espera que se clasifique como un ID
+014255689  //se espera que no se acepte como octal y de un error
