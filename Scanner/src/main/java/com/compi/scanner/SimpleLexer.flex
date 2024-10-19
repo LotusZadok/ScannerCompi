@@ -49,8 +49,8 @@ union | unsigned | void | volatile | while {tokenList.insertToken(PALABRA_RESERV
 // 3. NUMEROS
 {INT}("-")                     { errorList.insertError(ERROR, "Símbolo inválido después de número -> " + yytext(), yyline); }
 {FLOAT}("-")                   { errorList.insertError(ERROR, "Símbolo inválido después de número -> " + yytext(), yyline); }
-"-"?{INT}     { tokenList.insertToken(LITERAL, yytext(), yyline); }
-"-"?{FLOAT}   { tokenList.insertToken(LITERAL, yytext(), yyline); }
+"-"?{INT}     { tokenList.insertToken(INT_LITERAL, yytext(), yyline); }
+"-"?{FLOAT}   { tokenList.insertToken(FLOAT_LITERAL, yytext(), yyline); }
 \.[0-9]+                         { errorList.insertError(ERROR, "Flotante mal formado -> " + yytext(), yyline); } // Captura casos como .456
 [0-9]+\.[0-9]+\.[0-9]+           { errorList.insertError(ERROR, "Flotante mal formado -> " + yytext(), yyline); }
 0[xX][^0-9A-Fa-f]+ { errorList.insertError(ERROR, "Hexadecimal mal formado -> " + yytext(), yyline); }
@@ -64,8 +64,8 @@ union | unsigned | void | volatile | while {tokenList.insertToken(PALABRA_RESERV
 ">>" | "<<" | "~" | "%=" | "&=" | "^=" | "|=" | "<<=" | ">>=" | "->" {tokenList.insertToken(OPERADOR, yytext(), yyline);}
 
 // 5. STRINGS
-\"([^\"\\\n]|\\.)*\" {tokenList.insertToken(LITERAL, yytext(), yyline);}
-\'([^\'\\\n]|\\[\'\"\\ntr0])\' {tokenList.insertToken(LITERAL, yytext(), yyline);}      // linea anadida despues de la revision
+\"([^\"\\\n]|\\.)*\" {tokenList.insertToken(STRING_LITERAL, yytext(), yyline);}
+\'([^\'\\\n]|\\[\'\"\\ntr0])\' {tokenList.insertToken(CHAR_LITERAL, yytext(), yyline);}      // linea anadida despues de la revision
 
 // \"([^\"\\\n]|\\.)*\"[^ \t\n\r]* {errorList.insertError(ERROR, "String invalido -> " + yytext(), yyline);}
 
@@ -73,7 +73,7 @@ union | unsigned | void | volatile | while {tokenList.insertToken(PALABRA_RESERV
 \'([^\'\\\n]|\\[\'\"\\ntr0]) {errorList.insertError(ERROR, "Caracter no cerrado -> " + yytext(), yyline);}  // linea anadida despues de la revision
 \'([^\'\\\n]|\\.)+\' {errorList.insertError(ERROR, "Caracter mal formado -> " + yytext(), yyline);}         // linea anadida despues de la revision
 
-"#"{DECIMAL} {tokenList.insertToken(LITERAL, yytext(), yyline);}
+"#"{DECIMAL} {tokenList.insertToken(CHAR_LITERAL, yytext(), yyline);}
 "#"[^ \t\n\r]* {errorList.insertError(ERROR, "Caracter invalido -> " + yytext(), yyline);}
 
 
