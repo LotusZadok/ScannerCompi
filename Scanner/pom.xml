@@ -38,6 +38,15 @@
       <artifactId>jflex</artifactId>
       <version>1.8.2</version>
     </dependency>
-
+    <dependency>
+      <groupId>java_cup</groupId>
+      <artifactId>java_cup</artifactId>
+      <version>0.9e</version>
+    </dependency>
+    <dependency>
+      <groupId>org.netbeans.external</groupId>
+      <artifactId>java-cup-11a</artifactId>
+      <version>RELEASE230</version>
+    </dependency>
   </dependencies>
 </project>
