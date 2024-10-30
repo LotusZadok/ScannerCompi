@@ -14,35 +14,44 @@ parser code {:
     }
 :};
 
-/* define how to connect to the scanner! */
+/* define how to connect to the scanner! 
 init with {: s.init(); :};
-scan with {: return s.next_token(); :};
+scan with {: return s.next_token(); :}; */
 
 /* Terminals (tokens returned by the scanner). */
-terminal            SEMI, PLUS, MINUS, TIMES, UMINUS, LPAREN, RPAREN;
-terminal Integer    NUMBER;        // our scanner provides numbers as integers
+terminal    Break, Case, Char, Const, Continue, Default, 
+            Do, Else, For, If, Int, Long, Return, Short, 
+            Switch, Void, While, Read, Write, Op_aritmetrico, 
+            Op_booleano, If_else, Linea, Comillas, Tipo_dato, 
+            Cadena, Igual, Parentesis_a, Parentesis_c, 
+            Llave_a, Llave_c, Corchete_a, Corchete_c, 
+            Main, P_coma, Identificador, ERROR;
 
 /* Non terminals */
-non terminal            expr_list;
-non terminal Integer    expr;      // used to store evaluated subexpressions
+non terminal INICIO, GLOBAL, CONSTANTE, FUNCIONES, DECLARACION, ASIGNACION;
 
 /* Precedences */
-precedence left PLUS, MINUS;
-precedence left TIMES;
-precedence left UMINUS;
 
 /* Start with the expr_list non-terminal */
-start with expr_list;
+start with INICIO;
 
 /* The grammar rules */
-expr_list ::= expr_list expr:e SEMI         {: System.out.println(e);:}
-            | expr:e SEMI                   {: System.out.println(e);:}
+INICIO ::=
+    GLOBAL | CONSTANTE | FUNCIONES
 ;
-expr      ::= expr:e1 PLUS  expr:e2         {: RESULT = e1+e2;       :}
-             | expr:e1 MINUS expr:e2        {: RESULT = e1-e2;       :}
-             | expr:e1 TIMES expr:e2        {: RESULT = e1*e2;       :}
-             | MINUS expr:e                 {: RESULT = -e;          :}
-  	     %prec UMINUS
-       | LPAREN expr:e RPAREN	         {: RESULT = e;           :}
-       | NUMBER:n	                     {: RESULT = n;           :}
-             ;
+
+GLOBAL ::=
+    DECLARACION
+;
+
+CONSTANTE ::=
+    Const Tipo_dato ASIGNACION P_coma
+;
+
+DECLARACION ::=
+    Tipo_dato Identificador P_coma
+;
+
+ASIGNACION ::=
+    Comillas
+;

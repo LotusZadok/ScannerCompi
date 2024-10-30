@@ -3,9 +3,6 @@ package com.compi.scanner;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import jflex.exceptions.SilentExit;
 
@@ -52,28 +49,13 @@ public class Scanner {
 
     public static void generateLexer() throws IOException, Exception {
         String projectDir = System.getProperty("user.dir");
-        String ruta1 = projectDir + "/scanner/src/main/java/com/compi/scanner/SimpleLexer.flex";
-        String ruta2 = projectDir + "/scanner/src/main/java/com/compi/scanner/LexerCup.flex";
+        String ruta1 = projectDir + "/src/main/java/com/compi/scanner/SimpleLexer.flex";
+        String ruta2 = projectDir + "/src/main/java/com/compi/scanner/LexerCup.flex";
         String[] rutaSintax = { "-parser", "Sintax", projectDir + "/src/main/java/com/compi/scanner/Sintax.cup" };
         try {
             Main.generate(new String[] { ruta1 });
             Main.generate(new String[] { ruta2 });
-            java_cup.Main.main(rutaSintax); // no pasa de aqui
-            Path rutaSym = Paths.get(projectDir + "/src/main/java/com/compi/scanner/sym.java");
-            if (Files.exists(rutaSym)) {
-                Files.delete(rutaSym);
-            }
-            Files.move(
-                    Paths.get(projectDir + "/src/main/java/com/compi/scanner/sym.java"),
-                    Paths.get(projectDir + "/src/main/java/com/compi/scanner/sym.java"));
-            Path rutaSin = Paths.get(projectDir + "/src/main/java/com/compi/scanner/Sintax.java");
-            if (Files.exists(rutaSin)) {
-                Files.delete(rutaSin);
-            }
-            Files.move(
-                    Paths.get(projectDir + "/src/main/java/com/compi/scanner/Sintax.java"),
-                    Paths.get(projectDir + "/src/main/java/com/compi/scanner/Sintax.java"));
-
+            java_cup.Main.main(rutaSintax);
         } catch (SilentExit e) {
             System.out.println("SilentExit occurred: " + e.getMessage());
             e.printStackTrace();
