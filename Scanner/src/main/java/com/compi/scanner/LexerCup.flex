@@ -50,8 +50,6 @@ D = [0-9]
 ( void ) {return new Symbol(sym.Void, yychar, yyline, yytext());}
 ( while ) {return new Symbol(sym.While, yychar, yyline, yytext());}
 
-
-
 // 4. OPERADORES
 ( ";" ) {return new Symbol(sym.P_coma, yychar, yyline, yytext());}
 ( "(" ) {return new Symbol(sym.Parentesis_a, yychar, yyline, yytext());}
@@ -69,6 +67,9 @@ D = [0-9]
 ( "/" ) {return new Symbol(sym.Division, yychar, yyline, yytext());}
 ( "==" | ">=" | ">" | "<=" | "<" | "!=" ) {return new Symbol(sym.Op_relacional, yychar, yyline, yytext());}
 ( "||" | "&&" | "!" ) {return new Symbol(sym.Op_logico, yychar, yyline, yytext());}
+( "+" | "-" | "*" | "/" | "%" ) {return new Symbol(sym.Op_aritmetico, yychar, yyline, yytext());}
+( "+=" | "-=" | "*=" | "/=" ) {return new Symbol(sym.Op_asignacion, yychar, yyline, yytext());}
+( "%" ) {return new Symbol(sym.Modulo, yychar, yyline, yytext());}
 
 
 .   {return new Symbol(sym.ERROR, yychar, yyline, yytext());}
