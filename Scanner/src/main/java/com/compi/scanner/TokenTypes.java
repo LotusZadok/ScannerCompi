@@ -42,6 +42,7 @@ public enum TokenTypes {
     Corchete_a, 
     Corchete_c, 
     Main, 
-    P_coma
+    P_coma,
+    Identificador
 
 }

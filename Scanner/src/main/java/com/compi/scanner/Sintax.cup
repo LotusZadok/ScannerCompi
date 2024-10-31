@@ -14,9 +14,9 @@ parser code {:
     }
 :};
 
-/* define how to connect to the scanner! */
+/* define how to connect to the scanner! 
 init with {: s.init(); :};
-scan with {: return s.next_token(); :};
+scan with {: return s.next_token(); :}; */
 
 /* Terminals (tokens returned by the scanner). */
 terminal ID, NUMBER, STRING, TRUE, FALSE, EQ, PLUS, MINUS, TIMES, DIV, SEMI, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACKET, CLOSE_BRACKET, COMMA, COLON, EQ_EQ, GT_EQ, GT, LT_EQ, LT, NOT_EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ, PLUS_PLUS, MINUS_MINUS, OR, AND, NOT, IF, ELSE, FOR, WHILE, SWITCH, CASE, DEFAULT, INT, FLOAT, CHAR, VOID;
