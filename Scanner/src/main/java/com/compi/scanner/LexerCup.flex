@@ -1,5 +1,5 @@
 package com.compi.scanner;
-import java_cup.runtime.Symbol;
+import java_cup.runtime.Symbol
 %%
 %class LexerCup
 %type java_cup.runtime.Symbol

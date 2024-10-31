@@ -19,30 +19,133 @@ init with {: s.init(); :};
 scan with {: return s.next_token(); :};
 
 /* Terminals (tokens returned by the scanner). */
-terminal            SEMI, PLUS, MINUS, TIMES, UMINUS, LPAREN, RPAREN;
-terminal Integer    NUMBER;        // our scanner provides numbers as integers
+terminal ID, NUMBER, STRING, TRUE, FALSE, EQ, PLUS, MINUS, TIMES, DIV, SEMI, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACKET, CLOSE_BRACKET, COMMA, COLON, EQ_EQ, GT_EQ, GT, LT_EQ, LT, NOT_EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ, PLUS_PLUS, MINUS_MINUS, OR, AND, NOT, IF, ELSE, FOR, WHILE, SWITCH, CASE, DEFAULT, INT, FLOAT, CHAR, VOID;
+
 
 /* Non terminals */
-non terminal            expr_list;
-non terminal Integer    expr;      // used to store evaluated subexpressions
+non terminal Integer programa, globales, funcion_list, bloque, estru_control, funcion, parametro_list, if, else, for, while, switch, case_list, constante, variable, tipo, id_list, asignacion, op_asignacion, op_incremento, expr, literal, boolean, bool_op, bool, op_logico, op_relacional, aritmetica, aritmetica_op, num;
 
 /* Precedences */
+precedence left OR, AND;
+precedence left EQ_EQ, GT_EQ, GT, LT_EQ, LT, NOT_EQ;
 precedence left PLUS, MINUS;
-precedence left TIMES;
-precedence left UMINUS;
+precedence left TIMES, DIV;
+precedence left NOT;
+precedence left PLUS_PLUS, MINUS_MINUS;
+precedence left EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ;
 
-/* Start with the expr_list non-terminal */
-start with expr_list;
 
-/* The grammar rules */
-expr_list ::= expr_list expr:e SEMI         {: System.out.println(e);:}
-            | expr:e SEMI                   {: System.out.println(e);:}
-;
-expr      ::= expr:e1 PLUS  expr:e2         {: RESULT = e1+e2;       :}
-             | expr:e1 MINUS expr:e2        {: RESULT = e1-e2;       :}
-             | expr:e1 TIMES expr:e2        {: RESULT = e1*e2;       :}
-             | MINUS expr:e                 {: RESULT = -e;          :}
-  	     %prec UMINUS
-       | LPAREN expr:e RPAREN	         {: RESULT = e;           :}
-       | NUMBER:n	                     {: RESULT = n;           :}
-             ;
+/* Start with the programa non-terminal */
+start with programa;
+
+/* The grammar rules for C subset */
+
+programa ::= globales funcion_list {: RESULT = new Integer(0); :}
+
+globales ::= constante globales {: RESULT = new Integer(0); :}
+        | variable globales {: RESULT = new Integer(0); :}
+        | /* empty */ {: RESULT = new Integer(0); :}
+
+funcion_list ::= funcion {: RESULT = new Integer(0); :}
+        | funcion funcion_list {: RESULT = new Integer(0); :}
+
+
+bloque ::= estru_control {: RESULT = new Integer(0); :}
+        | constante {: RESULT = new Integer(0); :}
+        | variable {: RESULT = new Integer(0); :}
+        | asignacion {: RESULT = new Integer(0); :}
+        | funcion {: RESULT = new Integer(0); :}
+
+estru_control ::= if {: RESULT = new Integer(0); :}
+        | for {: RESULT = new Integer(0); :}
+        | while {: RESULT = new Integer(0); :}
+        | switch {: RESULT = new Integer(0); :}
+
+
+funcion ::= tipo ID OPEN_PAREN parametro_list CLOSE_PAREN OPEN_BRACKET bloque CLOSE_BRACKET SEMI {: RESULT = new Integer(0); :}
+
+parametro_list ::= tipo ID COMMA parametro_list {: RESULT = new Integer(0); :}
+        | /* empty */ {: RESULT = new Integer(0); :}
+
+
+if ::= IF OPEN_PAREN expr CLOSE_PAREN OPEN_BRACKET bloque CLOSE_BRACKET else {: RESULT = new Integer(0); :}
+
+else ::= ELSE OPEN_BRACKET bloque CLOSE_BRACKET SEMI {: RESULT = new Integer(0); :}
+        | SEMI {: RESULT = new Integer(0); :}
+
+
+for ::= FOR OPEN_PAREN asignacion SEMI expr SEMI asignacion CLOSE_PAREN OPEN_BRACKET bloque CLOSE_BRACKET SEMI {: RESULT = new Integer(0); :}
+
+while ::= WHILE OPEN_PAREN expr CLOSE_PAREN OPEN_BRACKET bloque CLOSE_BRACKET SEMI {: RESULT = new Integer(0); :}
+
+switch ::= SWITCH OPEN_PAREN aritmetica CLOSE_PAREN OPEN_BRACKET case_list CLOSE_BRACKET SEMI {: RESULT = new Integer(0); :}
+
+case_list ::= CASE NUMBER COLON bloque {: RESULT = new Integer(0); :}
+        | CASE NUMBER COLON bloque case_list {: RESULT = new Integer(0); :}
+        | DEFAULT COLON bloque {: RESULT = new Integer(0); :}
+
+
+constante ::= tipo ID EQ expr SEMI {: RESULT = new Integer(0); :}
+
+variable ::= tipo id_list SEMI {: RESULT = new Integer(0); :}
+
+tipo ::= INT {: RESULT = new Integer(0); :}
+        | FLOAT {: RESULT = new Integer(0); :}
+        | CHAR {: RESULT = new Integer(0); :}
+        | VOID {: RESULT = new Integer(0); :}
+
+id_list ::= ID {: RESULT = new Integer(0); :}
+        | ID COMMA id_list {: RESULT = new Integer(0); :}
+ 
+asignacion ::= ID op_asignacion expr SEMI; {: RESULT = new Integer(0); :}
+        | ID op_incremento SEMI {: RESULT = new Integer(0); :}
+
+op_asignacion ::= "EQ" {: RESULT = new Integer(0); :}
+        | "PLUS_EQ" {: RESULT = new Integer(0); :}
+        | "MINUS_EQ" {: RESULT = new Integer(0); :}
+        | "TIMES_EQ" {: RESULT = new Integer(0); :}
+        | "DIV_EQ" {: RESULT = new Integer(0); :}
+
+op_incremento ::= "PLUS_PLUS" {: RESULT = new Integer(0); :}
+        | "MINUS_MINUS" {: RESULT = new Integer(0); :}
+
+expr ::= literal {: RESULT = new Integer(0); :}
+        | boolean {: RESULT = new Integer(0); :}
+        | ID {: RESULT = new Integer(0); :}
+        | aritmetica {: RESULT = new Integer(0); :}
+
+literal ::= STRING {: RESULT = new Integer(0); :}
+
+boolean ::= OPEN_PAREN bool CLOSE_PAREN {: RESULT = new Integer(0); :}
+        | bool_op {: RESULT = new Integer(0); :} 
+
+bool_op ::= bool op_logico bool  {: RESULT = new Integer(0); :}
+        | bool {: RESULT = new Integer(0); :}
+        | num op_relacional num {: RESULT = new Integer(0); :}
+
+bool ::= TRUE {: RESULT = new Integer(0); :}
+        | FALSE {: RESULT = new Integer(0); :}
+        | ID {: RESULT = new Integer(0); :}
+        | boolean {: RESULT = new Integer(0); :}
+
+op_logico ::= "OR" {: RESULT = new Integer(0); :}
+        | "AND" {: RESULT = new Integer(0); :}
+        | "NOT" {: RESULT = new Integer(0); :}
+
+op_relacional ::= "EQ_EQ" {: RESULT = new Integer(0); :}
+        | "GT_EQ" {: RESULT = new Integer(0); :}
+        | "GT" {: RESULT = new Integer(0); :}
+        | "LT_EQ" {: RESULT = new Integer(0); :}
+        | "LT" {: RESULT = new Integer(0); :}
+        | "NOT_EQ" {: RESULT = new Integer(0); :}
+
+aritmetica ::= OPEN_PAREN aritmetica_op CLOSE_PAREN {: RESULT = new Integer(0); :}
+        | aritmetica_op {: RESULT = new Integer(0); :}
+
+aritmetica_op ::= aritmetica op_aritmetico aritmetica {: RESULT = new Integer(0); :}
+        | aritmetica {: RESULT = new Integer(0); :}
+    
+num ::= NUMBER {: RESULT = new Integer(0); :}
+        | ID {: RESULT = new Integer(0); :}
+        | aritmetica {: RESULT = new Integer(0); :}
+
