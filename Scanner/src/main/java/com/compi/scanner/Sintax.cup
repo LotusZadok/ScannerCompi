@@ -1,151 +1,192 @@
 /* Simple +/-/* expression language; parser evaluates constant expressions on the fly*/
 package com.compi.scanner;
-import java_cup.runtime.*;
+import java_cup.runtime.Symbol;
 
 parser code {:
-    private Symbol s;
-    
-    public void syntax_error(Symbol s) {
-        System.err.println("Error de sintaxis en línea " + s.left + ", columna " + s.right + ": " + s.value);
-    }
+    private Symbol sym;
+
 
     public Symbol getS(){
-        return this.s;
-    }
+        return this.sym;
+    };
 :};
 
-/* define how to connect to the scanner! 
-init with {: s.init(); :};
-scan with {: return s.next_token(); :}; */
+
 
 /* Terminals (tokens returned by the scanner). */
-terminal ID, NUMBER, STRING, TRUE, FALSE, EQ, PLUS, MINUS, TIMES, DIV, SEMI, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACKET, CLOSE_BRACKET, COMMA, COLON, EQ_EQ, GT_EQ, GT, LT_EQ, LT, NOT_EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ, PLUS_PLUS, MINUS_MINUS, OR, AND, NOT, IF, ELSE, FOR, WHILE, SWITCH, CASE, DEFAULT, INT, FLOAT, CHAR, VOID;
-
+terminal ID, MOD, GLOBAL, STRING, CONST, TRUE, FALSE, EQ, PLUS, MINUS, TIMES, DIV, SEMI, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, COLON, EQ_EQ, GT_EQ, GT, LT_EQ, LT, NOT_EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ, PLUS_PLUS, MINUS_MINUS, OR, AND, NOT, IF, ELSE, FOR, WHILE, SWITCH, CASE, DEFAULT, TYPE_INT, TYPE_LONG, TYPE_SHORT, TYPE_CHAR, VOID, BREAK, CONTINUE, DO, RETURN, INT , FLOAT, CHAR;
 
 /* Non terminals */
-non terminal Integer programa, globales, funcion_list, bloque, estru_control, funcion, parametro_list, if, else, for, while, switch, case_list, constante, variable, tipo, id_list, asignacion, op_asignacion, op_incremento, expr, literal, boolean, bool_op, bool, op_logico, op_relacional, aritmetica, aritmetica_op, num;
+non terminal programa, global_decl, globales, global, funcion_list, bloque, estru_control, funcion, parametro_list, if, else, for, while, switch, case_list, constante, variable, tipo, id_list, asignacion, op_asignacion, op_incremento, expr, literal, bool_expr, bool_term, bool_factor, rel_expr, op_relacional, arit_exp, term, factor, number;
 
-/* Precedences */
+/* Precedence and associativity declarations */
 precedence left OR, AND;
-precedence left EQ_EQ, GT_EQ, GT, LT_EQ, LT, NOT_EQ;
+precedence left EQ_EQ, NOT_EQ;
+precedence left GT, LT, GT_EQ, LT_EQ;
 precedence left PLUS, MINUS;
 precedence left TIMES, DIV;
-precedence left NOT;
+precedence right NOT;
 precedence left PLUS_PLUS, MINUS_MINUS;
 precedence left EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ;
-
 
 /* Start with the programa non-terminal */
 start with programa;
 
 /* The grammar rules for C subset */
 
-programa ::= globales funcion_list {: RESULT = new Integer(0); :}
+programa ::= globales funcion_list;
 
-globales ::= constante globales {: RESULT = new Integer(0); :}
-        | variable globales {: RESULT = new Integer(0); :}
-        | /* empty */ {: RESULT = new Integer(0); :}
+globales ::= global_decl globales
+        | /* empty */
+        ;
 
-funcion_list ::= funcion {: RESULT = new Integer(0); :}
-        | funcion funcion_list {: RESULT = new Integer(0); :}
+global_decl ::= constante 
+        | global 
+        ;
 
-
-bloque ::= estru_control {: RESULT = new Integer(0); :}
-        | constante {: RESULT = new Integer(0); :}
-        | variable {: RESULT = new Integer(0); :}
-        | asignacion {: RESULT = new Integer(0); :}
-        | funcion {: RESULT = new Integer(0); :}
-
-estru_control ::= if {: RESULT = new Integer(0); :}
-        | for {: RESULT = new Integer(0); :}
-        | while {: RESULT = new Integer(0); :}
-        | switch {: RESULT = new Integer(0); :}
+funcion_list ::= funcion
+        | funcion funcion_list
+        ;
 
 
-funcion ::= tipo ID OPEN_PAREN parametro_list CLOSE_PAREN OPEN_BRACKET bloque CLOSE_BRACKET SEMI {: RESULT = new Integer(0); :}
-
-parametro_list ::= tipo ID COMMA parametro_list {: RESULT = new Integer(0); :}
-        | /* empty */ {: RESULT = new Integer(0); :}
-
-
-if ::= IF OPEN_PAREN expr CLOSE_PAREN OPEN_BRACKET bloque CLOSE_BRACKET else {: RESULT = new Integer(0); :}
-
-else ::= ELSE OPEN_BRACKET bloque CLOSE_BRACKET SEMI {: RESULT = new Integer(0); :}
-        | SEMI {: RESULT = new Integer(0); :}
-
-
-for ::= FOR OPEN_PAREN asignacion SEMI expr SEMI asignacion CLOSE_PAREN OPEN_BRACKET bloque CLOSE_BRACKET SEMI {: RESULT = new Integer(0); :}
-
-while ::= WHILE OPEN_PAREN expr CLOSE_PAREN OPEN_BRACKET bloque CLOSE_BRACKET SEMI {: RESULT = new Integer(0); :}
-
-switch ::= SWITCH OPEN_PAREN aritmetica CLOSE_PAREN OPEN_BRACKET case_list CLOSE_BRACKET SEMI {: RESULT = new Integer(0); :}
-
-case_list ::= CASE NUMBER COLON bloque {: RESULT = new Integer(0); :}
-        | CASE NUMBER COLON bloque case_list {: RESULT = new Integer(0); :}
-        | DEFAULT COLON bloque {: RESULT = new Integer(0); :}
+bloque ::= estru_control
+        | constante
+        | variable
+        | asignacion
+        | funcion
+        | BREAK SEMI
+        | CONTINUE SEMI
+        | DO SEMI
+        | RETURN expr SEMI
+        | RETURN SEMI
+        ;
 
 
-constante ::= tipo ID EQ expr SEMI {: RESULT = new Integer(0); :}
+estru_control ::= if
+        | for
+        | while
+        | switch
+        ;
 
-variable ::= tipo id_list SEMI {: RESULT = new Integer(0); :}
 
-tipo ::= INT {: RESULT = new Integer(0); :}
-        | FLOAT {: RESULT = new Integer(0); :}
-        | CHAR {: RESULT = new Integer(0); :}
-        | VOID {: RESULT = new Integer(0); :}
+funcion ::= tipo ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET 
+        ;
 
-id_list ::= ID {: RESULT = new Integer(0); :}
-        | ID COMMA id_list {: RESULT = new Integer(0); :}
- 
-asignacion ::= ID op_asignacion expr SEMI; {: RESULT = new Integer(0); :}
-        | ID op_incremento SEMI {: RESULT = new Integer(0); :}
+parametro_list ::= tipo ID COMMA parametro_list
+        | tipo ID
+        | /* empty */
+        ;
 
-op_asignacion ::= "EQ" {: RESULT = new Integer(0); :}
-        | "PLUS_EQ" {: RESULT = new Integer(0); :}
-        | "MINUS_EQ" {: RESULT = new Integer(0); :}
-        | "TIMES_EQ" {: RESULT = new Integer(0); :}
-        | "DIV_EQ" {: RESULT = new Integer(0); :}
 
-op_incremento ::= "PLUS_PLUS" {: RESULT = new Integer(0); :}
-        | "MINUS_MINUS" {: RESULT = new Integer(0); :}
+if ::= IF LPAREN expr RPAREN LBRACKET bloque RBRACKET else;
 
-expr ::= literal {: RESULT = new Integer(0); :}
-        | boolean {: RESULT = new Integer(0); :}
-        | ID {: RESULT = new Integer(0); :}
-        | aritmetica {: RESULT = new Integer(0); :}
+else ::= ELSE LBRACKET bloque RBRACKET 
+        | /* empty */
+        ;
 
-literal ::= STRING {: RESULT = new Integer(0); :}
 
-boolean ::= OPEN_PAREN bool CLOSE_PAREN {: RESULT = new Integer(0); :}
-        | bool_op {: RESULT = new Integer(0); :} 
+for ::= FOR LPAREN variable SEMI expr SEMI asignacion RPAREN LBRACKET bloque RBRACKET 
+        ;
 
-bool_op ::= bool op_logico bool  {: RESULT = new Integer(0); :}
-        | bool {: RESULT = new Integer(0); :}
-        | num op_relacional num {: RESULT = new Integer(0); :}
+while ::= WHILE LPAREN expr RPAREN LBRACKET bloque RBRACKET 
+        ;
 
-bool ::= TRUE {: RESULT = new Integer(0); :}
-        | FALSE {: RESULT = new Integer(0); :}
-        | ID {: RESULT = new Integer(0); :}
-        | boolean {: RESULT = new Integer(0); :}
+switch ::= SWITCH LPAREN arit_exp RPAREN LBRACKET case_list RBRACKET 
+        ;
 
-op_logico ::= "OR" {: RESULT = new Integer(0); :}
-        | "AND" {: RESULT = new Integer(0); :}
-        | "NOT" {: RESULT = new Integer(0); :}
+case_list ::= CASE number COLON bloque
+        | CASE number COLON bloque case_list
+        | DEFAULT COLON bloque
+        ;
 
-op_relacional ::= "EQ_EQ" {: RESULT = new Integer(0); :}
-        | "GT_EQ" {: RESULT = new Integer(0); :}
-        | "GT" {: RESULT = new Integer(0); :}
-        | "LT_EQ" {: RESULT = new Integer(0); :}
-        | "LT" {: RESULT = new Integer(0); :}
-        | "NOT_EQ" {: RESULT = new Integer(0); :}
+constante ::= CONST tipo ID EQ expr SEMI
+        ;
 
-aritmetica ::= OPEN_PAREN aritmetica_op CLOSE_PAREN {: RESULT = new Integer(0); :}
-        | aritmetica_op {: RESULT = new Integer(0); :}
+global ::= GLOBAL tipo id_list SEMI
+        ;
 
-aritmetica_op ::= aritmetica op_aritmetico aritmetica {: RESULT = new Integer(0); :}
-        | aritmetica {: RESULT = new Integer(0); :}
-    
-num ::= NUMBER {: RESULT = new Integer(0); :}
-        | ID {: RESULT = new Integer(0); :}
-        | aritmetica {: RESULT = new Integer(0); :}
+variable ::= tipo id_list SEMI
+        ;
+
+tipo ::= TYPE_INT
+        | TYPE_LONG
+        | TYPE_SHORT
+        | TYPE_CHAR
+        | VOID
+        ;
+
+id_list ::= ID
+        | ID COMMA id_list
+        ;
+
+asignacion ::= ID op_asignacion expr SEMI
+        | ID op_incremento
+        ;
+
+
+op_asignacion ::= EQ
+        | PLUS_EQ
+        | MINUS_EQ
+        | TIMES_EQ
+        | DIV_EQ
+        ;
+
+op_incremento ::= PLUS_PLUS
+        | MINUS_MINUS
+        ;
+
+expr ::= literal
+        | bool_expr
+        | arit_exp
+        ;
+
+literal ::= CHAR
+        | STRING
+        ;
+
+bool_expr ::= bool_expr OR bool_term
+        | bool_term
+        ;
+
+bool_term ::= bool_term AND bool_factor
+        | bool_factor
+        ;
+
+bool_factor ::= NOT bool_factor
+        | LPAREN bool_expr RPAREN
+        | rel_expr
+        | TRUE
+        | FALSE
+        ;
+
+rel_expr ::= arit_exp op_relacional arit_exp
+        ;
+
+op_relacional ::= EQ_EQ
+        | GT_EQ
+        | GT
+        | LT_EQ
+        | LT
+        | NOT_EQ
+        ;
+
+arit_exp ::= arit_exp PLUS term
+        | arit_exp MINUS term   
+        | term
+        ;
+
+term ::= term TIMES factor
+        | term DIV factor
+        | term MOD factor
+        | factor
+        ;
+
+factor ::= LPAREN arit_exp RPAREN
+        | number
+        | ID
+        ;
+
+number ::= INT
+        | FLOAT
+        ;
 
