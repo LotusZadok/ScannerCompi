@@ -42,7 +42,9 @@ start with programa;
 
 /* The grammar rules for C subset */
 
-programa ::= globales funcion_list;
+programa ::= globales funcion_list
+        | error funcion_list
+        ;
 
 globales ::= global_decl_list;
 
@@ -63,12 +65,13 @@ instruccion  ::= estru_control
         | variable
         | asignacion
         | funcion
-		| expr SEMI
+	| expr SEMI
         | BREAK SEMI
         | CONTINUE SEMI
         | DO SEMI
         | RETURN expr SEMI
         | RETURN SEMI
+        | error SEMI
         ;
 
 bloque ::= instruccion 
@@ -89,6 +92,8 @@ estru_control ::= if
 
 
 funcion ::= tipo ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET 
+        | tipo ID error LBRACKET bloque RBRACKET
+        | tipo ID LPAREN parametro_list RPAREN  error RBRACKET
         ;
 
 parametro_list ::= tipo ID COMMA parametro_list
@@ -97,20 +102,30 @@ parametro_list ::= tipo ID COMMA parametro_list
         ;
 
 
-if ::= IF LPAREN expr RPAREN LBRACKET bloque RBRACKET else;
+if ::= IF LPAREN expr RPAREN LBRACKET bloque RBRACKET else
+        | IF error LBRACKET bloque RBRACKET else
+        | IF LPAREN expr RPAREN error RBRACKET else
+        ;
 
 else ::= ELSE LBRACKET bloque RBRACKET 
+        | ELSE error RBRACKET
         | /* empty */
         ;
 
 
-for ::= FOR LPAREN variable SEMI expr SEMI asignacion RPAREN LBRACKET bloque RBRACKET 
+for ::= FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN LBRACKET bloque RBRACKET 
+        | FOR error LBRACKET bloque RBRACKET
+        | FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN error RBRACKET
         ;
 
 while ::= WHILE LPAREN expr RPAREN LBRACKET bloque RBRACKET 
+        | WHILE error LBRACKET bloque RBRACKET
+        | WHILE LPAREN expr RPAREN error RBRACKET
         ;
 
 switch ::= SWITCH LPAREN arit_exp RPAREN LBRACKET case_list RBRACKET 
+        | SWITCH error LBRACKET case_list RBRACKET
+        | SWITCH LPAREN arit_exp RPAREN error RBRACKET
         ;
 
 case_list ::= CASE arit_exp COLON bloque
@@ -206,7 +221,7 @@ term ::= term TIMES factor
 factor ::= LPAREN arit_exp RPAREN
         | number
         | ID
-		| ID LPAREN expr_list RPAREN
+        | ID LPAREN expr_list RPAREN
         ;
 
 number ::= INT
