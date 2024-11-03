@@ -73,7 +73,7 @@ FLOAT           = {INT}({DECPART} {EXP}? | {OPTIONALDECPART}{EXP}) {FLOATSUFFIX}
 // 3. PALABRAS RESERVADAS
 "int"       { return new Symbol(sym.TYPE_INT, yyline, yycolumn, yytext()); }
 "long"      { return new Symbol(sym.TYPE_LONG, yyline, yycolumn, yytext()); }
-"shot"      { return new Symbol(sym.TYPE_SHORT, yyline, yycolumn, yytext()); }
+"short"      { return new Symbol(sym.TYPE_SHORT, yyline, yycolumn, yytext()); }
 "char"      { return new Symbol(sym.TYPE_CHAR, yyline, yycolumn, yytext()); }
 "void"      { return new Symbol(sym.VOID, yyline, yycolumn, yytext()); }
 

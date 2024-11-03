@@ -1,13 +1,15 @@
-
-global int g;
- 
-global int z, t, y, y;
+int g;
+void x; //deberia de dar error pues no se pueden declarar variables void
+y;  // error     
+int z, t, y, y;
 
 int funcion1(){  
 int k;  
+int g  //error por no tener ;
 
 
 a = a * funcion(8);
+a = a * c // error por el punto y coma
 
 	if (y>=0) {
 		x= a+b; 
@@ -15,7 +17,9 @@ a = a * funcion(8);
 	else {
 		x--; 
 	}
-
+	else { //deberia dar error por doble uso de else
+		x= a+b;
+	} 
         
 
 	if x==3 {//deberia dar error por expresion fuera de parentesis
