@@ -5,6 +5,13 @@ import java_cup.runtime.Symbol;
 parser code {:
     private Symbol sym;
 
+	public void report_error(String message, Object info) {
+		System.err.println(message);
+		if (info instanceof Symbol) {
+			Symbol s = (Symbol) info;
+			System.err.println(" at line " + (s.left + 1) + ", column " + (s.right + 1) + ": " + s.value);
+		}
+	}
 
     public Symbol getS(){
         return this.sym;
@@ -17,17 +24,18 @@ parser code {:
 terminal ID, MOD, GLOBAL, STRING, CONST, TRUE, FALSE, EQ, PLUS, MINUS, TIMES, DIV, SEMI, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, COLON, EQ_EQ, GT_EQ, GT, LT_EQ, LT, NOT_EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ, PLUS_PLUS, MINUS_MINUS, OR, AND, NOT, IF, ELSE, FOR, WHILE, SWITCH, CASE, DEFAULT, TYPE_INT, TYPE_LONG, TYPE_SHORT, TYPE_CHAR, VOID, BREAK, CONTINUE, DO, RETURN, INT , FLOAT, CHAR;
 
 /* Non terminals */
-non terminal programa, global_decl, globales, global, funcion_list, bloque, estru_control, funcion, parametro_list, if, else, for, while, switch, case_list, constante, variable, tipo, id_list, asignacion, op_asignacion, op_incremento, expr, literal, bool_expr, bool_term, bool_factor, rel_expr, op_relacional, arit_exp, term, factor, number;
+non terminal programa, instruccion , global_decl_list, expr_list, global_decl, globales, global, funcion_list, bloque, estru_control, funcion, parametro_list, if, else, for, while, switch, case_list, constante, variable, tipo, id_list, asignacion, op_asignacion, op_incremento, expr, literal, bool_expr, bool_term, bool_factor, rel_expr, op_relacional, arit_exp, term, factor, number, next_id_list;
 
 /* Precedence and associativity declarations */
 precedence left OR, AND;
 precedence left EQ_EQ, NOT_EQ;
 precedence left GT, LT, GT_EQ, LT_EQ;
 precedence left PLUS, MINUS;
-precedence left TIMES, DIV;
+precedence left TIMES, DIV, MOD;
 precedence right NOT;
 precedence left PLUS_PLUS, MINUS_MINUS;
 precedence left EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ;
+
 
 /* Start with the programa non-terminal */
 start with programa;
@@ -36,24 +44,26 @@ start with programa;
 
 programa ::= globales funcion_list;
 
-globales ::= global_decl globales
-        | /* empty */
-        ;
+globales ::= global_decl_list;
 
-global_decl ::= constante 
-        | global 
-        ;
+global_decl_list ::= global_decl_list global_decl
+                   | global_decl;
+
+global_decl ::= GLOBAL variable
+              | constante
+			  ;
 
 funcion_list ::= funcion
         | funcion funcion_list
         ;
 
 
-bloque ::= estru_control
+instruccion  ::= estru_control
         | constante
         | variable
         | asignacion
         | funcion
+		| expr SEMI
         | BREAK SEMI
         | CONTINUE SEMI
         | DO SEMI
@@ -61,6 +71,15 @@ bloque ::= estru_control
         | RETURN SEMI
         ;
 
+bloque ::= instruccion 
+		| instruccion bloque
+		;
+
+
+expr_list ::= expr COMMA expr_list
+		| expr
+		| /* empty */
+		;
 
 estru_control ::= if
         | for
@@ -94,20 +113,19 @@ while ::= WHILE LPAREN expr RPAREN LBRACKET bloque RBRACKET
 switch ::= SWITCH LPAREN arit_exp RPAREN LBRACKET case_list RBRACKET 
         ;
 
-case_list ::= CASE number COLON bloque
-        | CASE number COLON bloque case_list
+case_list ::= CASE arit_exp COLON bloque
+        | CASE arit_exp COLON bloque case_list
         | DEFAULT COLON bloque
         ;
 
 constante ::= CONST tipo ID EQ expr SEMI
         ;
 
-global ::= GLOBAL tipo id_list SEMI
-        ;
 
 variable ::= tipo id_list SEMI
         ;
 
+// FIXME: Tipos para funciones aparte 
 tipo ::= TYPE_INT
         | TYPE_LONG
         | TYPE_SHORT
@@ -115,12 +133,16 @@ tipo ::= TYPE_INT
         | VOID
         ;
 
-id_list ::= ID
-        | ID COMMA id_list
+id_list ::= ID next_id_list
         ;
 
+next_id_list ::= COMMA ID next_id_list
+        | /* empty */
+        ;
+
+
 asignacion ::= ID op_asignacion expr SEMI
-        | ID op_incremento
+        | ID op_incremento SEMI
         ;
 
 
@@ -184,6 +206,7 @@ term ::= term TIMES factor
 factor ::= LPAREN arit_exp RPAREN
         | number
         | ID
+		| ID LPAREN expr_list RPAREN
         ;
 
 number ::= INT
