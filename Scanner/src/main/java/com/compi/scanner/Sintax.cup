@@ -9,7 +9,7 @@ parser code {:
 		System.err.println(message);
 		if (info instanceof Symbol) {
 			Symbol s = (Symbol) info;
-			System.err.println(" at line " + (s.left + 1) + ", column " + (s.right + 1));
+			System.err.println(" at line " + (s.left + 1) + ", column " + (s.right + 1) + ": " + s.value);
 		}
 	}
 
@@ -49,8 +49,9 @@ globales ::= global_decl_list;
 global_decl_list ::= global_decl_list global_decl
                    | global_decl;
 
-global_decl ::= GLOBAL tipo ID SEMI
-              | CONST tipo ID EQ expr SEMI;
+global_decl ::= GLOBAL variable
+              | constante
+			  ;
 
 funcion_list ::= funcion
         | funcion funcion_list
@@ -62,7 +63,7 @@ instruccion  ::= estru_control
         | variable
         | asignacion
         | funcion
-		| ID LPAREN expr_list RPAREN SEMI
+		| expr SEMI
         | BREAK SEMI
         | CONTINUE SEMI
         | DO SEMI
@@ -112,8 +113,8 @@ while ::= WHILE LPAREN expr RPAREN LBRACKET bloque RBRACKET
 switch ::= SWITCH LPAREN arit_exp RPAREN LBRACKET case_list RBRACKET 
         ;
 
-case_list ::= CASE number COLON bloque
-        | CASE number COLON bloque case_list
+case_list ::= CASE arit_exp COLON bloque
+        | CASE arit_exp COLON bloque case_list
         | DEFAULT COLON bloque
         ;
 
@@ -124,6 +125,7 @@ constante ::= CONST tipo ID EQ expr SEMI
 variable ::= tipo id_list SEMI
         ;
 
+// FIXME: Tipos para funciones aparte 
 tipo ::= TYPE_INT
         | TYPE_LONG
         | TYPE_SHORT
@@ -204,6 +206,7 @@ term ::= term TIMES factor
 factor ::= LPAREN arit_exp RPAREN
         | number
         | ID
+		| ID LPAREN expr_list RPAREN
         ;
 
 number ::= INT
