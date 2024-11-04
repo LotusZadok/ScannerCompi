@@ -4,149 +4,73 @@ import java_cup.runtime.Symbol;
 
 parser code {:
     private Symbol sym;
+    
+    public void syntax_error(Symbol sym) {
+        System.err.println("Error sintáctico en línea " + (sym.left + 1) + ", columna " + (sym.right + 1) + ": " + sym.value);
+    }
 
-	public void report_error(String message, Object info) {
-		System.err.println(message);
-		if (info instanceof Symbol) {
-			Symbol s = (Symbol) info;
-			System.err.println(" at line " + (s.left + 1) + ", column " + (s.right + 1) + ": " + s.value);
-		}
-	}
+    public void unrecovered_syntax_error(Symbol sym) {
+        System.err.println("Error irreparable en línea " + (sym.left + 1) + ", columna " + (sym.right + 1) + ": " + sym.value);
+    }
+
+    public void report_error(String message) {
+        Symbol errorSym = (Symbol)stack.peek();
+        System.err.println("Error sintáctico en línea " + (errorSym.left + 1) + ", columna " + (errorSym.right + 1)  + ": " + message);
+    }
 
     public Symbol getS(){
         return this.sym;
     };
+    
 :};
 
 
-
 /* Terminals (tokens returned by the scanner). */
-terminal ID, MOD, GLOBAL, STRING, CONST, TRUE, FALSE, EQ, PLUS, MINUS, TIMES, DIV, SEMI, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, COLON, EQ_EQ, GT_EQ, GT, LT_EQ, LT, NOT_EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ, PLUS_PLUS, MINUS_MINUS, OR, AND, NOT, IF, ELSE, FOR, WHILE, SWITCH, CASE, DEFAULT, TYPE_INT, TYPE_LONG, TYPE_SHORT, TYPE_CHAR, VOID, BREAK, CONTINUE, DO, RETURN, INT , FLOAT, CHAR;
+terminal ID, MOD, GLOBAL, STRING, CONST, TRUE, FALSE, EQ, PLUS, MINUS, TIMES, DIV, SEMI, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, COLON, EQ_EQ, GT_EQ, GT, LT_EQ, LT, NOT_EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ, PLUS_PLUS, MINUS_MINUS, OR, AND, NOT, IF, ELSE, FOR, WHILE, SWITCH, CASE, DEFAULT, TYPE_INT, TYPE_LONG, TYPE_SHORT, TYPE_CHAR, VOID, BREAK, CONTINUE, DO, RETURN, INT , FLOAT, CHAR, ERROR;
 
 /* Non terminals */
-non terminal programa, instruccion , global_decl_list, expr_list, global_decl, globales, global, funcion_list, bloque, estru_control, funcion, parametro_list, if, else, for, while, switch, case_list, constante, variable, tipo, id_list, asignacion, op_asignacion, op_incremento, expr, literal, bool_expr, bool_term, bool_factor, rel_expr, op_relacional, arit_exp, term, factor, number, next_id_list;
-
-/* Precedence and associativity declarations */
-precedence left OR, AND;
-precedence left EQ_EQ, NOT_EQ;
-precedence left GT, LT, GT_EQ, LT_EQ;
-precedence left PLUS, MINUS;
-precedence left TIMES, DIV, MOD;
-precedence right NOT;
-precedence left PLUS_PLUS, MINUS_MINUS;
-precedence left EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ;
-
+non terminal programa, globales, funcion_list, global_decl, variable, constante, tipo_var, tipo_func, expr, id_list, next_id_list;
 
 /* Start with the programa non-terminal */
 start with programa;
 
-/* The grammar rules for C subset */
-
+/* The grammar rule for a simple constant declaration */
 programa ::= globales funcion_list
-        | error funcion_list
-        ;
+           ;
 
-globales ::= global_decl_list;
-
-global_decl_list ::= global_decl_list global_decl
-                   | global_decl;
+globales ::= globales constante
+           | globales global_decl
+           | /* empty */  /* Permite que no haya declaraciones */
+           ;
 
 global_decl ::= GLOBAL variable
-              | constante
-			  ;
+              | variable
+              ;
 
-funcion_list ::= funcion
-        | funcion funcion_list
+constante ::= CONST tipo_var ID EQ expr SEMI
+            | CONST tipo_var ID EQ expr error {: parser.report_error("Falta un ; al final de la declaración de la constante."); :}
+            | CONST tipo_var ID SEMI error {: parser.report_error("Debe asignarle un valor a la constante."); :}
+            | CONST ID EQ expr SEMI {: parser.report_error("Debe especificar el tipo de la constante."); :}
+            | CONST error {: parser.report_error("Declaración de constante incorrecta."); :}
         ;
 
-
-instruccion  ::= estru_control
-        | constante
-        | variable
-        | asignacion
-        | funcion
-	| expr SEMI
-        | BREAK SEMI
-        | CONTINUE SEMI
-        | DO SEMI
-        | RETURN expr SEMI
-        | RETURN SEMI
-        | error SEMI
-        ;
-
-bloque ::= instruccion 
-		| instruccion bloque
-		;
-
-
-expr_list ::= expr COMMA expr_list
-		| expr
-		| /* empty */
-		;
-
-estru_control ::= if
-        | for
-        | while
-        | switch
-        ;
-
-
-funcion ::= tipo ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET 
-        | tipo ID error LBRACKET bloque RBRACKET
-        | tipo ID LPAREN parametro_list RPAREN  error RBRACKET
-        ;
-
-parametro_list ::= tipo ID COMMA parametro_list
-        | tipo ID
-        | /* empty */
-        ;
-
-
-if ::= IF LPAREN expr RPAREN LBRACKET bloque RBRACKET else
-        | IF error LBRACKET bloque RBRACKET else
-        | IF LPAREN expr RPAREN error RBRACKET else
-        ;
-
-else ::= ELSE LBRACKET bloque RBRACKET 
-        | ELSE error RBRACKET
-        | /* empty */
-        ;
-
-
-for ::= FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN LBRACKET bloque RBRACKET 
-        | FOR error LBRACKET bloque RBRACKET
-        | FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN error RBRACKET
-        ;
-
-while ::= WHILE LPAREN expr RPAREN LBRACKET bloque RBRACKET 
-        | WHILE error LBRACKET bloque RBRACKET
-        | WHILE LPAREN expr RPAREN error RBRACKET
-        ;
-
-switch ::= SWITCH LPAREN arit_exp RPAREN LBRACKET case_list RBRACKET 
-        | SWITCH error LBRACKET case_list RBRACKET
-        | SWITCH LPAREN arit_exp RPAREN error RBRACKET
-        ;
-
-case_list ::= CASE arit_exp COLON bloque
-        | CASE arit_exp COLON bloque case_list
-        | DEFAULT COLON bloque
-        ;
-
-constante ::= CONST tipo ID EQ expr SEMI
-        ;
-
-
-variable ::= tipo id_list SEMI
+variable ::= tipo_var id_list SEMI
+           | tipo_var id_list error {: parser.report_error("Falta un ; al final de la declaración de la variable."); :}
+           | VOID id_list SEMI error {: parser.report_error("Error declarando variable void."); :}
+           | ID SEMI error {: parser.report_error("Debe especificar el tipo de la variable."); :}
+           | error {: parser.report_error("Declaración de variable incorrecta."); :}
         ;
 
 // FIXME: Tipos para funciones aparte 
-tipo ::= TYPE_INT
-        | TYPE_LONG
-        | TYPE_SHORT
-        | TYPE_CHAR
-        | VOID
-        ;
+tipo_var ::= TYPE_INT
+           | TYPE_LONG
+           | TYPE_SHORT
+           | TYPE_CHAR
+           ;
+
+tipo_func ::= tipo_var
+            | VOID
+            ;
 
 id_list ::= ID next_id_list
         ;
@@ -154,77 +78,3 @@ id_list ::= ID next_id_list
 next_id_list ::= COMMA ID next_id_list
         | /* empty */
         ;
-
-
-asignacion ::= ID op_asignacion expr SEMI
-        | ID op_incremento SEMI
-        ;
-
-
-op_asignacion ::= EQ
-        | PLUS_EQ
-        | MINUS_EQ
-        | TIMES_EQ
-        | DIV_EQ
-        ;
-
-op_incremento ::= PLUS_PLUS
-        | MINUS_MINUS
-        ;
-
-expr ::= literal
-        | bool_expr
-        | arit_exp
-        ;
-
-literal ::= CHAR
-        | STRING
-        ;
-
-bool_expr ::= bool_expr OR bool_term
-        | bool_term
-        ;
-
-bool_term ::= bool_term AND bool_factor
-        | bool_factor
-        ;
-
-bool_factor ::= NOT bool_factor
-        | LPAREN bool_expr RPAREN
-        | rel_expr
-        | TRUE
-        | FALSE
-        ;
-
-rel_expr ::= arit_exp op_relacional arit_exp
-        ;
-
-op_relacional ::= EQ_EQ
-        | GT_EQ
-        | GT
-        | LT_EQ
-        | LT
-        | NOT_EQ
-        ;
-
-arit_exp ::= arit_exp PLUS term
-        | arit_exp MINUS term   
-        | term
-        ;
-
-term ::= term TIMES factor
-        | term DIV factor
-        | term MOD factor
-        | factor
-        ;
-
-factor ::= LPAREN arit_exp RPAREN
-        | number
-        | ID
-        | ID LPAREN expr_list RPAREN
-        ;
-
-number ::= INT
-        | FLOAT
-        ;
-

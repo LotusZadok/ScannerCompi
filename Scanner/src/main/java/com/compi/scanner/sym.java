@@ -45,6 +45,7 @@ public class sym {
   public static final int BREAK = 48;
   public static final int VOID = 47;
   public static final int EQ = 9;
+  public static final int ERROR = 55;
   public static final int TYPE_CHAR = 46;
   public static final int SWITCH = 40;
   public static final int TIMES = 12;
@@ -118,7 +119,8 @@ public class sym {
   "RETURN",
   "INT",
   "FLOAT",
-  "CHAR"
+  "CHAR",
+  "ERROR"
   };
 }
 
