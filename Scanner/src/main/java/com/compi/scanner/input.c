@@ -1,3 +1,4 @@
+
 int g;
 void x; //deberia de dar error pues no se pueden declarar variables void
 y;  // error     

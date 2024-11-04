@@ -43,17 +43,20 @@ start with programa;
 /* The grammar rules for C subset */
 
 programa ::= globales funcion_list
-        | error funcion_list
         ;
 
 globales ::= global_decl_list;
 
 global_decl_list ::= global_decl_list global_decl
-                   | global_decl;
+                   | global_decl
+                   | error
+                   ;
+                   
 
 global_decl ::= GLOBAL variable
               | constante
-			  ;
+        
+		;
 
 funcion_list ::= funcion
         | funcion funcion_list
@@ -181,6 +184,7 @@ literal ::= CHAR
         | STRING
         ;
 
+// FIXME: No funcionan con ID
 bool_expr ::= bool_expr OR bool_term
         | bool_term
         ;
