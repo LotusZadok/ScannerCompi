@@ -4,37 +4,44 @@ import java_cup.runtime.Symbol;
 
 parser code {:
     private Symbol sym;
-    
-    public void syntax_error(Symbol sym) {
-        System.err.println("Error sintáctico en línea " + (sym.left + 1) + ", columna " + (sym.right + 1) + ": " + sym.value);
-    }
 
-    public void unrecovered_syntax_error(Symbol sym) {
-        System.err.println("Error irreparable en línea " + (sym.left + 1) + ", columna " + (sym.right + 1) + ": " + sym.value);
-    }
-
-    public void report_error(String message) {
-        Symbol errorSym = (Symbol)stack.peek();
-        System.err.println("Error sintáctico en línea " + (errorSym.left + 1) + ", columna " + (errorSym.right + 1)  + ": " + message);
-    }
+	public void report_error(String message, Object info) {
+		System.err.println(message);
+		if (info instanceof Symbol) {
+			Symbol s = (Symbol) info;
+			System.err.println(" at line " + (s.left + 1) + ", column " + (s.right + 1) + ": " + s.value);
+		}
+	}
 
     public Symbol getS(){
         return this.sym;
     };
-    
 :};
 
 
+
 /* Terminals (tokens returned by the scanner). */
-terminal ID, MOD, GLOBAL, STRING, CONST, TRUE, FALSE, EQ, PLUS, MINUS, TIMES, DIV, SEMI, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, COLON, EQ_EQ, GT_EQ, GT, LT_EQ, LT, NOT_EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ, PLUS_PLUS, MINUS_MINUS, OR, AND, NOT, IF, ELSE, FOR, WHILE, SWITCH, CASE, DEFAULT, TYPE_INT, TYPE_LONG, TYPE_SHORT, TYPE_CHAR, VOID, BREAK, CONTINUE, DO, RETURN, INT , FLOAT, CHAR, ERROR;
+terminal ID, MOD, GLOBAL, STRING, CONST, TRUE, FALSE, EQ, PLUS, MINUS, TIMES, DIV, SEMI, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, COLON, EQ_EQ, GT_EQ, GT, LT_EQ, LT, NOT_EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ, PLUS_PLUS, MINUS_MINUS, OR, AND, NOT, IF, ELSE, FOR, WHILE, SWITCH, CASE, DEFAULT, TYPE_INT, TYPE_LONG, TYPE_SHORT, TYPE_CHAR, VOID, BREAK, CONTINUE, DO, RETURN, INT , FLOAT, CHAR;
 
 /* Non terminals */
-non terminal programa, globales, funcion_list, global_decl, variable, constante, tipo_var, tipo_func, expr, id_list, next_id_list;
+non terminal programa, instruccion , global_decl_list, expr_list, global_decl, globales, global, funcion_list, bloque, estru_control, funcion, parametro_list, if, else, for, while, switch, case_list, constante, variable, tipo, id_list, asignacion, op_asignacion, op_incremento, expr, literal, bool_expr, bool_term, bool_factor, rel_expr, op_relacional, arit_exp, term, factor, number, next_id_list;
+
+/* Precedence and associativity declarations */
+precedence left OR, AND;
+precedence left EQ_EQ, NOT_EQ;
+precedence left GT, LT, GT_EQ, LT_EQ;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIV, MOD;
+precedence right NOT;
+precedence left PLUS_PLUS, MINUS_MINUS;
+precedence left EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ;
+
 
 /* Start with the programa non-terminal */
 start with programa;
 
-/* The grammar rule for a simple constant declaration */
+/* The grammar rules for C subset */
+
 programa ::= globales funcion_list
         ;
 
@@ -137,15 +144,12 @@ variable ::= tipo id_list SEMI
         ;
 
 // FIXME: Tipos para funciones aparte 
-tipo_var ::= TYPE_INT
-           | TYPE_LONG
-           | TYPE_SHORT
-           | TYPE_CHAR
-           ;
-
-tipo_func ::= tipo_var
-            | VOID
-            ;
+tipo ::= TYPE_INT
+        | TYPE_LONG
+        | TYPE_SHORT
+        | TYPE_CHAR
+        | VOID
+        ;
 
 id_list ::= ID next_id_list
         ;
