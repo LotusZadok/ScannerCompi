@@ -1,5 +1,6 @@
 
 int g;
+const int a;
 void x; //deberia de dar error pues no se pueden declarar variables void
 y;  // error     
 int z, t, y, y;
