@@ -1,9 +1,8 @@
-
 int g;
-const int a;
-void x; //deberia de dar error pues no se pueden declarar variables void
+const int a = 5;
 y;  // error     
 int z, t, y, y;
+void x; //deberia de dar error pues no se pueden declarar variables void
 
 int funcion1(){  
 int k;  
@@ -56,21 +55,21 @@ int funcion1( int x   {  // falta parentesis
 		x++;
  	}
 	
-	switch(x) {            
+	// switch(x) {            
 
-	case 5:    //se espera error por no tener ;
-        case 8: {break;}  
-	case 5: {break;}  
-	case x: {break;}  //error debe ser constante              
-	default 5: {break;} //error por el 5, default no lleva expresion_constante       
-	default: x++;  //se espera error por doble default habiendo quitado el error anterior              
- 	}
+	// case 5: x;   //se espera error por no tener ;
+    // case 8: break;  
+	// case 5: break;  
+	// case x: break;  //error debe ser constante              
+	// default: break; //error por el 5, default no lleva expresion_constante       
+	// default: x++;  //se espera error por doble default habiendo quitado el error anterior              
+ 	// }
 
 read(X);  
 read(123);  //se espera error, pues no se acepta expresion entre ( )
-read(x++); //se espera error
+read(x); //se espera error
 
-write(C- 123);
-write( );     //se espera error
+// write(C - 123);
+write( );    //se espera error
 
 }  

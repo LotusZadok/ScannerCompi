@@ -13,14 +13,14 @@ public class Main {
                     Main.class.getResourceAsStream("/com/compi/scanner/input.c"));
             LexerCup lexer = new LexerCup(reader);
 
-             /*while (true) {
-             Symbol token = lexer.next_token();
-             if (token.sym == 0) {
-             break;
-             }
-             System.out.println("Token: " + sym.terminalNames[token.sym] + " - " +
-             token.value);
-             } */
+            // while (true) {
+            // Symbol token = lexer.next_token();
+            // if (token.sym == 0) {
+            // break;
+            // }
+            // System.out.println("Token: " + sym.terminalNames[token.sym] + " - " +
+            // token.value);
+            // }
 
             // Crear una instancia del parser usando el nuevo constructor
             ParserCup parser = new ParserCup(lexer);

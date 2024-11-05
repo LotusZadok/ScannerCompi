@@ -89,7 +89,6 @@ FLOAT           = {INT}({DECPART} {EXP}? | {OPTIONALDECPART}{EXP}) {FLOATSUFFIX}
 "default"   { return new Symbol(sym.DEFAULT, yyline, yycolumn, yytext()); }
 
 "const"     { return new Symbol(sym.CONST, yyline, yycolumn, yytext()); }
-"global"    { return new Symbol(sym.GLOBAL, yyline, yycolumn, yytext()); }
 
 "true"      { return new Symbol(sym.TRUE, yyline, yycolumn, yytext()); }
 "false"     { return new Symbol(sym.FALSE, yyline, yycolumn, yytext()); }
@@ -98,7 +97,8 @@ FLOAT           = {INT}({DECPART} {EXP}? | {OPTIONALDECPART}{EXP}) {FLOATSUFFIX}
 "break"     { return new Symbol(sym.BREAK, yyline, yycolumn, yytext()); }
 "do"        { return new Symbol(sym.DO, yyline, yycolumn, yytext()); }
 "return"    { return new Symbol(sym.RETURN, yyline, yycolumn, yytext()); }
-
+"read"      { return new Symbol(sym.READ, yyline, yycolumn, yytext()); }
+"write"     { return new Symbol(sym.WRITE, yyline, yycolumn, yytext()); }
 
 //  4. NUMEROS
 {INT}("-")                     { reportError("Símbolo inválido después de número -> " + yytext()); }
