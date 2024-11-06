@@ -59,8 +59,7 @@ global_decl_list ::= global_decl_list global_decl
 global_decl ::= variable
               | constante
               | funcion
-              | error ID SEMI {: report_error("Error: debe especificar el tipo de variable."); :}
-              /*| error {: report_error("Error: declaración global inválida o incompleta."); :} */
+              | error {: report_error("Error: declaración global inválida o incompleta."); :}
 	;
 
 
@@ -166,7 +165,6 @@ constante ::= CONST tipo_var ID EQ expr SEMI
         ;
 
 variable ::= tipo_var id_list SEMI
-        | VOID ID error SEMI {: report_error("Error: no puede declarar variables void."); :}
         ;
 
 
