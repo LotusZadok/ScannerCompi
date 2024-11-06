@@ -6,7 +6,8 @@ parser code {:
     private Symbol sym;
 
     public void syntax_error(Symbol sym) {
-        System.err.println("Error sintáctico en línea " + (sym.left + 1) + ", columna " + (sym.right + 1) + ": " + sym.value);
+        System.err.println();
+        System.err.print("Error sintáctico en línea " + (sym.left + 1) + ", columna " + (sym.right + 1) + ": " + sym.value);
     }
 
     public void unrecovered_syntax_error(Symbol sym) {
@@ -14,7 +15,7 @@ parser code {:
     }
 
     public void report_error(String message) {
-        System.err.println(message);
+        System.err.print("\t" + message);
     }
         
     public Symbol getS(){
@@ -116,6 +117,7 @@ estru_control ::= if
 
 funcion ::= tipo_var ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET 
         | tipo_var ID error LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la declaración de función."); :}
+        /*| tipo_var ID LPAREN parametro_list LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la declaración de función."); :}*/
         | tipo_var ID LPAREN parametro_list RPAREN error RBRACKET {: report_error("Error: falta llave de apertura en el cuerpo de la función."); :}
         | VOID ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET
         | VOID ID error LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la declaración de función."); :}
@@ -147,6 +149,7 @@ for ::= FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN LBRACKET bloque R
 while ::= WHILE LPAREN expr RPAREN LBRACKET bloque RBRACKET 
         | WHILE error LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la expresión 'while'."); :}
         | WHILE LPAREN expr RPAREN error RBRACKET {: report_error("Error: falta llave de apertura en el bloque 'while'."); :}
+        | WHILE LPAREN error RPAREN LBRACKET bloque RBRACKET {: report_error("Error: falta la expresión del 'while'."); :}
         ;
 
 switch ::= SWITCH LPAREN arit_exp RPAREN LBRACKET case_list case_end RBRACKET 
