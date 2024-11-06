@@ -891,7 +891,7 @@ class CUP$ParserCup$actions {
           case 23: // read ::= READ error 
             {
               Object RESULT =null;
-
+		 report_error("Error: parámetro no válido para la función 'read'."); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("read",1, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1035,7 +1035,7 @@ class CUP$ParserCup$actions {
           case 39: // funcion ::= tipo_var ID error LBRACKET bloque RBRACKET 
             {
               Object RESULT =null;
-
+		 report_error("Error: falta paréntesis en la declaración de función."); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("funcion",13, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-5)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1044,7 +1044,7 @@ class CUP$ParserCup$actions {
           case 40: // funcion ::= tipo_var ID LPAREN parametro_list RPAREN error RBRACKET 
             {
               Object RESULT =null;
-
+		 report_error("Error: falta llave de apertura en el cuerpo de la función."); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("funcion",13, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-6)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1062,7 +1062,7 @@ class CUP$ParserCup$actions {
           case 42: // funcion ::= VOID ID error LBRACKET bloque RBRACKET 
             {
               Object RESULT =null;
-
+		 report_error("Error: falta paréntesis en la declaración de función."); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("funcion",13, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-5)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1071,7 +1071,7 @@ class CUP$ParserCup$actions {
           case 43: // funcion ::= VOID ID LPAREN parametro_list RPAREN error RBRACKET 
             {
               Object RESULT =null;
-
+		 report_error("Error: falta llave de apertura en el cuerpo de la función."); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("funcion",13, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-6)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1116,7 +1116,7 @@ class CUP$ParserCup$actions {
           case 48: // if ::= IF error LBRACKET bloque RBRACKET else 
             {
               Object RESULT =null;
-
+		 report_error("Error: falta paréntesis en la expresión 'if'."); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("if",15, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-5)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1125,7 +1125,7 @@ class CUP$ParserCup$actions {
           case 49: // if ::= IF LPAREN expr RPAREN error RBRACKET else 
             {
               Object RESULT =null;
-
+		 report_error("Error: falta llave de apertura en el bloque 'if'."); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("if",15, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-6)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;

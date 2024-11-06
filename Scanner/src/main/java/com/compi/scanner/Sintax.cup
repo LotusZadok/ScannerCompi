@@ -80,7 +80,7 @@ instruccion  ::= estru_control
 
 read ::= READ LPAREN read_parameter RPAREN 
         | READ LPAREN RPAREN
-        | READ error 
+        | READ error {: report_error("Error: parámetro no válido para la función 'read'."); :}
         ;
 
 read_parameter ::= ID COMMA read_parameter
@@ -114,11 +114,11 @@ estru_control ::= if
 
 
 funcion ::= tipo_var ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET 
-        | tipo_var ID error LBRACKET bloque RBRACKET
-        | tipo_var ID LPAREN parametro_list RPAREN  error RBRACKET
+        | tipo_var ID error LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la declaración de función."); :}
+        | tipo_var ID LPAREN parametro_list RPAREN error RBRACKET {: report_error("Error: falta llave de apertura en el cuerpo de la función."); :}
         | VOID ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET
-        | VOID ID error LBRACKET bloque RBRACKET
-        | VOID ID LPAREN parametro_list RPAREN error RBRACKET
+        | VOID ID error LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la declaración de función."); :}
+        | VOID ID LPAREN parametro_list RPAREN error RBRACKET {: report_error("Error: falta llave de apertura en el cuerpo de la función."); :}
         ;
 
 parametro_list ::= tipo_var ID COMMA parametro_list
@@ -128,8 +128,8 @@ parametro_list ::= tipo_var ID COMMA parametro_list
 
 
 if ::= IF LPAREN expr RPAREN LBRACKET bloque RBRACKET else
-        | IF error LBRACKET bloque RBRACKET else
-        | IF LPAREN expr RPAREN error RBRACKET else
+        | IF error LBRACKET bloque RBRACKET else {: report_error("Error: falta paréntesis en la expresión 'if'."); :}
+        | IF LPAREN expr RPAREN error RBRACKET else {: report_error("Error: falta llave de apertura en el bloque 'if'."); :}
         ;
 
 else ::= ELSE LBRACKET bloque RBRACKET 
