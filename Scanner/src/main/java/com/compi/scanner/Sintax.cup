@@ -14,12 +14,9 @@ parser code {:
     }
 
     public void report_error(String message) {
-        Symbol errorSym = (Symbol)stack.peek();
-        System.err.println("Error sintáctico en línea " + (errorSym.left + 1) + ", columna " + (errorSym.right + 1)  + ": " + message);
+        System.err.println(message);
     }
-
         
-
     public Symbol getS(){
         return this.sym;
     };
@@ -62,7 +59,7 @@ global_decl_list ::= global_decl_list global_decl
 global_decl ::= variable
               | constante
               | funcion
-              | error
+              | error {: report_error("Error: declaración global inválida o incompleta."); :}
 	;
 
 

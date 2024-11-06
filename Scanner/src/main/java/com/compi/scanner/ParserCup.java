@@ -643,12 +643,9 @@ public class ParserCup extends java_cup.runtime.lr_parser {
     }
 
     public void report_error(String message) {
-        Symbol errorSym = (Symbol)stack.peek();
-        System.err.println("Error sintáctico en línea " + (errorSym.left + 1) + ", columna " + (errorSym.right + 1)  + ": " + message);
+        System.err.println(message);
     }
-
         
-
     public Symbol getS(){
         return this.sym;
     };
@@ -759,7 +756,7 @@ class CUP$ParserCup$actions {
           case 8: // global_decl ::= error 
             {
               Object RESULT =null;
-
+		 report_error("Error: declaración global inválida o incompleta."); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("global_decl",9, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
