@@ -88,7 +88,7 @@ read_parameter ::= ID COMMA read_parameter
         ;
 
 write ::= WRITE LPAREN write_parameter RPAREN
-        WRITE error
+        | WRITE error {: report_error("Error: parámetro no válido para la función 'write'."); :}
         ;
 
 write_parameter ::= expr COMMA write_parameter
@@ -133,24 +133,24 @@ if ::= IF LPAREN expr RPAREN LBRACKET bloque RBRACKET else
         ;
 
 else ::= ELSE LBRACKET bloque RBRACKET 
-        | ELSE error RBRACKET
+        | ELSE error RBRACKET {: report_error("Error: falta llave de apertura en el bloque 'else'."); :}
         | /* empty */
         ;
 
 
 for ::= FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN LBRACKET bloque RBRACKET 
-        | FOR error LBRACKET bloque RBRACKET
-        | FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN error RBRACKET
+        | FOR error LBRACKET bloque RBRACKET {: report_error("Error: error en la estructura del bucle 'for'."); :}
+        | FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN error RBRACKET {: report_error("Error: falta llave de apertura en el bloque 'for'."); :}
         ;
 
 while ::= WHILE LPAREN expr RPAREN LBRACKET bloque RBRACKET 
-        | WHILE error LBRACKET bloque RBRACKET
-        | WHILE LPAREN expr RPAREN error RBRACKET
+        | WHILE error LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la expresión 'while'."); :}
+        | WHILE LPAREN expr RPAREN error RBRACKET {: report_error("Error: falta llave de apertura en el bloque 'while'."); :}
         ;
 
 switch ::= SWITCH LPAREN arit_exp RPAREN LBRACKET case_list case_end RBRACKET 
-        | SWITCH error LBRACKET case_list case_end RBRACKET
-        | SWITCH LPAREN arit_exp RPAREN case_list error RBRACKET
+        | SWITCH error LBRACKET case_list case_end RBRACKET {: report_error("Error: falta paréntesis en la expresión 'switch'."); :}
+        | SWITCH LPAREN arit_exp RPAREN case_list error RBRACKET {: report_error("Error: falta llave de apertura en el bloque 'switch'."); :}
         ;
 
 case_list ::= CASE arit_exp COLON bloque
