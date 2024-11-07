@@ -116,12 +116,11 @@ estru_control ::= if
 
 
 funcion ::= tipo_var ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET 
-        | tipo_var ID error LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la declaración de función."); :}
-        /*| tipo_var ID LPAREN parametro_list LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la declaración de función."); :}*/
-        | tipo_var ID LPAREN parametro_list RPAREN error RBRACKET {: report_error("Error: falta llave de apertura en el cuerpo de la función."); :}
+        | tipo_var ID error parametro_list LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la declaración de función."); :}
+        | tipo_var ID LPAREN parametro_list RPAREN error bloque RBRACKET {: report_error("Error: falta llave de apertura en el cuerpo de la función."); :}
         | VOID ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET
-        | VOID ID error LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la declaración de función."); :}
-        | VOID ID LPAREN parametro_list RPAREN error RBRACKET {: report_error("Error: falta llave de apertura en el cuerpo de la función."); :}
+        | VOID ID error parametro_list LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la declaración de función."); :}
+        | VOID ID LPAREN parametro_list RPAREN error bloque RBRACKET {: report_error("Error: falta llave de apertura en el cuerpo de la función."); :}
         ;
 
 parametro_list ::= tipo_var ID COMMA parametro_list
@@ -136,7 +135,7 @@ if ::= IF LPAREN expr RPAREN LBRACKET bloque RBRACKET else
         ;
 
 else ::= ELSE LBRACKET bloque RBRACKET 
-        | ELSE error RBRACKET {: report_error("Error: falta llave de apertura en el bloque 'else'."); :}
+        | ELSE error RBRACKET {: report_error("Error: error en el 'else'."); :}
         | /* empty */
         ;
 
@@ -167,12 +166,10 @@ case_end ::= DEFAULT COLON bloque
 
 constante ::= CONST tipo_var ID EQ expr SEMI
         | CONST tipo_var ID error SEMI {: report_error("Error: falta inicializar la constante."); :}
-        | CONST tipo_var ID EQ expr error {: report_error("Error: falta punto y coma al final de la declaración anterior."); :}
         ;
 
 variable ::= tipo_var id_list SEMI
         | VOID ID error SEMI {: report_error("Error: no puede declarar variables void."); :}
-        | tipo_var ID error {: report_error("Error: falta punto y coma al final de la declaración anterior."); :}
         ;
 
 

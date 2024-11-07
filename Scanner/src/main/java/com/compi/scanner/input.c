@@ -10,9 +10,8 @@ int funcion1(){
 int k;  
 int g  //error por no tener ;
 
-
+a = a * c
 a = a * funcion(8);
-a = a * c // error por el punto y coma
 
 	if (y>=0) {
 		x= a+b; 
