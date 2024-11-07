@@ -1,8 +1,10 @@
+const int a;    // error: debe inicializar la constante
 int g;
-const int a = 5;
-y;  // error     
+y;      // error: no especifica tipo 
 int z, t, y, y;
 void x; //deberia de dar error pues no se pueden declarar variables void
+int h   // error: falta punto y coma
+const char b = lqs;
 
 int funcion1(){  
 int k;  

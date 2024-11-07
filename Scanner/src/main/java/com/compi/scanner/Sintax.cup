@@ -61,7 +61,7 @@ global_decl ::= variable
               | constante
               | funcion
               | error ID SEMI {: report_error("Error: debe especificar el tipo de variable."); :}
-              /*| error {: report_error("Error: declaración global inválida o incompleta."); :} */
+              | error {: report_error("Error: declaración global inválida o incompleta."); :} 
 	;
 
 
@@ -166,10 +166,13 @@ case_end ::= DEFAULT COLON bloque
         ;
 
 constante ::= CONST tipo_var ID EQ expr SEMI
+        | CONST tipo_var ID error SEMI {: report_error("Error: falta inicializar la constante."); :}
+        | CONST tipo_var ID EQ expr error {: report_error("Error: falta punto y coma al final de la declaración anterior."); :}
         ;
 
 variable ::= tipo_var id_list SEMI
         | VOID ID error SEMI {: report_error("Error: no puede declarar variables void."); :}
+        | tipo_var ID error {: report_error("Error: falta punto y coma al final de la declaración anterior."); :}
         ;
 
 
