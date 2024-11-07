@@ -68,7 +68,7 @@ global_decl ::= variable
 instruccion ::= estru_control
               | constante
               | variable
-              | asignacion
+              | asignacion SEMI
               | BREAK SEMI
               | read SEMI
               | write SEMI
@@ -119,10 +119,7 @@ estru_control ::= if
 
 funcion ::= tipo_var ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET
           | VOID ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET
-
                 | tipo_var ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
-
-    
                 | VOID ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
 
           ;
@@ -193,8 +190,8 @@ next_id_list ::= COMMA ID next_id_list
                ;
 
 
-asignacion ::= ID op_asignacion expr SEMI
-             | ID op_incremento SEMI
+asignacion ::= ID op_asignacion expr 
+             | ID op_incremento 
              | ID op_asignacion error {: report_error("Invalid assignment expression."); :}
              ;
 
