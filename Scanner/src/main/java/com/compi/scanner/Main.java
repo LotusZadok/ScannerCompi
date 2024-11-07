@@ -28,7 +28,7 @@ public class Main {
             // Parsear el archivo de entrada
             Symbol result = parser.parse();
 
-            System.out.println("Parsing completed successfully.");
+            System.out.println("\nParsing completed successfully.");
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
         }

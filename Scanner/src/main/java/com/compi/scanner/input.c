@@ -1,16 +1,17 @@
+const int a;    // error: debe inicializar la constante
 int g;
-const int a = 5;
-y;  // error     
+y;      // error: no especifica tipo 
 int z, t, y, y;
-void x; //deberia de dar error pues no se pueden declarar variables void
+
+int h   // error: falta punto y coma
+const char b = lqs;
 
 int funcion1(){  
 int k;  
 int g  //error por no tener ;
 
-
+a = a * c;
 a = a * funcion(8);
-a = a * c // error por el punto y coma
 
 	if (y>=0) {
 		x= a+b; 
@@ -49,27 +50,23 @@ int funcion4(int, int) { //no se permite solo los tipos
 	}
 }
 
-int funcion1( int x   {  // falta parentesis
+int funcion1( int x )  {  
 
 	while (x && y){ 
 		x++;
  	}
 	
-	// switch(x) {            
+	switch(2) {            
+		case 1: x=1; break;
+		case 2: x=2; break;
+		default: x=0; break;
+ 	}
 
-	// case 5: x;   //se espera error por no tener ;
-    // case 8: break;  
-	// case 5: break;  
-	// case x: break;  //error debe ser constante              
-	// default: break; //error por el 5, default no lleva expresion_constante       
-	// default: x++;  //se espera error por doble default habiendo quitado el error anterior              
- 	// }
-
-read(X);  
+read(uud);  
 read(123);  //se espera error, pues no se acepta expresion entre ( )
-read(x); //se espera error
+read(); //se espera error
 
-// write(C - 123);
+write(C - 123);
 write( );    //se espera error
 
 }  

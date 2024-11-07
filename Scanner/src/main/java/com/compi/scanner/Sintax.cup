@@ -48,9 +48,11 @@ start with programa;
 /* The grammar rules for C subset */
 
 programa ::= globales
-        ;
+           ;
 
-globales ::= global_decl_list;
+globales ::= global_decl_list
+           ;
+
 
 global_decl_list ::= global_decl_list global_decl
                    | global_decl
@@ -59,146 +61,153 @@ global_decl_list ::= global_decl_list global_decl
 global_decl ::= variable
               | constante
               | funcion
-              | error ID SEMI {: report_error("debe especificar el tipo de variable."); :}
-              /*| error {: report_error("declaración global inválida o incompleta."); :} */
-	;
+              | error {: report_error("Error in global declaration."); :}
+              ;
 
 
-
-instruccion  ::= estru_control
-        | constante
-        | variable
-        | asignacion
-        | BREAK SEMI
-        | read SEMI
-        | write SEMI
-        | CONTINUE SEMI
-        | DO SEMI 
-        | RETURN expr SEMI
-        | RETURN SEMI
-        ;
+instruccion ::= estru_control
+              | constante
+              | variable
+              | asignacion
+              | BREAK SEMI
+              | read SEMI
+              | write SEMI
+              | CONTINUE SEMI
+              | DO SEMI 
+              | RETURN expr SEMI
+              | RETURN SEMI
+              | error {: report_error("Invalid instruction."); :}
+              ;
 
 read ::= READ LPAREN read_parameter RPAREN 
-        | READ LPAREN RPAREN
-        | READ error {: report_error("parámetro no válido para la función 'read'."); :}
-        ;
+       | READ LPAREN RPAREN
+       | READ error {: report_error("Invalid 'read' parameters."); :}
+       ;
 
 read_parameter ::= ID COMMA read_parameter
-        | ID
-        ;
+                 | ID
+                 ;
 
 write ::= WRITE LPAREN write_parameter RPAREN
-        | WRITE error {: report_error("parámetro no válido para la función 'write'."); :}
+        | WRITE error {: report_error("Invalid 'write' parameters."); :}
         ;
+
 
 write_parameter ::= expr COMMA write_parameter
-        | expr
-        ;
+                  | expr
+                  ;
 
-bloque ::= instruccion 
-        
-		| instruccion bloque
-		;
+
+bloque ::= instruccion
+         | instruccion bloque
+         ;
+
 
 
 expr_list ::= expr COMMA expr_list
-		| expr
-		| /* empty */
-		;
+            | expr
+            | /* empty */
+            | error {: report_error("Error in expression list."); :}
+            ;
 
 estru_control ::= if
-        | for
-        | while
-        | switch
-        ;
+                | for
+                | while
+                | switch
+                ;
 
 
-funcion ::= tipo_var ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET 
-        | tipo_var ID error LBRACKET bloque RBRACKET {: report_error("problemas con los parametros de la funcion"); :}
-        | tipo_var ID LPAREN parametro_list RPAREN error RBRACKET {: report_error("problemas en el cuerpo de la funcion"); :}
-        | VOID ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET
-        | VOID ID error LBRACKET bloque RBRACKET {: report_error("problemas con los parametros de la funcion"); :}
-        | VOID ID LPAREN parametro_list RPAREN error RBRACKET {: report_error("problemas en el cuerpo de la funcion"); :}
-        ;
+funcion ::= tipo_var ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET
+          | VOID ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET
+
+                | tipo_var ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
+
+    
+                | VOID ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
+
+          ;
+
 
 parametro_list ::= tipo_var ID COMMA parametro_list
-        | tipo_var ID
-        | /* empty */
-        ;
+                 | tipo_var ID
+                 | /* empty */
+                 | error {: report_error("Error in parameter list."); :}
+                 ;
 
 
 if ::= IF LPAREN expr RPAREN LBRACKET bloque RBRACKET else
-        | IF error LBRACKET bloque RBRACKET else {: report_error("problemas en la expresion del 'if'."); :}
-        | IF LPAREN expr RPAREN error RBRACKET else {: report_error("problemas en el cuerpo del 'if'."); :}
-        ;
+     | IF error bloque RBRACKET else {: report_error("Invalid expression in 'if' condition."); :}
+        | IF LPAREN expr RPAREN error {: report_error("Invalid 'if' statement."); :}
+     ;
 
-else ::= ELSE LBRACKET bloque RBRACKET 
-        | ELSE error RBRACKET {: report_error("problemas en el cuerpo del 'else'."); :}
-        | /* empty */
-        ;
+else ::= ELSE LBRACKET bloque RBRACKET
+        | ELSE error {: report_error("Invalid 'else' statement."); :}
+       | /* empty */
+       ;
+for ::= FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN LBRACKET bloque RBRACKET
+        | FOR error bloque RBRACKET {: report_error("Invalid 'for' loop condition."); :}
+        | FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN error {: report_error("Invalid 'for' loop condition."); :}
+       ;
 
+while ::= WHILE LPAREN expr RPAREN LBRACKET bloque RBRACKET
+        | WHILE error bloque RBRACKET {: report_error("Invalid 'while' loop condition."); :}
+        | WHILE LPAREN expr RPAREN error {: report_error("Invalid 'while' loop condition."); :}
+         ;
 
-for ::= FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN LBRACKET bloque RBRACKET 
-        | FOR error LBRACKET bloque RBRACKET {: report_error("problemas en la expresion del bucle 'for'."); :}
-        | FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN error RBRACKET {: report_error("problemas en el cuerpo del 'for'."); :}
-        ;
-
-while ::= WHILE LPAREN expr RPAREN LBRACKET bloque RBRACKET 
-        | WHILE error LBRACKET bloque RBRACKET {: report_error("problemas en la expresion del 'while'."); :}
-        | WHILE LPAREN expr RPAREN error RBRACKET {: report_error("problemas en el cuerpo del 'while'."); :}
-        ;
-
-switch ::= SWITCH LPAREN arit_exp RPAREN LBRACKET case_list case_end RBRACKET 
-        | SWITCH error LBRACKET case_list case_end RBRACKET {: report_error("problemas en la expresion del 'switch'."); :}
-        | SWITCH LPAREN arit_exp RPAREN case_list error RBRACKET {: report_error("problemas en el cuerpo del 'switch'."); :}
-        ;
+switch ::= SWITCH LPAREN arit_exp RPAREN LBRACKET case_list case_end RBRACKET
+        | SWITCH error case_list case_end RBRACKET {: report_error("Invalid 'switch' statement."); :}
+        | SWITCH LPAREN arit_exp RPAREN error {: report_error("Invalid 'switch' statement."); :}
+         ;
 
 case_list ::= CASE arit_exp COLON bloque
-        | CASE arit_exp COLON bloque case_list
-        ;
+            | CASE arit_exp COLON bloque case_list
+                | CASE error {: report_error("Invalid 'case' statement."); :}
+            ;
 
 case_end ::= DEFAULT COLON bloque
-        | /* empty */
-        ;
+                | DEFAULT error {: report_error("Invalid 'default' statement."); :}
+           | /* empty */
+           ;
 
 constante ::= CONST tipo_var ID EQ expr SEMI
-        | CONST error SEMI {: report_error("error en la declaración de constante."); :}
-        ;
+            | CONST tipo_var ID EQ expr error {: report_error("Missing semicolon in constant declaration."); :}
+            ;
 
 variable ::= tipo_var id_list SEMI
-        | tipo_var SEMI {: report_error("error en la declaración de variable."); :}
-        ;
+           | tipo_var id_list error {: report_error("Missing semicolon in variable declaration."); :}
+           ;
+
 
 tipo_var ::= TYPE_INT
-        | TYPE_LONG
-        | TYPE_SHORT
-        | TYPE_CHAR
-        ;
+           | TYPE_LONG
+           | TYPE_SHORT
+           | TYPE_CHAR
+           ;
 
 
 id_list ::= ID next_id_list
-        ;
+          ;
 
 next_id_list ::= COMMA ID next_id_list
-        | /* empty */
-        ;
+               | /* empty */
+               ;
 
 
 asignacion ::= ID op_asignacion expr SEMI
-        | ID op_incremento SEMI
-        ;
-
+             | ID op_incremento SEMI
+             | ID op_asignacion error {: report_error("Invalid assignment expression."); :}
+             ;
 
 op_asignacion ::= EQ
-        | PLUS_EQ
-        | MINUS_EQ
-        | TIMES_EQ
-        | DIV_EQ
-        ;
+                | PLUS_EQ
+                | MINUS_EQ
+                | TIMES_EQ
+                | DIV_EQ
+                ;
 
 op_incremento ::= PLUS_PLUS
-        | MINUS_MINUS
-        ;
+                | MINUS_MINUS
+                ;
 
 expr ::= expr PLUS expr
        | expr MINUS expr
@@ -210,10 +219,21 @@ expr ::= expr PLUS expr
        | NOT expr
        | expr op_relacional expr
        | LPAREN expr RPAREN
+       | ID LPAREN expr_list RPAREN
        | ID
        | literal
        | number
        ;
+
+arit_exp ::= arit_exp PLUS arit_exp
+           | arit_exp MINUS arit_exp
+           | arit_exp TIMES arit_exp
+           | arit_exp DIV arit_exp
+           | arit_exp MOD arit_exp
+           | LPAREN arit_exp RPAREN
+                  | ID
+                  | number
+           ;
 
 op_relacional ::= EQ_EQ
                 | GT_EQ
