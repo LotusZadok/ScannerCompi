@@ -59,8 +59,8 @@ global_decl_list ::= global_decl_list global_decl
 global_decl ::= variable
               | constante
               | funcion
-              | error ID SEMI {: report_error("Error: debe especificar el tipo de variable."); :}
-              /*| error {: report_error("Error: declaración global inválida o incompleta."); :} */
+              | error ID SEMI {: report_error("debe especificar el tipo de variable."); :}
+              /*| error {: report_error("declaración global inválida o incompleta."); :} */
 	;
 
 
@@ -69,19 +69,18 @@ instruccion  ::= estru_control
         | constante
         | variable
         | asignacion
-        | funcion
         | BREAK SEMI
         | read SEMI
         | write SEMI
         | CONTINUE SEMI
-        | DO SEMI
+        | DO SEMI 
         | RETURN expr SEMI
         | RETURN SEMI
         ;
 
 read ::= READ LPAREN read_parameter RPAREN 
         | READ LPAREN RPAREN
-        | READ error {: report_error("Error: parámetro no válido para la función 'read'."); :}
+        | READ error {: report_error("parámetro no válido para la función 'read'."); :}
         ;
 
 read_parameter ::= ID COMMA read_parameter
@@ -89,7 +88,7 @@ read_parameter ::= ID COMMA read_parameter
         ;
 
 write ::= WRITE LPAREN write_parameter RPAREN
-        | WRITE error {: report_error("Error: parámetro no válido para la función 'write'."); :}
+        | WRITE error {: report_error("parámetro no válido para la función 'write'."); :}
         ;
 
 write_parameter ::= expr COMMA write_parameter
@@ -97,7 +96,7 @@ write_parameter ::= expr COMMA write_parameter
         ;
 
 bloque ::= instruccion 
-
+        
 		| instruccion bloque
 		;
 
@@ -115,11 +114,11 @@ estru_control ::= if
 
 
 funcion ::= tipo_var ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET 
-        | tipo_var ID error LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la declaración de función."); :}
-        | tipo_var ID LPAREN parametro_list RPAREN error RBRACKET {: report_error("Error: falta llave de apertura en el cuerpo de la función."); :}
+        | tipo_var ID error LBRACKET bloque RBRACKET {: report_error("problemas con los parametros de la funcion"); :}
+        | tipo_var ID LPAREN parametro_list RPAREN error RBRACKET {: report_error("problemas en el cuerpo de la funcion"); :}
         | VOID ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET
-        | VOID ID error LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la declaración de función."); :}
-        | VOID ID LPAREN parametro_list RPAREN error RBRACKET {: report_error("Error: falta llave de apertura en el cuerpo de la función."); :}
+        | VOID ID error LBRACKET bloque RBRACKET {: report_error("problemas con los parametros de la funcion"); :}
+        | VOID ID LPAREN parametro_list RPAREN error RBRACKET {: report_error("problemas en el cuerpo de la funcion"); :}
         ;
 
 parametro_list ::= tipo_var ID COMMA parametro_list
@@ -129,29 +128,29 @@ parametro_list ::= tipo_var ID COMMA parametro_list
 
 
 if ::= IF LPAREN expr RPAREN LBRACKET bloque RBRACKET else
-        | IF error LBRACKET bloque RBRACKET else {: report_error("Error: falta paréntesis en la expresión 'if'."); :}
-        | IF LPAREN expr RPAREN error RBRACKET else {: report_error("Error: falta llave de apertura en el bloque 'if'."); :}
+        | IF error LBRACKET bloque RBRACKET else {: report_error("problemas en la expresion del 'if'."); :}
+        | IF LPAREN expr RPAREN error RBRACKET else {: report_error("problemas en el cuerpo del 'if'."); :}
         ;
 
 else ::= ELSE LBRACKET bloque RBRACKET 
-        | ELSE error RBRACKET {: report_error("Error: falta llave de apertura en el bloque 'else'."); :}
+        | ELSE error RBRACKET {: report_error("problemas en el cuerpo del 'else'."); :}
         | /* empty */
         ;
 
 
 for ::= FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN LBRACKET bloque RBRACKET 
-        | FOR error LBRACKET bloque RBRACKET {: report_error("Error: error en la estructura del bucle 'for'."); :}
-        | FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN error RBRACKET {: report_error("Error: falta llave de apertura en el bloque 'for'."); :}
+        | FOR error LBRACKET bloque RBRACKET {: report_error("problemas en la expresion del bucle 'for'."); :}
+        | FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN error RBRACKET {: report_error("problemas en el cuerpo del 'for'."); :}
         ;
 
 while ::= WHILE LPAREN expr RPAREN LBRACKET bloque RBRACKET 
-        | WHILE error LBRACKET bloque RBRACKET {: report_error("Error: falta paréntesis en la expresión 'while'."); :}
-        | WHILE LPAREN expr RPAREN error RBRACKET {: report_error("Error: falta llave de apertura en el bloque 'while'."); :}
+        | WHILE error LBRACKET bloque RBRACKET {: report_error("problemas en la expresion del 'while'."); :}
+        | WHILE LPAREN expr RPAREN error RBRACKET {: report_error("problemas en el cuerpo del 'while'."); :}
         ;
 
 switch ::= SWITCH LPAREN arit_exp RPAREN LBRACKET case_list case_end RBRACKET 
-        | SWITCH error LBRACKET case_list case_end RBRACKET {: report_error("Error: falta paréntesis en la expresión 'switch'."); :}
-        | SWITCH LPAREN arit_exp RPAREN case_list error RBRACKET {: report_error("Error: falta llave de apertura en el bloque 'switch'."); :}
+        | SWITCH error LBRACKET case_list case_end RBRACKET {: report_error("problemas en la expresion del 'switch'."); :}
+        | SWITCH LPAREN arit_exp RPAREN case_list error RBRACKET {: report_error("problemas en el cuerpo del 'switch'."); :}
         ;
 
 case_list ::= CASE arit_exp COLON bloque
@@ -163,14 +162,13 @@ case_end ::= DEFAULT COLON bloque
         ;
 
 constante ::= CONST tipo_var ID EQ expr SEMI
+        | CONST error SEMI {: report_error("error en la declaración de constante."); :}
         ;
 
 variable ::= tipo_var id_list SEMI
-        | VOID ID error SEMI {: report_error("Error: no puede declarar variables void."); :}
+        | tipo_var SEMI {: report_error("error en la declaración de variable."); :}
         ;
 
-
-// FIXME: Tipos para funciones aparte 
 tipo_var ::= TYPE_INT
         | TYPE_LONG
         | TYPE_SHORT
@@ -202,60 +200,35 @@ op_incremento ::= PLUS_PLUS
         | MINUS_MINUS
         ;
 
-expr ::= literal
-        | bool_expr
-        | arit_exp
-        ;
-
-literal ::= CHAR
-        | STRING
-        ;
-
-// FIXME: No funcionan con ID
-bool_expr ::= bool_expr OR bool_term
-        | bool_term
-        ;
-
-bool_term ::= bool_term AND bool_factor
-        | bool_factor
-        ;
-
-bool_factor ::= NOT bool_factor
-        | LPAREN bool_expr RPAREN
-        | rel_expr
-        | TRUE
-        | FALSE
-        ;
-
-rel_expr ::= arit_exp op_relacional arit_exp
-        ;
+expr ::= expr PLUS expr
+       | expr MINUS expr
+       | expr TIMES expr
+       | expr DIV expr
+       | expr MOD expr
+       | expr AND expr
+       | expr OR expr
+       | NOT expr
+       | expr op_relacional expr
+       | LPAREN expr RPAREN
+       | ID
+       | literal
+       | number
+       ;
 
 op_relacional ::= EQ_EQ
-        | GT_EQ
-        | GT
-        | LT_EQ
-        | LT
-        | NOT_EQ
-        ;
+                | GT_EQ
+                | GT
+                | LT_EQ
+                | LT
+                | NOT_EQ
+                ;
 
-arit_exp ::= arit_exp PLUS term
-        | arit_exp MINUS term   
-        | term
-        ;
-
-term ::= term TIMES factor
-        | term DIV factor
-        | term MOD factor
-        | factor
-        ;
-
-factor ::= LPAREN arit_exp RPAREN
-        | number
-        | ID
-        | ID LPAREN expr_list RPAREN
-        ;
+literal ::= CHAR
+          | STRING
+          | TRUE
+          | FALSE
+          ;
 
 number ::= INT
-        | FLOAT
-        ;
-
+         | FLOAT
+         ;

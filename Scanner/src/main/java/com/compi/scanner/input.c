@@ -15,12 +15,12 @@ a = a * c // error por el punto y coma
 	if (y>=0) {
 		x= a+b; 
 	}
-	else {
-		x--; 
-	}
-	else { //deberia dar error por doble uso de else
+	else { 
 		x= a+b;
 	} 
+	else {
+		x--;
+	}
         
 
 	if x==3 {//deberia dar error por expresion fuera de parentesis
