@@ -6,6 +6,7 @@
 package com.compi.scanner;
 
 import java_cup.runtime.Symbol;
+import com.compi.scanner.semantico.*;
 import java_cup.runtime.XMLElement;
 
 /** CUP v0.11b 20160615 (GIT 4ac7450) generated parser.
@@ -660,6 +661,8 @@ public class ParserCup extends java_cup.runtime.lr_parser {
         return this.sym;
     };
 
+    private TablaSimbolos ts = new TablaSimbolos();
+
 
 /** Cup generated class to encapsulate user supplied action code.*/
 @SuppressWarnings({"rawtypes", "unchecked", "unused"})
@@ -748,7 +751,10 @@ class CUP$ParserCup$actions {
           case 6: // global_decl ::= constante 
             {
               Object RESULT =null;
-
+		 
+                    Simbolo constSimbolo = (Simbolo) RESULT;
+                    ts.insertarGlobal(constSimbolo);
+              
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("global_decl",9, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1315,7 +1321,22 @@ class CUP$ParserCup$actions {
           case 69: // constante ::= CONST tipo_var ID EQ expr SEMI 
             {
               Object RESULT =null;
-
+		int tipoleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-4)).left;
+		int tiporight = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-4)).right;
+		Object tipo = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-4)).value;
+		int idleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-3)).left;
+		int idright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-3)).right;
+		Object id = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-3)).value;
+		int valorleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).left;
+		int valorright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).right;
+		Object valor = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).value;
+		 
+                Simbolo simbolo = new Simbolo();
+                simbolo.setTipo_var(String.valueOf(tipo)); 
+                simbolo.setId(String.valueOf(id));
+                // Devolver el objeto Simbolo creado
+                RESULT = simbolo;
+            
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("constante",21, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-5)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;

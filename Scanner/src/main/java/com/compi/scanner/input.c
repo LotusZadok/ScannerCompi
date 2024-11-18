@@ -1,4 +1,5 @@
 const int a = 4;
+const char a=no;
 int b;
 
 int main(int a, int b) {

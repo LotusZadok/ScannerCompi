@@ -1,7 +1,6 @@
 /* Simple +/-/* expression language; parser evaluates constant expressions on the fly*/
 package com.compi.scanner;
 import java_cup.runtime.Symbol;
-import com.compi.scanner.semantico.*;
 
 parser code {:
     private Symbol sym;
@@ -21,8 +20,6 @@ parser code {:
     public Symbol getS(){
         return this.sym;
     };
-
-    private TablaSimbolos ts = new TablaSimbolos();
 :};
 
 
@@ -62,10 +59,7 @@ global_decl_list ::= global_decl_list global_decl
                    ;                 
 
 global_decl ::= variable
-              | constante {: 
-                    Simbolo constSimbolo = (Simbolo) RESULT;
-                    ts.insertarGlobal(constSimbolo);
-              :}
+              | constante
               | funcion
               | error {: report_error("Error in global declaration."); :}
               ;
@@ -172,12 +166,7 @@ case_end ::= DEFAULT COLON bloque
            | /* empty */
            ;
 
-constante ::= CONST tipo_var:tipo ID:id EQ expr:valor SEMI {: 
-                Simbolo simbolo = new Simbolo();
-                simbolo.setTipo_var (String.valueOf(tipo)); 
-                simbolo.setId (String.valueOf(id));
-                RESULT = simbolo;
-            :}
+constante ::= CONST tipo_var ID EQ expr SEMI
             | CONST tipo_var ID EQ expr error {: report_error("Missing semicolon in constant declaration."); :}
             ;
 
