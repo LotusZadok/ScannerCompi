@@ -656,12 +656,28 @@ public class ParserCup extends java_cup.runtime.lr_parser {
     public void report_error(String message) {
         System.err.println(message);
     }
+
+    public void semantic_error(Symbol sym) {
+        System.err.println("Error semántico en línea " + (sym.left + 1) + ", columna " + (sym.right + 1) + ": " + sym.value);
+    }
         
     public Symbol getS(){
         return this.sym;
     };
 
     private TablaSimbolos ts = new TablaSimbolos();
+
+    public void imprimirTablasSimbolos() {
+        ts.imprimirTablas();
+    }
+
+    public void insertarVar (Simbolo simbolo){
+        String mensaje = ts.insertarVar (simbolo);
+        if (mensaje != null){
+            semantic_error (cur_token);
+            System.err.println(mensaje);
+        } 
+    }
 
 
 /** Cup generated class to encapsulate user supplied action code.*/
@@ -706,7 +722,7 @@ class CUP$ParserCup$actions {
           case 1: // programa ::= globales 
             {
               Object RESULT =null;
-
+		 imprimirTablasSimbolos();
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("programa",0, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -751,10 +767,7 @@ class CUP$ParserCup$actions {
           case 6: // global_decl ::= constante 
             {
               Object RESULT =null;
-		 
-                    Simbolo constSimbolo = (Simbolo) RESULT;
-                    ts.insertarGlobal(constSimbolo);
-              
+
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("global_decl",9, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -763,7 +776,7 @@ class CUP$ParserCup$actions {
           case 7: // global_decl ::= funcion 
             {
               Object RESULT =null;
-
+		 ts.globales (); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("global_decl",9, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1330,13 +1343,7 @@ class CUP$ParserCup$actions {
 		int valorleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).left;
 		int valorright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).right;
 		Object valor = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).value;
-		 
-                Simbolo simbolo = new Simbolo();
-                simbolo.setTipo_var(String.valueOf(tipo)); 
-                simbolo.setId(String.valueOf(id));
-                // Devolver el objeto Simbolo creado
-                RESULT = simbolo;
-            
+		 insertarVar (new Simbolo (tipo, id)); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("constante",21, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-5)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1372,7 +1379,7 @@ class CUP$ParserCup$actions {
           case 73: // tipo_var ::= TYPE_INT 
             {
               Object RESULT =null;
-
+		 RESULT = "int"; 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("tipo_var",23, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1381,7 +1388,7 @@ class CUP$ParserCup$actions {
           case 74: // tipo_var ::= TYPE_LONG 
             {
               Object RESULT =null;
-
+		 RESULT = "long"; 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("tipo_var",23, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1390,7 +1397,7 @@ class CUP$ParserCup$actions {
           case 75: // tipo_var ::= TYPE_SHORT 
             {
               Object RESULT =null;
-
+		 RESULT = "short"; 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("tipo_var",23, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1399,7 +1406,7 @@ class CUP$ParserCup$actions {
           case 76: // tipo_var ::= TYPE_CHAR 
             {
               Object RESULT =null;
-
+		 RESULT = "char"; 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("tipo_var",23, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;

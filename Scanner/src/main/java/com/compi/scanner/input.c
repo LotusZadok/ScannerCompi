@@ -1,5 +1,5 @@
 const int a = 4;
-const char a=no;
+const long c = 4;
 int b;
 
 int main(int a, int b) {

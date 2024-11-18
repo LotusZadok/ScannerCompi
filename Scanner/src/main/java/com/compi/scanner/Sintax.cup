@@ -17,12 +17,28 @@ parser code {:
     public void report_error(String message) {
         System.err.println(message);
     }
+
+    public void semantic_error(Symbol sym) {
+        System.err.println("Error semántico en línea " + (sym.left + 1) + ", columna " + (sym.right + 1) + ": " + sym.value);
+    }
         
     public Symbol getS(){
         return this.sym;
     };
 
     private TablaSimbolos ts = new TablaSimbolos();
+
+    public void imprimirTablasSimbolos() {
+        ts.imprimirTablas();
+    }
+
+    public void insertarVar (Simbolo simbolo){
+        String mensaje = ts.insertarVar (simbolo);
+        if (mensaje != null){
+            semantic_error (cur_token);
+            System.err.println(mensaje);
+        } 
+    }
 :};
 
 
@@ -50,7 +66,7 @@ start with programa;
 
 /* The grammar rules for C subset */
 
-programa ::= globales
+programa ::= globales {: imprimirTablasSimbolos();:}
            ;
 
 globales ::= global_decl_list
@@ -62,11 +78,8 @@ global_decl_list ::= global_decl_list global_decl
                    ;                 
 
 global_decl ::= variable
-              | constante {: 
-                    Simbolo constSimbolo = (Simbolo) RESULT;
-                    ts.insertarGlobal(constSimbolo);
-              :}
-              | funcion
+              | constante
+              | funcion {: ts.globales (); :}
               | error {: report_error("Error in global declaration."); :}
               ;
 
@@ -172,12 +185,7 @@ case_end ::= DEFAULT COLON bloque
            | /* empty */
            ;
 
-constante ::= CONST tipo_var:tipo ID:id EQ expr:valor SEMI {: 
-                Simbolo simbolo = new Simbolo();
-                simbolo.setTipo_var (String.valueOf(tipo)); 
-                simbolo.setId (String.valueOf(id));
-                RESULT = simbolo;
-            :}
+constante ::= CONST tipo_var:tipo ID:id EQ expr:valor SEMI {: insertarVar (new Simbolo (tipo, id)); :}
             | CONST tipo_var ID EQ expr error {: report_error("Missing semicolon in constant declaration."); :}
             ;
 
@@ -186,10 +194,10 @@ variable ::= tipo_var id_list SEMI
            ;
 
 
-tipo_var ::= TYPE_INT
-           | TYPE_LONG
-           | TYPE_SHORT
-           | TYPE_CHAR
+tipo_var ::= TYPE_INT {: RESULT = "int"; :}
+           | TYPE_LONG {: RESULT = "long"; :}
+           | TYPE_SHORT {: RESULT = "short"; :}
+           | TYPE_CHAR {: RESULT = "char"; :}
            ;
 
 
