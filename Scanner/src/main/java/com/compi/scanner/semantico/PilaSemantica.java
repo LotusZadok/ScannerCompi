@@ -10,7 +10,7 @@ public class PilaSemantica {
         pilaSemantica = new ArrayList<>();
     }
 
-    // Variables
+    // VAR
     public void push_init(String tipo_var, String id){
         pilaSemantica.add(0, new RegistroSemantico(tipo_var, id));
     }
@@ -18,12 +18,12 @@ public class PilaSemantica {
         pilaSemantica.add(pilaSemantica.size(), new RegistroSemantico(tipo_var, id));
     }
 
-    // Constantes
-     public void push_init(String tipo, String tipo_var, String id){
-        pilaSemantica.add(0, new RegistroSemantico(tipo, tipo_var, id));
+    // CONST
+     public void push_init(String tipo, String tipo_var, String id, String valor){
+        pilaSemantica.add(0, new RegistroSemantico(tipo, tipo_var, id, valor));
     }
-    public void push_end(String tipo, String tipo_var, String id){
-        pilaSemantica.add(pilaSemantica.size(), new RegistroSemantico(tipo, tipo_var, id));
+    public void push_end(String tipo, String tipo_var, String id, String valor){
+        pilaSemantica.add(pilaSemantica.size(), new RegistroSemantico(tipo, tipo_var, id, valor));
     }
 
     public RegistroSemantico pop_init(){ // saca el primero de la lista

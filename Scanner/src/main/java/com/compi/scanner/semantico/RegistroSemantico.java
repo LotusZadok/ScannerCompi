@@ -14,10 +14,11 @@ public class RegistroSemantico {
         this.id = id;
     }
 
-    public RegistroSemantico(String tipo, String tipo_var, String id) {
+    public RegistroSemantico(String tipo, String tipo_var, String id, String valor) {
         this.tipo = tipo;
         this.tipo_var = tipo_var;
         this.id = id;
+        this.valor = valor;
     }
 
     public String getTipo() {
