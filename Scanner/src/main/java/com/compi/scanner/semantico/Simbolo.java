@@ -4,21 +4,29 @@ public class Simbolo {
     protected String tipo_var;
     protected String id;
     protected String ambito;
+    private boolean esConstante;
+    private Object valor;
 
-    public Simbolo(){
+    public Simbolo() {
         tipo_var = "";
         id = "";
         ambito = "";
+        esConstante = false;
+        valor = null;
     }
 
-    public Simbolo(String tipo_var, String id){
+    public Simbolo(String tipo_var, String id) {
         this.tipo_var = tipo_var;
         this.id = id;
+        this.esConstante = false;
+        this.valor = null;
     }
 
-    public Simbolo(Object tipo_var, Object id){
-        this.tipo_var = String.valueOf(tipo_var);
-        this.id = String.valueOf(id);
+    public Simbolo(String tipo_var, String id, boolean esConstante, Object valor) {
+        this.tipo_var = tipo_var;
+        this.id = id;
+        this.esConstante = esConstante;
+        this.valor = valor;
     }
 
     public String getTipo_var() {
@@ -45,7 +53,30 @@ public class Simbolo {
         this.ambito = ambito;
     }
 
-    public String toString (){
-        return "Tipo: " + tipo_var + ", identificador: " + id;
+    public boolean isEsConstante() {
+        return esConstante;
+    }
+
+    public void setEsConstante(boolean esConstante) {
+        this.esConstante = esConstante;
+    }
+
+    public Object getValor() {
+        return valor;
+    }
+
+    public void setValor(Object valor) {
+        this.valor = valor;
+    }
+
+    @Override
+    public String toString() {
+        return "Simbolo{" +
+                "tipo_var='" + tipo_var + '\'' +
+                ", id='" + id + '\'' +
+                ", ambito='" + ambito + '\'' +
+                ", esConstante=" + esConstante +
+                ", valor=" + valor +
+                '}';
     }
 }

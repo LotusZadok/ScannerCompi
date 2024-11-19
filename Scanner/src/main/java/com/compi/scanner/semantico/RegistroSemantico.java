@@ -54,7 +54,12 @@ public class RegistroSemantico {
     }
 
     @Override
-    public String toString(){
-        return null;
+    public String toString() {
+        return "RegistroSemantico{" +
+                "tipo='" + tipo + '\'' +
+                ", tipo_var='" + tipo_var + '\'' +
+                ", id='" + id + '\'' +
+                ", valor='" + valor + '\'' +
+                '}';
     }
 }

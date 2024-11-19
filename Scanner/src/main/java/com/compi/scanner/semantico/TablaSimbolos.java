@@ -3,58 +3,85 @@ package com.compi.scanner.semantico;
 import java.util.ArrayList;
 
 public class TablaSimbolos {
-    static ArrayList<Simbolo> tablaSimbolos;
-    public ArrayList<Simbolo> variablesGlobales;
-    public ArrayList<Simbolo> variables;
-    // falta una lista de funciones, todavia no se como manejarlo
+    private ArrayList<Simbolo> variablesGlobales;
+    private ArrayList<Simbolo> variables;
 
-    public TablaSimbolos(){
-        tablaSimbolos = new ArrayList<>();
+    public TablaSimbolos() {
         variablesGlobales = new ArrayList<>();
         variables = new ArrayList<>();
     }
 
-    public String insertarGlobal(Simbolo simbolo){
+    public String insertarGlobal(Simbolo simbolo) {
         String idSimbolo = simbolo.getId();
-    
-        for (Simbolo s : variablesGlobales) {   // Verificar si el nombre del símbolo ya existe en variablesGlobales
-            if (s.getId().equals(idSimbolo)) return "Variable ya declarada en el ámbito global.";
+
+        for (Simbolo s : variablesGlobales) {
+            if (s.getId().equals(idSimbolo)) return "Variable '" + idSimbolo + "' ya declarada en el ámbito global.";
         }
 
         variablesGlobales.add(simbolo);
         return null;
     }
 
-    public String insertarVar(Simbolo simbolo){
+    public String insertarVar(Simbolo simbolo) {
         String idSimbolo = simbolo.getId();
-    
-        for (Simbolo s : variablesGlobales) {   // Verificar si el nombre del símbolo ya existe en variablesGlobales
-            if (s.getId().equals(idSimbolo)) return "Variable ya declarada en el ámbito global.";
+
+        for (Simbolo s : variablesGlobales) {
+            if (s.getId().equals(idSimbolo)) return "Variable '" + idSimbolo + "' ya declarada en el ámbito global.";
         }
 
-        for (Simbolo s : variables) {    // Verificar si el nombre del símbolo ya existe en variables
-            if (s.getId().equals(idSimbolo)) return "Variable ya declarada en el ámbito local.";
+        for (Simbolo s : variables) {
+            if (s.getId().equals(idSimbolo)) return "Variable '" + idSimbolo + "' ya declarada en el ámbito local.";
         }
 
         variables.add(simbolo);
         return null;
     }
 
-    public void globales (){
+    public String insertarConstante(Simbolo simbolo) {
+        String idSimbolo = simbolo.getId();
+
+        for (Simbolo s : variablesGlobales) {
+            if (s.getId().equals(idSimbolo)) return "Constante '" + idSimbolo + "' ya declarada en el ámbito global.";
+        }
+
+        variablesGlobales.add(simbolo);
+        return null;
+    }
+
+    public void globales() {
         variablesGlobales.addAll(variables);
         variables.clear();
     }
 
-    public void imprimirTablas(){
+    public void imprimirTablas() {
         System.out.println("\n--- Variables Globales ---");
         for (Simbolo simbolo : variablesGlobales) {
             System.out.println(simbolo.toString());
         }
 
-        System.out.println("\n--- Variables ---");
+        System.out.println("\n--- Variables Locales ---");
         for (Simbolo simbolo : variables) {
             System.out.println(simbolo.toString());
         }
     }
 
+    public boolean contiene(String id) {
+        for (Simbolo s : variablesGlobales) {
+            if (s.getId().equals(id)) return true;
+        }
+        for (Simbolo s : variables) {
+            if (s.getId().equals(id)) return true;
+        }
+        return false;
+    }
+
+    public Simbolo obtenerSimbolo(String id) {
+        for (Simbolo s : variablesGlobales) {
+            if (s.getId().equals(id)) return s;
+        }
+        for (Simbolo s : variables) {
+            if (s.getId().equals(id)) return s;
+        }
+        return null;
+    }
 }
