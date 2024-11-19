@@ -473,7 +473,7 @@ p_relacional ::= EQ_EQ {:
         :}
         ;
 
-literal ::= CHAR:c STRING:c {:
+literal ::= CHAR:c {:
                 RESULT = c.value;
             :}
           | STRING {:
