@@ -453,19 +453,31 @@ arit_exp ::= arit_exp:left PLUS arit_exp:right {:
             :}
           ;
 
-op_relacional ::= EQ_EQ
-                | GT_EQ
-                | GT
-                | LT_EQ
-                | LT
-                | NOT_EQ
-                ;
+p_relacional ::= EQ_EQ {:
+            RESULT = "==";
+        :}
+        | GT_EQ {:
+            RESULT = ">=";
+        :}
+        | GT {:
+            RESULT = ">";
+        :}
+        | LT_EQ {:
+            RESULT = "<=";
+        :}
+        | LT {:
+            RESULT = "<";
+        :}
+        | NOT_EQ {:
+            RESULT = "!=";
+        :}
+        ;
 
-literal ::= CHAR:c {:
+literal ::= CHAR:c STRING:c {:
                 RESULT = c.value;
             :}
           | STRING {:
-                RESULT = ((Symbol) $1).value;
+                RESULT = "";
             :}
           | TRUE {:
                 RESULT = true;
