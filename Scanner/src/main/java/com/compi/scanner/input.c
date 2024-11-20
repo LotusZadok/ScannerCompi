@@ -1,6 +1,6 @@
 const int a = 4;
 const char c = 4;
-int b,d,e,f;
+int a,d,e,f;
 
 int main(int a, int b) {
 for (i = 0; i < 10; i++) {

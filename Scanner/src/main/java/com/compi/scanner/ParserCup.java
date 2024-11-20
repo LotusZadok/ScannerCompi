@@ -691,11 +691,14 @@ public class ParserCup extends java_cup.runtime.lr_parser {
         if (tipo!=null){
             while (!pilaSemantica.isEmpty() && pilaSemantica.get(pilaSemantica.size() - 1).getTipo().equals("")) {
                 RegistroSemantico registro = pilaSemantica.pop_end();
-                ts.insertarVar (new Simbolo (tipo, registro.getId()));
+                String mensaje = ts.insertarVar (new Simbolo (tipo, registro.getId()));
+                if (mensaje != null){
+                    semantic_error (cur_token);
+                    System.err.println(mensaje);
+                } 
             }
         }
         pilaSemantica.pop_end ();
-        pilaSemantica.print();
     }
 
 
