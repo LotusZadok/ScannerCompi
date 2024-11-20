@@ -35,6 +35,7 @@ public class TablaSimbolos {
 
         variables.add(simbolo);
         return null;
+    
     }
 
     public String insertarConstante(Simbolo simbolo) {

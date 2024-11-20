@@ -17,7 +17,6 @@ public class Simbolo {
         this.tipo_var = tipo_var;
         this.id = id;
         this.esConstante = false;
-        this.valor = null;
     }
 
     public Simbolo(String tipo_var, String id, boolean esConstante, Object valor) {

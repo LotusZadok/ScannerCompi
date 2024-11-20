@@ -36,6 +36,15 @@ public class PilaSemantica {
         }
     }
 
+    public String buscarTipo (){
+        for (RegistroSemantico registro : pilaSemantica) {
+            if ("TIPO".equals(registro.getTipo())) {
+                return registro.getTipo_Var().toString();
+            }
+        }
+        return null;
+    }
+
     public Boolean isEmpty(){
         return pilaSemantica.isEmpty();
     }
@@ -48,9 +57,19 @@ public class PilaSemantica {
         return pilaSemantica.size();
     }
 
+    public RegistroSemantico get(int index) {
+        if (index >= 0 && index < pilaSemantica.size()) {
+            return pilaSemantica.get(index); 
+        } else {
+            System.err.println("Error: índice fuera de rango");
+            return null;
+        }
+    }
+
     public void print() {
         for (RegistroSemantico registro : pilaSemantica) {
             System.out.println(registro);
+            //System.out.println(pilaSemantica.indexOf(registro));
         }
     }
 }

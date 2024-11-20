@@ -8,8 +8,6 @@ import com.compi.scanner.semantico.*;
 
 /* Clases auxiliares */
 action code {:
-    public PilaSemantica pilaSemantica = new PilaSemantica();
-
     public class ExprValue {
         public boolean esConstante;
         public Object valor;
@@ -60,6 +58,7 @@ parser code {:
     };
 
     private TablaSimbolos ts = new TablaSimbolos();
+    public PilaSemantica pilaSemantica = new PilaSemantica();
 
     public void imprimirTablasSimbolos() {
         ts.imprimirTablas();
@@ -72,6 +71,18 @@ parser code {:
             semantic_error (cur_token);
             System.err.println(mensaje);
         } 
+    }
+
+    public void insertarVariables (){
+        String tipo = pilaSemantica.buscarTipo ();
+        if (tipo!=null){
+            while (!pilaSemantica.isEmpty() && pilaSemantica.get(pilaSemantica.size() - 1).getTipo().equals("")) {
+                RegistroSemantico registro = pilaSemantica.pop_end();
+                ts.insertarVar (new Simbolo (tipo, registro.getId()));
+            }
+        }
+        pilaSemantica.pop_end ();
+        pilaSemantica.print();
     }
 :};
 
@@ -232,7 +243,7 @@ constante ::= CONST tipo_var:tipo ID:id EQ expr:valor SEMI {:
 
 variable ::= tipo_var:tipo id_list SEMI{:
                 pilaSemantica.push_init(new RegistroSemantico (tipo));
-                pilaSemantica.print ();
+                insertarVariables ();
             :}
            | tipo_var id_list error {: report_error("Missing semicolon in variable declaration."); :}
            ;

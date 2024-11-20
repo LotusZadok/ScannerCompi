@@ -671,6 +671,7 @@ public class ParserCup extends java_cup.runtime.lr_parser {
     };
 
     private TablaSimbolos ts = new TablaSimbolos();
+    public PilaSemantica pilaSemantica = new PilaSemantica();
 
     public void imprimirTablasSimbolos() {
         ts.imprimirTablas();
@@ -685,13 +686,23 @@ public class ParserCup extends java_cup.runtime.lr_parser {
         } 
     }
 
+    public void insertarVariables (){
+        String tipo = pilaSemantica.buscarTipo ();
+        if (tipo!=null){
+            while (!pilaSemantica.isEmpty() && pilaSemantica.get(pilaSemantica.size() - 1).getTipo().equals("")) {
+                RegistroSemantico registro = pilaSemantica.pop_end();
+                ts.insertarVar (new Simbolo (tipo, registro.getId()));
+            }
+        }
+        pilaSemantica.pop_end ();
+        pilaSemantica.print();
+    }
+
 
 /** Cup generated class to encapsulate user supplied action code.*/
 @SuppressWarnings({"rawtypes", "unchecked", "unused"})
 class CUP$ParserCup$actions {
 
-
-    public PilaSemantica pilaSemantica = new PilaSemantica();
 
     public class ExprValue {
         public boolean esConstante;
@@ -1412,7 +1423,7 @@ class CUP$ParserCup$actions {
 		String tipo = (String)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-2)).value;
 		
                 pilaSemantica.push_init(new RegistroSemantico (tipo));
-                pilaSemantica.print ();
+                insertarVariables ();
             
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("variable",27, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-2)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }

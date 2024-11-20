@@ -8,9 +8,13 @@ public class RegistroSemantico {
     private String id = "";
     private String valor = "";
 
-    public RegistroSemantico(String valor){
-        if ("int".equals(valor) || "long".equals(valor) || "short".equals(valor) || "char".equals(valor)) this.tipo = "TIPO";
-        this.valor = valor;
+    public RegistroSemantico(String id){
+        if ("int".equals(id) || "long".equals(id) || "short".equals(id) || "char".equals(id)){
+            this.tipo = "TIPO";
+            this.tipo_var = id;
+        } else{
+            this.id = id;
+        }    
     }
 
     public RegistroSemantico(String tipo_var, String id) {
