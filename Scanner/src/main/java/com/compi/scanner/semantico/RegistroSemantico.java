@@ -3,10 +3,15 @@ package com.compi.scanner.semantico;
 public class RegistroSemantico {
     
     // DO
-    private String tipo;    // CONST | VAR
-    private String tipo_var;//TYPE_INT | TYPE_LONG | TYPE_SHORT | TYPE_CHAR
-    private String id;
-    private String valor;
+    private String tipo = "";    // TIPO | CONST | VAR
+    private String tipo_var = "";//TYPE_INT | TYPE_LONG | TYPE_SHORT | TYPE_CHAR
+    private String id = "";
+    private String valor = "";
+
+    public RegistroSemantico(String valor){
+        if ("int".equals(valor) || "long".equals(valor) || "short".equals(valor) || "char".equals(valor)) this.tipo = "TIPO";
+        this.valor = valor;
+    }
 
     public RegistroSemantico(String tipo_var, String id) {
         this.tipo = "VAR";
