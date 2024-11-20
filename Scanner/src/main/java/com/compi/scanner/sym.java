@@ -8,69 +8,74 @@ package com.compi.scanner;
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int DIV_EQ = 31;
-  public static final int LBRACKET = 18;
-  public static final int CHAR = 55;
-  public static final int CONST = 5;
-  public static final int MINUS_MINUS = 33;
-  public static final int CASE = 42;
-  public static final int CONTINUE = 50;
-  public static final int LPAREN = 16;
-  public static final int SEMI = 15;
-  public static final int INT = 53;
-  public static final int FOR = 39;
-  public static final int MINUS = 12;
-  public static final int WRITE = 6;
-  public static final int RPAREN = 17;
-  public static final int NOT = 36;
-  public static final int AND = 35;
-  public static final int TIMES_EQ = 30;
-  public static final int LT_EQ = 25;
-  public static final int LT = 26;
-  public static final int OR = 34;
-  public static final int COMMA = 20;
-  public static final int DIV = 14;
-  public static final int TYPE_LONG = 45;
-  public static final int TYPE_INT = 44;
-  public static final int PLUS = 11;
-  public static final int IF = 37;
+  public static final int DIV_EQ = 36;
+  public static final int LBRACKET = 23;
+  public static final int CONST = 8;
+  public static final int CHAR = 7;
+  public static final int MINUS_MINUS = 38;
+  public static final int CASE = 47;
+  public static final int LPAREN = 21;
+  public static final int SEMI = 20;
+  public static final int CONTINUE = 4;
+  public static final int INT = 5;
+  public static final int FOR = 44;
+  public static final int MINUS = 17;
+  public static final int WRITE = 11;
+  public static final int RPAREN = 22;
+  public static final int NOT = 41;
+  public static final int AND = 40;
+  public static final int TIMES_EQ = 35;
+  public static final int LT_EQ = 30;
+  public static final int LT = 31;
+  public static final int OR = 39;
+  public static final int COMMA = 25;
+  public static final int DIV = 19;
+  public static final int TYPE_LONG = 50;
+  public static final int TYPE_INT = 49;
+  public static final int PLUS = 16;
+  public static final int IF = 42;
   public static final int ID = 2;
   public static final int EOF = 0;
-  public static final int RETURN = 52;
-  public static final int PLUS_PLUS = 32;
-  public static final int RBRACKET = 19;
-  public static final int TRUE = 8;
+  public static final int RETURN = 55;
+  public static final int PLUS_PLUS = 37;
+  public static final int RBRACKET = 24;
+  public static final int TRUE = 13;
   public static final int error = 1;
-  public static final int MOD = 3;
-  public static final int BREAK = 49;
-  public static final int VOID = 48;
-  public static final int EQ = 10;
-  public static final int TYPE_CHAR = 47;
-  public static final int SWITCH = 41;
-  public static final int TIMES = 13;
-  public static final int GT_EQ = 23;
-  public static final int COLON = 21;
-  public static final int ELSE = 38;
-  public static final int READ = 7;
-  public static final int NOT_EQ = 27;
-  public static final int WHILE = 40;
-  public static final int DEFAULT = 43;
-  public static final int FLOAT = 54;
-  public static final int STRING = 4;
-  public static final int PLUS_EQ = 28;
-  public static final int TYPE_SHORT = 46;
-  public static final int MINUS_EQ = 29;
-  public static final int FALSE = 9;
-  public static final int GT = 24;
-  public static final int DO = 51;
-  public static final int EQ_EQ = 22;
+  public static final int MOD = 9;
+  public static final int BREAK = 3;
+  public static final int VOID = 53;
+  public static final int EQ = 15;
+  public static final int TYPE_CHAR = 52;
+  public static final int SWITCH = 46;
+  public static final int TIMES = 18;
+  public static final int GT_EQ = 28;
+  public static final int COLON = 26;
+  public static final int ELSE = 43;
+  public static final int READ = 12;
+  public static final int NOT_EQ = 32;
+  public static final int WHILE = 45;
+  public static final int DEFAULT = 48;
+  public static final int FLOAT = 6;
+  public static final int STRING = 10;
+  public static final int PLUS_EQ = 33;
+  public static final int TYPE_SHORT = 51;
+  public static final int MINUS_EQ = 34;
+  public static final int FALSE = 14;
+  public static final int GT = 29;
+  public static final int DO = 54;
+  public static final int EQ_EQ = 27;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
   "ID",
+  "BREAK",
+  "CONTINUE",
+  "INT",
+  "FLOAT",
+  "CHAR",
+  "CONST",
   "MOD",
   "STRING",
-  "CONST",
   "WRITE",
   "READ",
   "TRUE",
@@ -114,13 +119,8 @@ public class sym {
   "TYPE_SHORT",
   "TYPE_CHAR",
   "VOID",
-  "BREAK",
-  "CONTINUE",
   "DO",
-  "RETURN",
-  "INT",
-  "FLOAT",
-  "CHAR"
+  "RETURN"
   };
 }
 
