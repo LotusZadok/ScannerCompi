@@ -687,7 +687,7 @@ public class ParserCup extends java_cup.runtime.lr_parser {
     }
 
     public void insertarVariables (){
-        String tipo = pilaSemantica.buscarTipo ();
+        String tipo = pilaSemantica.buscarTipoVar ();
         if (tipo!=null){
             while (!pilaSemantica.isEmpty() && pilaSemantica.get(pilaSemantica.size() - 1).getTipo().equals("")) {
                 RegistroSemantico registro = pilaSemantica.pop_end();
@@ -699,6 +699,13 @@ public class ParserCup extends java_cup.runtime.lr_parser {
             }
         }
         pilaSemantica.pop_end ();
+    }
+
+    public void verificarVariableDefinida(String id) {
+        if (!ts.contiene(id)) {
+            semantic_error (cur_token);
+            System.err.println("La variable '" + id + "' no está definida.");
+        }
     }
 
 
@@ -1131,7 +1138,17 @@ class CUP$ParserCup$actions {
           case 41: // funcion ::= tipo_var ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET 
             {
               Object RESULT =null;
-
+		int tipoleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-7)).left;
+		int tiporight = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-7)).right;
+		String tipo = (String)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-7)).value;
+		int idleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-6)).left;
+		int idright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-6)).right;
+		Object id = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-6)).value;
+		
+                pilaSemantica.push_init(new RegistroSemantico ("FUNCION", tipo, id.toString()));
+                // meter funcion y sus parametros a ts
+                pilaSemantica.print ();
+            
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("funcion",18, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-7)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1140,7 +1157,17 @@ class CUP$ParserCup$actions {
           case 42: // funcion ::= VOID ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET 
             {
               Object RESULT =null;
-
+		int tipoleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-7)).left;
+		int tiporight = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-7)).right;
+		Object tipo = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-7)).value;
+		int idleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-6)).left;
+		int idright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-6)).right;
+		Object id = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-6)).value;
+		
+                pilaSemantica.push_init(new RegistroSemantico ("FUNCION", tipo.toString(), id.toString()));
+                // meter funcion y sus parametros a ts
+                pilaSemantica.print ();
+            
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("funcion",18, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-7)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1167,7 +1194,13 @@ class CUP$ParserCup$actions {
           case 45: // parametro_list ::= tipo_var ID COMMA parametro_list 
             {
               Object RESULT =null;
-
+		int tipoleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-3)).left;
+		int tiporight = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-3)).right;
+		String tipo = (String)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-3)).value;
+		int idleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-2)).left;
+		int idright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-2)).right;
+		Object id = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-2)).value;
+		 pilaSemantica.push_end (new RegistroSemantico (tipo, id.toString())); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("parametro_list",19, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-3)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1176,7 +1209,13 @@ class CUP$ParserCup$actions {
           case 46: // parametro_list ::= tipo_var ID 
             {
               Object RESULT =null;
-
+		int tipoleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).left;
+		int tiporight = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).right;
+		String tipo = (String)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).value;
+		int idleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()).left;
+		int idright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()).right;
+		Object id = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.peek()).value;
+		 pilaSemantica.push_end (new RegistroSemantico (tipo, id.toString())); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("parametro_list",19, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -1518,6 +1557,9 @@ class CUP$ParserCup$actions {
           case 81: // asignacion ::= ID op_asignacion expr 
             {
               Object RESULT =null;
+		int idleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-2)).left;
+		int idright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-2)).right;
+		Object id = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-2)).value;
 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("asignacion",29, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-2)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
@@ -1527,7 +1569,12 @@ class CUP$ParserCup$actions {
           case 82: // asignacion ::= ID op_incremento 
             {
               Object RESULT =null;
-
+		int idleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).left;
+		int idright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).right;
+		Object id = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).value;
+		
+                //verificarVariableDefinida(id.toString());
+             
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("asignacion",29, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;

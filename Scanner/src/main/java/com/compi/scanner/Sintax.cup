@@ -74,7 +74,7 @@ parser code {:
     }
 
     public void insertarVariables (){
-        String tipo = pilaSemantica.buscarTipo ();
+        String tipo = pilaSemantica.buscarTipoVar ();
         if (tipo!=null){
             while (!pilaSemantica.isEmpty() && pilaSemantica.get(pilaSemantica.size() - 1).getTipo().equals("")) {
                 RegistroSemantico registro = pilaSemantica.pop_end();
@@ -86,6 +86,13 @@ parser code {:
             }
         }
         pilaSemantica.pop_end ();
+    }
+
+    public void verificarVariableDefinida(String id) {
+        if (!ts.contiene(id)) {
+            semantic_error (cur_token);
+            System.err.println("La variable '" + id + "' no está definida.");
+        }
     }
 :};
 
@@ -175,7 +182,6 @@ bloque ::= instruccion
          ;
 
 
-
 expr_list ::= expr COMMA expr_list
             | expr
             | /* empty */
@@ -189,16 +195,22 @@ estru_control ::= if
                 ;
 
 
-funcion ::= tipo_var ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET
-          | VOID ID LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET
-                | tipo_var ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
-                | VOID ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
+funcion ::= tipo_var:tipo ID:id LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET {:
+                pilaSemantica.push_init(new RegistroSemantico ("FUNCION", tipo, id.toString()));
+                // meter funcion y sus parametros a ts
+                pilaSemantica.print ();
+            :}
+            | VOID:tipo ID:id LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET {:
+                pilaSemantica.push_init(new RegistroSemantico ("FUNCION", tipo.toString(), id.toString()));
+                // meter funcion y sus parametros a ts
+                pilaSemantica.print ();
+            :}
+            | tipo_var ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
+            | VOID ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
+            ;
 
-          ;
-
-
-parametro_list ::= tipo_var ID COMMA parametro_list
-                 | tipo_var ID
+parametro_list ::= tipo_var:tipo ID:id COMMA parametro_list {: pilaSemantica.push_end (new RegistroSemantico (tipo, id.toString())); :}
+                 | tipo_var:tipo ID:id {: pilaSemantica.push_end (new RegistroSemantico (tipo, id.toString())); :}
                  | /* empty */
                  | error {: report_error("Error in parameter list."); :}
                  ;
@@ -206,13 +218,14 @@ parametro_list ::= tipo_var ID COMMA parametro_list
 
 if ::= IF LPAREN expr RPAREN LBRACKET bloque RBRACKET else
      | IF error bloque RBRACKET else {: report_error("Invalid expression in 'if' condition."); :}
-        | IF LPAREN expr RPAREN error {: report_error("Invalid 'if' statement."); :}
+     | IF LPAREN expr RPAREN error {: report_error("Invalid 'if' statement."); :}
      ;
 
 else ::= ELSE LBRACKET bloque RBRACKET
-        | ELSE error {: report_error("Invalid 'else' statement."); :}
+       | ELSE error {: report_error("Invalid 'else' statement."); :}
        | /* empty */
        ;
+
 for ::= FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN LBRACKET bloque RBRACKET
         | FOR error bloque RBRACKET {: report_error("Invalid 'for' loop condition."); :}
         | FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN error {: report_error("Invalid 'for' loop condition."); :}
@@ -271,8 +284,10 @@ next_id_list ::= COMMA ID:id next_id_list {:
                ;
 
 
-asignacion ::= ID op_asignacion expr 
-             | ID op_incremento 
+asignacion ::= ID:id op_asignacion expr 
+             | ID:id op_incremento{:
+                //verificarVariableDefinida(id.toString());
+             :} 
              | ID op_asignacion error {: report_error("Invalid assignment expression."); :}
              ;
 

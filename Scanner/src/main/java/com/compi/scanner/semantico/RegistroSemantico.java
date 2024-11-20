@@ -2,11 +2,12 @@ package com.compi.scanner.semantico;
 
 public class RegistroSemantico {
     
-    // DO
+    // DataObject
     private String tipo = "";    // TIPO | CONST | VAR
     private String tipo_var = "";//TYPE_INT | TYPE_LONG | TYPE_SHORT | TYPE_CHAR
     private String id = "";
     private String valor = "";
+    private String operador = "";
 
     public RegistroSemantico(String id){
         if ("int".equals(id) || "long".equals(id) || "short".equals(id) || "char".equals(id)){
@@ -15,6 +16,12 @@ public class RegistroSemantico {
         } else{
             this.id = id;
         }    
+    }
+
+    public RegistroSemantico(String tipo, String tipo_var, String id) {
+        this.tipo = tipo;
+        this.tipo_var = tipo_var;
+        this.id = id;
     }
 
     public RegistroSemantico(String tipo_var, String id) {

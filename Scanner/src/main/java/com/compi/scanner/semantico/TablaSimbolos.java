@@ -34,7 +34,7 @@ public class TablaSimbolos {
         }
 
         variables.add(simbolo);
-        return null;
+        return null;    
     
     }
 

@@ -36,7 +36,7 @@ public class PilaSemantica {
         }
     }
 
-    public String buscarTipo (){
+    public String buscarTipoVar (){
         for (RegistroSemantico registro : pilaSemantica) {
             if ("TIPO".equals(registro.getTipo())) {
                 return registro.getTipo_Var().toString();
