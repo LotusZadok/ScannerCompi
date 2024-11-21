@@ -34,7 +34,8 @@ public class TablaSimbolos {
         }
 
         variables.add(simbolo);
-        return null;
+        return null;    
+    
     }
 
     public String insertarConstante(Simbolo simbolo) {
@@ -43,9 +44,14 @@ public class TablaSimbolos {
         for (Simbolo s : variablesGlobales) {
             if (s.getId().equals(idSimbolo)) return "Constante '" + idSimbolo + "' ya declarada en el ámbito global.";
         }
+        for (Simbolo s : variables) {
+            if (s.getId().equals(idSimbolo)) return "Constante '" + idSimbolo + "' ya declarada en el ámbito local.";
+        }
 
-        variablesGlobales.add(simbolo);
-        return null;
+        if (simbolo.esValorCompatible()){
+            variables.add(simbolo);
+            return null;    
+        } else { return "El valor no es compatible con el tipo de variable.";}
     }
 
     public void globales() {
