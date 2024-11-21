@@ -11,6 +11,10 @@ public class TablaSimbolos {
         variables = new ArrayList<>();
     }
 
+    public ArrayList<Simbolo> getGlobales (){
+        return variablesGlobales;
+    }
+
     public String insertarGlobal(Simbolo simbolo) {
         String idSimbolo = simbolo.getId();
 
