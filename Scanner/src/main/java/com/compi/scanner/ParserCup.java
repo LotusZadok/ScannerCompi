@@ -9,6 +9,8 @@ import java_cup.runtime.Symbol;
 import java.util.ArrayList;
 import java.util.List;
 import com.compi.scanner.semantico.*;
+import com.compi.scanner.traductor.Generador;
+import com.compi.scanner.traductor.*;
 import java_cup.runtime.XMLElement;
 
 /** CUP v0.11b 20160615 (GIT 4ac7450) generated parser.
@@ -677,6 +679,8 @@ public class ParserCup extends java_cup.runtime.lr_parser {
         return this.sym;
     };
 
+    public Generador generador = new Generador();
+
     // Para manejo de bucles
     private int contadorBucles = 0;
 
@@ -699,6 +703,7 @@ public class ParserCup extends java_cup.runtime.lr_parser {
 
     public void imprimirTablasSimbolos() {
         ts.imprimirTablas();
+        
     }
 
     public void insertarConstante (String tipo, String id, Object valor){
@@ -814,7 +819,7 @@ class CUP$ParserCup$actions {
           case 1: // programa ::= globales 
             {
               Object RESULT =null;
-		 imprimirTablasSimbolos(); 
+		 imprimirTablasSimbolos(); generador.generarArchivo(); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("programa",3, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -823,7 +828,7 @@ class CUP$ParserCup$actions {
           case 2: // globales ::= global_decl_list funciones 
             {
               Object RESULT =null;
-
+		 generador.declararGlobales(ts); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("globales",13, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
