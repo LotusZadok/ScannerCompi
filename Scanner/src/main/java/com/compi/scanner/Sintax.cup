@@ -57,8 +57,25 @@ parser code {:
         return this.sym;
     };
 
+    // Para manejo de bucles
+    private int contadorBucles = 0;
+
+    public void iniciarBucle() {
+        contadorBucles++;
+    }
+
+    public void finalizarBucle() {
+        contadorBucles--;
+    }
+
+    public boolean dentroDeBucle() {
+        return contadorBucles > 0;
+    }
+
+    // Métodos para la tabla de símbolos
     private TablaSimbolos ts = new TablaSimbolos();
     public PilaSemantica pilaSemantica = new PilaSemantica();
+    public PilaSemantica pilaSemantica2 = new PilaSemantica();
 
     public void imprimirTablasSimbolos() {
         ts.imprimirTablas();
@@ -88,8 +105,20 @@ parser code {:
         pilaSemantica.pop_end ();
     }
 
+    public void verificarVariableDefinida(String id, Object valor) {
+        if (!ts.contiene(id)) {    // luego manejar lo del ambito   
+            semantic_error (cur_token);
+            System.err.println("La variable '" + id + "' no está definida.");
+            String tipo = pilaSemantica.buscarTipoVar ();
+            if (tipo!=null) {
+                if (valor != null) ts.insertarVar (new Simbolo (tipo, id, false, valor));
+                else ts.insertarVar (new Simbolo (tipo, id));
+            }else System.err.println("La variable '" + id + "' no se pudo insertar a la tabla de simbolos porque no tiene un tipo especificado.");
+        }
+    }
+
     public void verificarVariableDefinida(String id) {
-        if (!ts.contiene(id)) {
+        if (!ts.contiene(id)) {    // luego manejar lo del ambito   
             semantic_error (cur_token);
             System.err.println("La variable '" + id + "' no está definida.");
         }
@@ -103,10 +132,10 @@ terminal ID, MOD, STRING, CONST, WRITE, READ, TRUE, FALSE, EQ, PLUS, MINUS, TIME
 
 /* No terminales con tipos */
 non terminal String tipo_var;
-non terminal ExprValue, arit_exp;
+non terminal ExprValue expr, arit_exp;
 
 /* No terminales sin tipo específico */
-non terminal programa, expr, read, read_parameter, write_parameter, write, case_end, instruccion , global_decl_list, expr_list, global_decl, globales, bloque, estru_control, funciones, funcion, parametro_list, if, else, for, while, switch, case_list, constante, variable, id_list, asignacion, op_asignacion, op_incremento, literal, bool_expr, bool_term, bool_factor, rel_expr, op_relacional, term, factor, number, next_id_list;
+non terminal programa, read, read_parameter, write_parameter, write, case_end, instruccion , global_decl_list, expr_list, global_decl, globales, bloque, estru_control, funciones, funcion, parametro_list, if, else, for, while, switch, case_list, constante, variable, id_list, asignacion, op_asignacion, op_incremento, literal, bool_expr, bool_term, bool_factor, rel_expr, op_relacional, term, factor, number, next_id_list;
 
 /* Precedence and associativity declarations */
 precedence left OR, AND;
@@ -148,10 +177,10 @@ instruccion ::= estru_control
               | constante
               | variable
               | asignacion SEMI
-              | BREAK SEMI
+              | BREAK SEMI {: if (!dentroDeBucle()) semantic_error(cur_token); :}
               | read SEMI
               | write SEMI
-              | CONTINUE SEMI
+              | CONTINUE SEMI {: if (!dentroDeBucle()) semantic_error(cur_token); :}
               | DO SEMI 
               | RETURN expr SEMI
               | RETURN SEMI
@@ -197,13 +226,13 @@ estru_control ::= if
 
 funcion ::= tipo_var:tipo ID:id LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET {:
                 pilaSemantica.push_init(new RegistroSemantico ("FUNCION", tipo, id.toString()));
-                // meter funcion y sus parametros a ts
-                pilaSemantica.print ();
+                // falta meter funcion y sus parametros a ts
+                // pilaSemantica.print ();
             :}
             | VOID:tipo ID:id LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET {:
                 pilaSemantica.push_init(new RegistroSemantico ("FUNCION", tipo.toString(), id.toString()));
-                // meter funcion y sus parametros a ts
-                pilaSemantica.print ();
+                // falta meter funcion y sus parametros a ts
+                // pilaSemantica.print ();
             :}
             | tipo_var ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
             | VOID ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
@@ -226,13 +255,13 @@ else ::= ELSE LBRACKET bloque RBRACKET
        | /* empty */
        ;
 
-for ::= FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN LBRACKET bloque RBRACKET
-        | FOR error bloque RBRACKET {: report_error("Invalid 'for' loop condition."); :}
+for ::= FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN LBRACKET {: iniciarBucle(); :} bloque RBRACKET {: finalizarBucle(); :}
+        | FOR error bloque RBRACKET {: report_error("Invalid 'for' loop condition."); finalizarBucle();  :} 
         | FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN error {: report_error("Invalid 'for' loop condition."); :}
        ;
 
-while ::= WHILE LPAREN expr RPAREN LBRACKET bloque RBRACKET
-        | WHILE error bloque RBRACKET {: report_error("Invalid 'while' loop condition."); :}
+while ::= WHILE LPAREN expr RPAREN LBRACKET {: iniciarBucle(); :}  bloque RBRACKET {: finalizarBucle(); :}
+        | WHILE error bloque RBRACKET {: report_error("Invalid 'while' loop condition."); finalizarBucle();  :}
         | WHILE LPAREN expr RPAREN error {: report_error("Invalid 'while' loop condition."); :}
          ;
 
@@ -243,16 +272,16 @@ switch ::= SWITCH LPAREN arit_exp RPAREN LBRACKET case_list case_end RBRACKET
 
 case_list ::= CASE arit_exp COLON bloque
             | CASE arit_exp COLON bloque case_list
-                | CASE error {: report_error("Invalid 'case' statement."); :}
+            | CASE error {: report_error("Invalid 'case' statement."); :}
             ;
 
 case_end ::= DEFAULT COLON bloque
-                | DEFAULT error {: report_error("Invalid 'default' statement."); :}
+           | DEFAULT error {: report_error("Invalid 'default' statement."); :}
            | /* empty */
            ;
 
 constante ::= CONST tipo_var:tipo ID:id EQ expr:valor SEMI {:
-                insertarConstante(tipo, id.toString(), valor);
+                insertarConstante(tipo, id.toString(), valor.valor);
             :}
             | CONST tipo_var ID EQ expr error {: report_error("Missing semicolon in constant declaration."); :}
             ;
@@ -274,8 +303,8 @@ tipo_var ::= TYPE_INT {: RESULT = "int"; :}
 
 id_list ::= ID:id next_id_list{:
                 pilaSemantica.push_end (new RegistroSemantico (id.toString()));
-          :}
-          ;
+            :}
+            ;
 
 next_id_list ::= COMMA ID:id next_id_list {:
                     pilaSemantica.push_end (new RegistroSemantico (id.toString()));
@@ -284,56 +313,83 @@ next_id_list ::= COMMA ID:id next_id_list {:
                ;
 
 
-asignacion ::= ID:id op_asignacion expr 
-             | ID:id op_incremento{:
-                //verificarVariableDefinida(id.toString());
+asignacion ::= ID:id op_asignacion expr:valor{:
+                verificarVariableDefinida(id.toString(), valor);
+                // falta código adicional para manejo de asignación
+             :} 
+             | ID:id op_incremento:op{:
+                verificarVariableDefinida(id.toString(), null);
+                // falta código adicional para manejo de asignación
              :} 
              | ID op_asignacion error {: report_error("Invalid assignment expression."); :}
              ;
 
-op_asignacion ::= EQ
-                | PLUS_EQ
-                | MINUS_EQ
-                | TIMES_EQ
-                | DIV_EQ
+op_asignacion ::= EQ:op {: RESULT = op; :}
+                | PLUS_EQ:op {: RESULT = op; :}
+                | MINUS_EQ:op {: RESULT = op; :}
+                | TIMES_EQ:op {: RESULT = op; :}
+                | DIV_EQ:op {: RESULT = op; :}
                 ;
 
-op_incremento ::= PLUS_PLUS
-                | MINUS_MINUS
+op_incremento ::= PLUS_PLUS:op {: RESULT = op; :}
+                | MINUS_MINUS:op {: RESULT = op; :}
                 ;
 
-expr ::= expr PLUS expr
-       | expr MINUS expr
-       | expr TIMES expr
-       | expr DIV expr
-       | expr MOD expr
-       | expr AND expr
-       | expr OR expr
-       | NOT expr
-       | expr op_relacional expr
-       | LPAREN expr RPAREN
-       | ID LPAREN expr_list RPAREN
-       | ID
-       | literal:lit {: RESULT = lit; :}
-       | number:num {: RESULT = num; :}
+expr ::= expr:left PLUS:op expr:right 
+       | expr:left MINUS:op expr:right
+       | expr:left TIMES:op expr:right
+       | expr:left DIV:op expr:right
+       | expr:left MOD:op expr:right
+       | expr:left AND expr:right {: 
+            // Implementar lógica para operadores lógicos
+            RESULT = new ExprValue(false, null, null);
+        :}
+       | expr:left OR expr:right {: RESULT = new ExprValue(false, null, null); :}
+       | NOT expr:exp {: RESULT = new ExprValue(false, null, null); :}
+       | expr:left op_relacional:op expr:right {: RESULT = new ExprValue(false, null, null); :}
+       | LPAREN expr:exp RPAREN {: RESULT = exp; :}
+       | ID:id LPAREN expr_list RPAREN {: 
+            // Llamada a función
+            RESULT = new ExprValue(false, null, null); 
+        :}
+       | ID:id {: 
+            verificarVariableDefinida(id.toString());
+            Simbolo simbolo = ts.obtenerSimbolo(id.toString());
+            if (simbolo != null && simbolo.esConstante()) {
+                RESULT = new ExprValue(true, simbolo.getValor(), simbolo.getTipo_var());
+            } else {
+                RESULT = new ExprValue(false, null, null);
+            }
+        :}
+       | literal:lit {: RESULT = new ExprValue(true, lit, "char"); :}
+       | number:num {: RESULT = new ExprValue(true, num, "int"); :}
        ;
 
-arit_exp ::= arit_exp PLUS arit_exp
-           | arit_exp MINUS arit_exp
-           | arit_exp TIMES arit_exp
-           | arit_exp DIV arit_exp
-           | arit_exp MOD arit_exp
-           | LPAREN arit_exp RPAREN
-           | ID
-           | number
+// Implementar lógica similar a 'expr' para constant folding
+arit_exp ::= arit_exp:left PLUS arit_exp:right {: RESULT = new ExprValue(false, null, null); :} 
+           | arit_exp:left MINUS arit_exp:right {: RESULT = new ExprValue(false, null, null); :}
+           | arit_exp:left TIMES arit_exp:right {: RESULT = new ExprValue(false, null, null); :}
+           | arit_exp:left DIV arit_exp:right {: RESULT = new ExprValue(false, null, null); :}
+           | arit_exp:left MOD arit_exp:right {: RESULT = new ExprValue(false, null, null); :}
+           | LPAREN arit_exp:exp RPAREN {: RESULT = exp; :}
+           | ID:id {: 
+                verificarVariableDefinida(id.toString());
+                Simbolo simbolo = ts.obtenerSimbolo(id.toString());
+                if (simbolo != null && simbolo.esConstante()) {
+                    RESULT = new ExprValue(true, simbolo.getValor(), simbolo.getTipo_var());
+                } else {
+                    RESULT = new ExprValue(false, null, null);
+                }
+            :}
+           | number:num {: RESULT = new ExprValue(true, num, "int"); :}
            ;
 
-op_relacional ::= EQ_EQ {: RESULT = "=="; :}
-                | GT_EQ {: RESULT = ">="; :}
-                | GT {: RESULT = ">"; :}
-                | LT_EQ {: RESULT = "<="; :}
-                | LT {: RESULT = "<"; :}
-                | NOT_EQ {: RESULT = "!="; :}
+op_relacional ::= EQ_EQ:op {: RESULT = op; :}
+                | GT_EQ:op {: RESULT = op; :}
+                | GT:op {: RESULT = op; :}
+                | LT_EQ:op {: RESULT = op; :}
+                | LT:op {: RESULT = op; :}
+                | NOT_EQ:op {: RESULT = op; :}
                 ;
 
 literal ::= CHAR:c {: RESULT = c.toString(); :}

@@ -42,7 +42,7 @@ public class Simbolo {
         this.id = id;
     }
 
-    public boolean isEsConstante() {
+    public boolean esConstante() {
         return esConstante;
     }
 
