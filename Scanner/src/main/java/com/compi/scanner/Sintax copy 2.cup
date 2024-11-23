@@ -1,0 +1,496 @@
+/* Archivo: sintax.cup */
+package com.compi.scanner;
+
+import java_cup.runtime.Symbol;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.compi.scanner.semantico.*;
+
+/* Clases auxiliares */
+action code {:
+    public class ExprValue {
+        public boolean esConstante;
+        public Object valor;
+        public String tipo; // "int", "float", etc.
+
+        public ExprValue(boolean esConstante, Object valor, String tipo) {
+            this.esConstante = esConstante;
+            this.valor = valor;
+            this.tipo = tipo;
+        }
+    }
+
+    public class Pair<K, V> {
+        private K key;
+        private V value;
+
+        public Pair(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public K getKey() { return key; }
+        public V getValue() { return value; }
+    }
+:}
+
+parser code {:
+    private Symbol sym;
+
+    // Manejo de errores
+    public void syntax_error(Symbol sym) {
+        System.err.println("Error sintáctico en línea " + (sym.left + 1) + ", columna " + (sym.right + 1) + ": " + sym.value);
+    }
+
+    public void unrecovered_syntax_error(Symbol sym) {
+        System.err.println("Error irreparable en línea " + (sym.left + 1) + ", columna " + (sym.right + 1) + ": " + sym.value);
+    }
+
+    public void report_error(String message) {
+        System.err.println(message);
+    }
+
+    public void semantic_error(Symbol sym, String message) {
+        System.err.println("Error semántico en línea " + (sym.left + 1) + ", columna " + (sym.right + 1) + ": " + message);
+    }
+
+    public Symbol getS() {
+        return this.sym;
+    }
+
+    private TablaSimbolos ts = new TablaSimbolos();
+
+    // Para manejo de bucles
+    private int contadorBucles = 0;
+
+    public void iniciarBucle() {
+        contadorBucles++;
+    }
+
+    public void finalizarBucle() {
+        contadorBucles--;
+    }
+
+    public boolean dentroDeBucle() {
+        return contadorBucles > 0;
+    }
+
+    // Métodos para la tabla de símbolos
+    public void imprimirTablasSimbolos() {
+        ts.imprimirTablas();
+    }
+
+    public void insertarVar(String tipo, String id, int linea) {
+        String mensaje = ts.insertarVar(new Simbolo(tipo, id));
+        if (mensaje != null) {
+            System.err.println("Error semántico en línea " + linea + ": " + mensaje);
+        }
+    }
+
+    public void insertarConstante(String tipo, String id, Object valor, int linea) {
+        String mensaje = ts.insertarConstante(new Simbolo(tipo, id, true, valor));
+        if (mensaje != null) {
+            System.err.println("Error semántico en línea " + linea + ": " + mensaje);
+        }
+    }
+
+    public void verificarVariableDefinida(String id, int linea) {
+        if (!ts.contiene(id)) {
+            System.err.println("Error semántico en línea " + linea + ": La variable '" + id + "' no está definida.");
+        }
+    }
+:}
+
+/* Declaración de terminales con tipo */
+terminal java_cup.runtime.Symbol ID, BREAK, CONTINUE, INT, FLOAT, CHAR, CONST;
+
+/* Otros terminales sin tipo específico */
+terminal MOD, STRING, WRITE, READ, TRUE, FALSE, EQ, PLUS, MINUS, TIMES, DIV, SEMI, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, COLON, EQ_EQ, GT_EQ, GT, LT_EQ, LT, NOT_EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ, PLUS_PLUS, MINUS_MINUS, OR, AND, NOT, IF, ELSE, FOR, WHILE, SWITCH, CASE, DEFAULT, TYPE_INT, TYPE_LONG, TYPE_SHORT, TYPE_CHAR, VOID, DO, RETURN;
+
+/* No terminales con tipos */
+non terminal List<Pair<String, Integer>> id_list, next_id_list;
+non terminal String tipo_var;
+non terminal ExprValue expr, arit_exp;
+non terminal Object literal, number;
+non terminal programa, read, read_parameter, write_parameter, write, case_end, instruccion, global_decl_list, expr_list, global_decl, globales, bloque, estru_control, funcion, parametro_list, if_stmt, else_stmt, for_stmt, while_stmt, switch_stmt, case_list, constante, variable, asignacion, op_asignacion, op_incremento, op_relacional;
+
+/* Precedencia y asociatividad */
+precedence left OR, AND;
+precedence left EQ_EQ, NOT_EQ;
+precedence left GT, LT, GT_EQ, LT_EQ;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIV, MOD;
+precedence right NOT;
+precedence left PLUS_PLUS, MINUS_MINUS;
+precedence left EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ;
+
+/* Inicio con el no terminal 'programa' */
+start with programa;
+
+/* Reglas gramaticales */
+
+programa ::= globales {: imprimirTablasSimbolos(); :}
+           ;
+
+globales ::= global_decl_list
+           ;
+
+global_decl_list ::= global_decl_list global_decl
+                   | global_decl
+                   ;
+
+global_decl ::= variable
+              | constante
+              | funcion {: ts.globales(); :}
+              | error {: report_error("Error en declaración global."); :}
+              ;
+
+instruccion ::= estru_control
+              | constante
+              | variable
+              | asignacion SEMI
+              | BREAK:s SEMI {:
+                  if (!dentroDeBucle()) {
+                      int linea = s.left + 1;
+                      System.err.println("Error semántico en línea " + linea + ": 'break' fuera de un bucle.");
+                  }
+                :}
+              | read SEMI
+              | write SEMI
+              | CONTINUE:s SEMI {:
+                  if (!dentroDeBucle()) {
+                      int linea = s.left + 1;
+                      System.err.println("Error semántico en línea " + linea + ": 'continue' fuera de un bucle.");
+                  }
+                :}
+              | DO SEMI
+              | RETURN expr SEMI
+              | RETURN SEMI
+              | error {: report_error("Instrucción inválida."); :}
+              ;
+
+read ::= READ LPAREN read_parameter RPAREN
+       | READ LPAREN RPAREN
+       | READ error {: report_error("Parámetros inválidos en 'read'."); :}
+       ;
+
+read_parameter ::= ID:id COMMA read_parameter
+                 | ID:id
+                 ;
+
+write ::= WRITE LPAREN write_parameter RPAREN
+        | WRITE error {: report_error("Parámetros inválidos en 'write'."); :}
+        ;
+
+write_parameter ::= expr COMMA write_parameter
+                  | expr
+                  ;
+
+bloque ::= instruccion
+         | instruccion bloque
+         ;
+
+expr_list ::= expr COMMA expr_list
+            | expr
+            | /* vacío */
+            | error {: report_error("Error en la lista de expresiones."); :}
+            ;
+
+estru_control ::= if_stmt
+                | for_stmt
+                | while_stmt
+                | switch_stmt
+                ;
+
+funcion ::= tipo_var:tipo ID:id LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET {: ts.globales(); :}
+          | VOID ID:id LPAREN parametro_list RPAREN LBRACKET bloque RBRACKET {: ts.globales(); :}
+          | tipo_var ID LBRACKET error bloque RBRACKET {: report_error("Declaración de función inválida."); :}
+          | VOID ID LBRACKET error bloque RBRACKET {: report_error("Declaración de función inválida."); :}
+          ;
+
+parametro_list ::= tipo_var ID:id COMMA parametro_list
+                 | tipo_var ID:id
+                 | /* vacío */
+                 | error {: report_error("Error en la lista de parámetros."); :}
+                 ;
+
+if_stmt ::= IF LPAREN expr RPAREN LBRACKET bloque RBRACKET else_stmt
+          | IF error bloque RBRACKET else_stmt {: report_error("Expresión inválida en la condición 'if'."); :}
+          | IF LPAREN expr RPAREN error {: report_error("Estructura 'if' inválida."); :}
+          ;
+
+else_stmt ::= ELSE LBRACKET bloque RBRACKET
+            | ELSE error {: report_error("Estructura 'else' inválida."); :}
+            | /* vacío */
+            ;
+
+for_stmt ::= FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN LBRACKET {: iniciarBucle(); :} bloque RBRACKET {: finalizarBucle(); :}
+           | FOR error bloque RBRACKET {: report_error("Condición inválida en el ciclo 'for'."); finalizarBucle(); :}
+           | FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN error {: report_error("Estructura del ciclo 'for' inválida."); :}
+           ;
+
+while_stmt ::= WHILE LPAREN expr RPAREN LBRACKET {: iniciarBucle(); :} bloque RBRACKET {: finalizarBucle(); :}
+             | WHILE error bloque RBRACKET {: report_error("Condición inválida en el ciclo 'while'."); finalizarBucle(); :}
+             | WHILE LPAREN expr RPAREN error {: report_error("Estructura del ciclo 'while' inválida."); :}
+             ;
+
+switch_stmt ::= SWITCH LPAREN arit_exp RPAREN LBRACKET case_list case_end RBRACKET
+              | SWITCH error case_list case_end RBRACKET {: report_error("Estructura 'switch' inválida."); :}
+              | SWITCH LPAREN arit_exp RPAREN error {: report_error("Estructura 'switch' inválida."); :}
+              ;
+
+case_list ::= CASE arit_exp COLON bloque
+            | CASE arit_exp COLON bloque case_list
+            | CASE error {: report_error("Estructura 'case' inválida."); :}
+            ;
+
+case_end ::= DEFAULT COLON bloque
+           | DEFAULT error {: report_error("Estructura 'default' inválida."); :}
+           | /* vacío */
+           ;
+
+constante ::= CONST tipo_var:tipo ID:id EQ expr:valor SEMI {:
+                String idStr = id.value.toString();
+                int linea = id.left + 1;
+                insertarConstante(tipo, idStr, valor.valor, linea);
+             :}
+            | CONST tipo_var ID EQ expr error {: report_error("Falta punto y coma en la declaración de constante."); :}
+            ;
+
+variable ::= tipo_var:tipo id_list:ids SEMI {:
+                String tipoStr = tipo.toString();
+                for (Pair<String, Integer> pair : ids) {
+                    String idStr = pair.getKey();
+                    int linea = pair.getValue();
+                    insertarVar(tipoStr, idStr, linea);
+                }
+             :}
+           | tipo_var id_list error {: report_error("Falta punto y coma en la declaración de variable."); :}
+           ;
+
+tipo_var ::= TYPE_INT {: RESULT = "int"; :}
+           | TYPE_LONG {: RESULT = "long"; :}
+           | TYPE_SHORT {: RESULT = "short"; :}
+           | TYPE_CHAR {: RESULT = "char"; :}
+           ;
+
+id_list ::= ID:id next_id_list:rest_ids {:
+                List<Pair<String, Integer>> ids = new ArrayList<>();
+                ids.add(new Pair<>(id.value.toString(), id.left + 1));
+                ids.addAll(rest_ids);
+                RESULT = ids;
+            :}
+          ;
+
+next_id_list ::= COMMA ID:id next_id_list:rest_ids {:
+                    List<Pair<String, Integer>> ids = new ArrayList<>();
+                    ids.add(new Pair<>(id.value.toString(), id.left + 1));
+                    ids.addAll(rest_ids);
+                    RESULT = ids;
+                :}
+               | {: RESULT = new ArrayList<Pair<String, Integer>>(); :}
+               ;
+
+asignacion ::= ID:var_id op_asignacion expr {:
+                    String id = var_id.value.toString();
+                    int linea = var_id.left + 1;
+                    verificarVariableDefinida(id, linea);
+                    // Código adicional para manejo de asignación
+                :}
+              | ID:var_id op_incremento {:
+                    String id = var_id.value.toString();
+                    int linea = var_id.left + 1;
+                    verificarVariableDefinida(id, linea);
+                    // Código adicional para incremento/decremento
+                :}
+              | ID op_asignacion error {: report_error("Expresión de asignación inválida."); :}
+              ;
+
+op_asignacion ::= EQ
+                | PLUS_EQ
+                | MINUS_EQ
+                | TIMES_EQ
+                | DIV_EQ
+                ;
+
+op_incremento ::= PLUS_PLUS
+                | MINUS_MINUS
+                ;
+
+expr ::= expr:left PLUS expr:right {:
+            if (left.esConstante && right.esConstante) {
+                if (left.tipo.equals("int") && right.tipo.equals("int")) {
+                    int valor = ((Integer) left.valor) + ((Integer) right.valor);
+                    RESULT = new ExprValue(true, valor, "int");
+                } else {
+                    // Manejo de otros tipos
+                    RESULT = new ExprValue(false, null, null);
+                }
+            } else {
+                RESULT = new ExprValue(false, null, null);
+            }
+        :}
+      | expr:left MINUS expr:right {:
+            if (left.esConstante && right.esConstante) {
+                if (left.tipo.equals("int") && right.tipo.equals("int")) {
+                    int valor = ((Integer) left.valor) - ((Integer) right.valor);
+                    RESULT = new ExprValue(true, valor, "int");
+                } else {
+                    RESULT = new ExprValue(false, null, null);
+                }
+            } else {
+                RESULT = new ExprValue(false, null, null);
+            }
+        :}
+      | expr:left TIMES expr:right {:
+            if (left.esConstante && right.esConstante) {
+                if (left.tipo.equals("int") && right.tipo.equals("int")) {
+                    int valor = ((Integer) left.valor) * ((Integer) right.valor);
+                    RESULT = new ExprValue(true, valor, "int");
+                } else {
+                    RESULT = new ExprValue(false, null, null);
+                }
+            } else {
+                RESULT = new ExprValue(false, null, null);
+            }
+        :}
+      | expr:left DIV expr:right {:
+            if (left.esConstante && right.esConstante) {
+                if (left.tipo.equals("int") && right.tipo.equals("int")) {
+                    int valor = ((Integer) left.valor) / ((Integer) right.valor);
+                    RESULT = new ExprValue(true, valor, "int");
+                } else {
+                    RESULT = new ExprValue(false, null, null);
+                }
+            } else {
+                RESULT = new ExprValue(false, null, null);
+            }
+        :}
+      | expr:left MOD expr:right {:
+            if (left.esConstante && right.esConstante) {
+                if (left.tipo.equals("int") && right.tipo.equals("int")) {
+                    int valor = ((Integer) left.valor) % ((Integer) right.valor);
+                    RESULT = new ExprValue(true, valor, "int");
+                } else {
+                    RESULT = new ExprValue(false, null, null);
+                }
+            } else {
+                RESULT = new ExprValue(false, null, null);
+            }
+        :}
+      | expr:left AND expr:right {:
+            // Implementar lógica para operadores lógicos
+            RESULT = new ExprValue(false, null, null);
+        :}
+      | expr:left OR expr:right {:
+            RESULT = new ExprValue(false, null, null);
+        :}
+      | NOT expr:exp {:
+            RESULT = new ExprValue(false, null, null);
+        :}
+      | expr:left op_relacional:op expr:right {:
+            RESULT = new ExprValue(false, null, null);
+        :}
+      | LPAREN expr:exp RPAREN {:
+            RESULT = exp;
+        :}
+      | ID:id LPAREN expr_list RPAREN {:
+            // Llamada a función
+            RESULT = new ExprValue(false, null, null);
+        :}
+      | ID:id {:
+            String idStr = id.value.toString();
+            int linea = id.left + 1;
+            verificarVariableDefinida(idStr, linea);
+            Simbolo simbolo = ts.obtenerSimbolo(idStr);
+            if (simbolo != null && simbolo.isEsConstante()) {
+                RESULT = new ExprValue(true, simbolo.getValor(), simbolo.getTipo_var());
+            } else {
+                RESULT = new ExprValue(false, null, null);
+            }
+        :}
+      | literal:lit {:
+            RESULT = new ExprValue(true, lit, "char");
+        :}
+      | number:num {:
+            RESULT = new ExprValue(true, num, "int");
+        :}
+      ;
+
+arit_exp ::= arit_exp:left PLUS arit_exp:right {:
+                // Implementar lógica similar a 'expr' para constant folding
+                RESULT = new ExprValue(false, null, null);
+            :}
+          | arit_exp:left MINUS arit_exp:right {:
+                RESULT = new ExprValue(false, null, null);
+            :}
+          | arit_exp:left TIMES arit_exp:right {:
+                RESULT = new ExprValue(false, null, null);
+            :}
+          | arit_exp:left DIV arit_exp:right {:
+                RESULT = new ExprValue(false, null, null);
+            :}
+          | arit_exp:left MOD arit_exp:right {:
+                RESULT = new ExprValue(false, null, null);
+            :}
+          | LPAREN arit_exp:exp RPAREN {:
+                RESULT = exp;
+            :}
+          | ID:id {:
+                String idStr = id.value.toString();
+                int linea = id.left + 1;
+                verificarVariableDefinida(idStr, linea);
+                Simbolo simbolo = ts.obtenerSimbolo(idStr);
+                if (simbolo != null && simbolo.isEsConstante()) {
+                    RESULT = new ExprValue(true, simbolo.getValor(), simbolo.getTipo_var());
+                } else {
+                    RESULT = new ExprValue(false, null, null);
+                }
+            :}
+          | number:num {:
+                RESULT = new ExprValue(true, num, "int");
+            :}
+          ;
+
+op_relacional ::= EQ_EQ {:
+            RESULT = "==";
+        :}
+        | GT_EQ {:
+            RESULT = ">=";
+        :}
+        | GT {:
+            RESULT = ">";
+        :}
+        | LT_EQ {:
+            RESULT = "<=";
+        :}
+        | LT {:
+            RESULT = "<";
+        :}
+        | NOT_EQ {:
+            RESULT = "!=";
+        :}
+        ;
+
+literal ::= CHAR:c {:
+                RESULT = c.value;
+            :}
+          | STRING {:
+                RESULT = "";
+            :}
+          | TRUE {:
+                RESULT = true;
+            :}
+          | FALSE {:
+                RESULT = false;
+            :}
+          ;
+
+number ::= INT:n {:
+                RESULT = Integer.parseInt(n.value.toString());
+            :}
+         | FLOAT:n {:
+                RESULT = Float.parseFloat(n.value.toString());
+            :}
+         ;
