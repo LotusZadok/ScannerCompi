@@ -69,7 +69,16 @@ public class Generador {
             traduccion += "cmp "+ registro.getValor() + registro2.getValor() +"\n";
         }
 
-        // jump conficional
+        if (!pila.isEmpty()){   // verifica si el if no tiene que hacer mas comparaciones
+            registro = pila.pop_init();
+            if (registro.getId().equals("&&") || registro.getId().equals("&&")){
+                estructuraIf(pila);
+            }
+        }
+
+        // se debe esperar a que se traduzca el bloque antes de hacer el jump al exit
+
+        // jump condicional al exit
         traduccion += getSalto(operador.getId()) + "exit"+getNextNumLabel() + ":\n";
     }
 
