@@ -69,10 +69,6 @@ public class Generador {
             traduccion += "cmp "+ registro.getValor() + registro2.getValor() +"\n";
         }
 
-        // jump condicional al exit
-        // nota> se debe guardar el numero de label
-        traduccion += getSalto(operador.getId()) + "exit"+getNextNumLabel() + "\n";
-
         if (!pila.isEmpty()){   // verifica si el if no tiene que hacer mas comparaciones
             registro = pila.pop_init();
             if (registro.getId().equals("&&") || registro.getId().equals("&&")){
@@ -80,11 +76,14 @@ public class Generador {
             }
         }
 
-        // se debe esperar a que se traduzca el bloque antes de hacer la etiqueta del exit
+        // se debe esperar a que se traduzca el bloque antes de hacer el jump al exit
+
+        // jump condicional al exit
+        traduccion += getSalto(operador.getId()) + "exit"+getNextNumLabel() + ":\n";
     }
 
     public void estructuraIfElse (PilaSemantica pila){
-        
+
     }
     
     public void registrarDir (String registro, String id){
