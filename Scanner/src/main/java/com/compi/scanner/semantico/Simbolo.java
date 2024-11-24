@@ -6,19 +6,22 @@ public class Simbolo {
     private boolean esConstante;
     private Object valor;
 
+    // Default constructor
     public Simbolo() {
-        tipo_var = "";
-        id = "";
-        esConstante = false;
-        valor = "";
+        this.tipo_var = "";
+        this.id = "";
+        this.esConstante = false;
+        this.valor = "";
     }
 
+    // Constructor with type and ID
     public Simbolo(String tipo_var, String id) {
         this.tipo_var = tipo_var;
         this.id = id;
         this.esConstante = false;
     }
 
+    // Constructor with all fields
     public Simbolo(String tipo_var, String id, boolean esConstante, Object valor) {
         this.tipo_var = tipo_var;
         this.id = id;
@@ -26,70 +29,94 @@ public class Simbolo {
         this.valor = valor;
     }
 
+    // Getter for tipo_var
     public String getTipo_var() {
         return tipo_var;
     }
 
+    // Setter for tipo_var
     public void setTipo_var(String tipo_var) {
         this.tipo_var = tipo_var;
     }
 
+    // Getter for id
     public String getId() {
         return id;
     }
 
+    // Setter for id
     public void setId(String id) {
         this.id = id;
     }
 
+    // Getter for esConstante
     public boolean esConstante() {
         return esConstante;
     }
 
+    // Setter for esConstante
     public void setEsConstante(boolean esConstante) {
         this.esConstante = esConstante;
     }
 
+    // Getter for valor
     public Object getValor() {
         return valor;
     }
 
+    // Setter for valor
     public void setValor(Object valor) {
         this.valor = valor;
     }
 
+    /**
+     * Verifies if the current value is compatible with the specified variable type.
+     *
+     * @return true if the value is compatible, false otherwise.
+     */
     public boolean esValorCompatible() {
-        // Verificar si el valor es un String y convertirlo al tipo correspondiente
+        // Convert value if it's a String
         if (valor instanceof String) {
-            try {
-                switch (tipo_var) {
-                    case "int":
-                        valor = Integer.parseInt((String) valor);
-                        break;
-                    case "long":
-                        valor = Long.parseLong((String) valor);
-                        break;
-                    case "short":
-                        valor = Short.parseShort((String) valor);
-                        break;
-                    case "char":
-                        // Asegurarse de que el String tiene un solo carácter
-                        String strValue = (String) valor;
-                        if (strValue.length() == 1) {
-                            valor = strValue.charAt(0);
-                        } else {
-                            return false; // No es un carácter válido
-                        }
-                        break;
-                    default:
-                        return false; // Tipo no soportado
-                }
-            } catch (NumberFormatException e) {
-                return false; // El valor no puede ser convertido
+            if (!convertStringToTipo((String) valor)) {
+                return false; // Conversion failed
             }
         }
 
-        // se verifica si el valor es del tipo adecuado
+        // Validate type compatibility
+        return validateTipoCompatibility();
+    }
+
+    // Converts a String value to the specified tipo_var, if possible
+    private boolean convertStringToTipo(String stringValue) {
+        try {
+            switch (tipo_var) {
+                case "int":
+                    valor = Integer.parseInt(stringValue);
+                    break;
+                case "long":
+                    valor = Long.parseLong(stringValue);
+                    break;
+                case "short":
+                    valor = Short.parseShort(stringValue);
+                    break;
+                case "char":
+                    if (stringValue.length() == 1) {
+                        valor = stringValue.charAt(0);
+                    } else {
+                        return false; // Invalid char
+                    }
+                    break;
+                default:
+                    return false; // Unsupported type
+            }
+            return true;
+        } catch (NumberFormatException e) {
+            return false; // Conversion error
+        }
+    }
+
+    // Validates if valor matches the expected tipo_var
+    private boolean validateTipoCompatibility() {
         switch (tipo_var) {
             case "int":
                 return valor instanceof Integer;
@@ -98,15 +125,14 @@ public class Simbolo {
             case "short":
                 return valor instanceof Short;
             case "char":
-                // Si es un Character o un valor convertible a char
                 return valor instanceof Character || (valor instanceof Integer &&
-                                                    (Integer) valor >= Character.MIN_VALUE &&
-                                                    (Integer) valor <= Character.MAX_VALUE);
+                        (Integer) valor >= Character.MIN_VALUE &&
+                        (Integer) valor <= Character.MAX_VALUE);
             default:
-                return false; // Tipo desconocido o no soportado
+                return false; // Unsupported type
         }
     }
-    
+
     @Override
     public String toString() {
         return "Simbolo { " +
