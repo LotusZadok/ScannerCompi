@@ -9,7 +9,6 @@ import java_cup.runtime.Symbol;
 import java.util.ArrayList;
 import java.util.List;
 import com.compi.scanner.semantico.*;
-import com.compi.scanner.traductor.Generador;
 import com.compi.scanner.traductor.*;
 import java_cup.runtime.XMLElement;
 
