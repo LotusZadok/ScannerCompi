@@ -5,85 +5,91 @@ import java.util.ArrayList;
 public class TablaSimbolos {
     private ArrayList<Simbolo> variablesGlobales;
     private ArrayList<Simbolo> variables;
+    private ArrayList<Simbolo> funciones;
 
     // Constructor to initialize the lists
     public TablaSimbolos() {
         variablesGlobales = new ArrayList<>();
         variables = new ArrayList<>();
+        funciones = new ArrayList<>();
     }
 
     // Getter for global variables
     public ArrayList<Simbolo> getGlobales() {
+        for (Simbolo s : variables) {
+            if (s.getAmbito().equals("global")) {
+                variablesGlobales.add(s);
+            }
+        }
         return variablesGlobales;
     }
 
-    // Inserts a global variable
-    public String insertarGlobal(Simbolo simbolo) {
-        if (containsInList(variablesGlobales, simbolo.getId())) {
-            return "Variable '" + simbolo.getId() + "' ya declarada en el ámbito global.";
-        }
-        variablesGlobales.add(simbolo);
-        return null;
-    }
-
-    // Inserts a local variable
+    // Inserts a variable
     public String insertarVar(Simbolo simbolo) {
+        //System.out.println("dentro del insertarVar");
         String idSimbolo = simbolo.getId();
+        String ambito = simbolo.getAmbito();
+        String mensaje =  idSimbolo + "' ya declarada.";
 
-        if (containsInList(variablesGlobales, idSimbolo)) {
-            return "Variable '" + idSimbolo + "' ya declarada en el ámbito global.";
+        if (simbolo.getValor() != null && simbolo.getValor().equals("PARAMETRO")) {
+            mensaje = checkAmbitoParametro(idSimbolo, ambito);
+        } else if (!containsInList(variables, idSimbolo, ambito)) {
+            mensaje = checkAmbito(idSimbolo, ambito);
         }
 
-        if (containsInList(variables, idSimbolo)) {
-            return "Variable '" + idSimbolo + "' ya declarada en el ámbito local.";
-        }
-
-        variables.add(simbolo);
-        return null;
+        if (mensaje == null) {
+            variables.add(simbolo);
+            return null;
+        } else return "Variable '" + mensaje;
     }
 
     // Inserts a constant
     public String insertarConstante(Simbolo simbolo) {
+        //System.out.println("dentro del insertarConst");
         String idSimbolo = simbolo.getId();
+        String ambito = simbolo.getAmbito();
+        String mensaje =  "Constante '" + idSimbolo + "' ya declarada.";
 
-        if (containsInList(variablesGlobales, idSimbolo)) {
-            return "Constante '" + idSimbolo + "' ya declarada en el ámbito global.";
+        if (!containsInList(variables, idSimbolo, ambito)) {
+            mensaje = checkAmbito(idSimbolo, ambito);
+            if (mensaje == null) {
+                if (simbolo.esValorCompatible()) {
+                    variables.add(simbolo);
+                    return null;
+                } else return "El valor no es compatible con el tipo de variable.";
+            } else return "Constante '" + mensaje;
         }
-
-        if (containsInList(variables, idSimbolo)) {
-            return "Constante '" + idSimbolo + "' ya declarada en el ámbito local.";
-        }
-
-        if (simbolo.esValorCompatible()) {
-            variables.add(simbolo);
-            return null;
-        } else {
-            return "El valor no es compatible con el tipo de variable.";
-        }
+        return mensaje;
     }
 
-    // Merges local variables into global variables
-    public void globales() {
-        variablesGlobales.addAll(variables);
-        variables.clear();
+    // Inserts a funtion ()
+    public String insertarFuncion (Simbolo simbolo){
+        String idSimbolo = simbolo.getId();
+        if (containsInList(funciones, idSimbolo,null)){
+            return "Función '" + idSimbolo + "' ya declarada."; 
+        } else {
+            funciones.add(simbolo);
+            return null;
+        }
     }
 
     // Prints both global and local variable tables
     public void imprimirTablas() {
-        System.out.println("\n--- Variables Globales ---");
-        for (Simbolo simbolo : variablesGlobales) {
+        System.out.println("\n--- Variables ---");
+        for (Simbolo simbolo : variables) {
             System.out.println(simbolo);
         }
 
-        System.out.println("\n--- Variables Locales ---");
-        for (Simbolo simbolo : variables) {
+        System.out.println("\n--- Funciones ---");
+        for (Simbolo simbolo : funciones) {
             System.out.println(simbolo);
         }
     }
 
     // Checks if a variable or constant with the given ID exists
-    public boolean contiene(String id) {
-        return containsInList(variablesGlobales, id) || containsInList(variables, id);
+    public boolean contiene(String id, String ambito) {
+        //System.out.println("esta en contiene");
+        return (containsInList(variables, id, ambito));
     }
 
     // Retrieves a symbol by ID
@@ -93,13 +99,39 @@ public class TablaSimbolos {
     }
 
     // Private helper method to check if a list contains a symbol by ID
-    private boolean containsInList(ArrayList<Simbolo> list, String id) {
+    private boolean containsInList(ArrayList<Simbolo> list, String id, String ambito) {
+        //System.out.println("dentro de containst in list");
         for (Simbolo s : list) {
-            if (s.getId().equals(id)) {
-                return true;
-            }
+            if (s.getId().equals(id))
+                if (list == variables) if (s.getAmbito().equals(ambito) || s.getAmbito().equals("global")) return true;
+                else {
+                    //System.out.println("es una funcion"); 
+                    return true;
+                }
         }
         return false;
+    }
+
+    // Private helper methor to check if theres two or more parametros on the same function
+    private String checkAmbitoParametro (String id, String ambito){
+        //System.out.println("dentro de checkambitoparametros");
+        for (Simbolo s : variables) {
+            if (s.getId().equals(id)) {
+                if (s.getAmbito().equals(ambito)) return id + "' ya declarada en el ámbito "+ ambito + ".";
+            }
+        }
+        return null;
+    }
+
+    // Private helper methor to check if theres two funtions or variable in the same ambito
+    private String checkAmbito (String id, String ambito){
+        for (Simbolo s : variables) {
+            if (s.getId().equals(id)) {
+                if (s.getAmbito().equals("global") && (ambito == null || ambito.equals("global"))) return id + "' ya declarada en el ámbito global.";    // solo puede haber una a nivel global
+                else if (s.getAmbito().equals(ambito)) return id + "' ya declarada en el ámbito "+ ambito + ".";
+            }
+        }
+        return null;
     }
 
     // Private helper method to find a symbol by ID in a list
@@ -110,5 +142,15 @@ public class TablaSimbolos {
             }
         }
         return null;
+    }
+
+    // Checks if a funtion already exists
+    public boolean existeFuncion (String id){
+        return containsInList(funciones, id, null);
+    }
+
+    // Set ambito global a variables
+    public void global (){
+        variables.getLast().setAmbito("global");
     }
 }

@@ -5,6 +5,7 @@ public class Simbolo {
     protected String id;
     private boolean esConstante;
     private Object valor;
+    private String ambito;
 
     // Default constructor
     public Simbolo() {
@@ -12,6 +13,7 @@ public class Simbolo {
         this.id = "";
         this.esConstante = false;
         this.valor = "";
+        this.ambito = "";
     }
 
     // Constructor with type and ID
@@ -21,12 +23,38 @@ public class Simbolo {
         this.esConstante = false;
     }
 
-    // Constructor with all fields
+    // Constructor global constant
     public Simbolo(String tipo_var, String id, boolean esConstante, Object valor) {
         this.tipo_var = tipo_var;
         this.id = id;
         this.esConstante = esConstante;
         this.valor = valor;
+    }
+
+    // Constructor with all fields
+    public Simbolo(String tipo_var, String id, boolean esConstante, Object valor, String ambito) {
+        this.tipo_var = tipo_var;
+        this.id = id;
+        this.esConstante = esConstante;
+        this.valor = valor;
+        this.ambito = ambito;
+    }
+
+    // Constructor with type, ID, ambit
+    public Simbolo(String tipo_var, String id, String ambito) {
+        this.tipo_var = tipo_var;
+        this.id = id;
+        this.esConstante = false;
+        this.ambito = ambito;
+    }
+
+    // Constructor for paremeters
+    public Simbolo(String tipo, String tipo_var, String id, String ambito) {
+        this.valor = tipo;  // se usa para identificar que es un parametro
+        this.tipo_var = tipo_var;
+        this.id = id;
+        this.esConstante = false;
+        this.ambito = ambito;
     }
 
     // Getter for tipo_var
@@ -69,6 +97,15 @@ public class Simbolo {
         this.valor = valor;
     }
 
+    // Getter for ambito
+    public String getAmbito() {
+        return ambito;
+    }
+
+    // Setter for ambito
+    public void setAmbito(String ambito) {
+        this.ambito = ambito;
+    }
     /**
      * Verifies if the current value is compatible with the specified variable type.
      *
@@ -139,7 +176,8 @@ public class Simbolo {
                 "esConstante=" + esConstante +
                 ", tipo_var='" + tipo_var + '\'' +
                 ", id='" + id + '\'' +
-                ", valor=" + valor +
+                ", valor=" + valor + '\''+
+                ", ambito=" + ambito +
                 " }";
     }
 }

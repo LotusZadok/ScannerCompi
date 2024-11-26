@@ -3,11 +3,11 @@ package com.compi.scanner.semantico;
 public class RegistroSemantico {
 
     // DataObject
-    private String tipo = "";    // TIPO | CONST | VAR
+    private String tipo = "";    // TIPO | CONST | VAR | PARAMETRO
     private String tipo_var = ""; // TYPE_INT | TYPE_LONG | TYPE_SHORT | TYPE_CHAR
     private String id = "";
     private String valor = "";
-    private String operador = "";
+    private Boolean expr ;
 
     // Constructor for type initialization
     public RegistroSemantico(String id) {
@@ -38,6 +38,14 @@ public class RegistroSemantico {
         this.tipo = tipo;
         this.tipo_var = tipo_var;
         this.id = id;
+        this.valor = valor;
+    }
+
+    // Constructor for expresions
+    public RegistroSemantico (boolean expr, String tipo, String valor){
+        //System.out.println("dentro del rs expr");
+        this.expr = true;
+        this.tipo = tipo;
         this.valor = valor;
     }
 
@@ -76,16 +84,24 @@ public class RegistroSemantico {
 
     @Override
     public String toString() {
-        return "RegistroSemantico{" +
+        if (expr != null){
+            return "RegistroSemantico{"+
+                "tipo='"+ tipo + "\'" +
+                "valor='" + valor + "\'"+
+                '}';
+        } else {
+            return "RegistroSemantico{" +
                 "tipo='" + tipo + '\'' +
                 ", tipo_var='" + tipo_var + '\'' +
                 ", id='" + id + '\'' +
                 ", valor='" + valor + '\'' +
                 '}';
+        }
     }
 
     // Private helper method to check if the given ID is a valid type
     private boolean isValidTipoVar(String id) {
         return "int".equals(id) || "long".equals(id) || "short".equals(id) || "char".equals(id);
     }
+
 }
