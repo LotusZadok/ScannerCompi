@@ -167,6 +167,26 @@ parser code {:
         if (funcion!=null)funcion.setValor (cantParametros);
     }
 
+
+    public void asignacion (String id, String op, String expr) {
+        if (ts.contiene(id, ambito)) {   
+            Simbolo simbolo = ts.obtenerSimbolo (id);
+            if (expr == null){  // es una op_incremento, se valida que la var este inicializada
+                if (simbolo.getValor() != null){  // si esta inicializada
+                    generador.opIncremento (id, op);
+                } else {
+                    semantic_error (cur_token);
+                    System.err.println("La variable '" + id + "' no está inicializada por lo que no se puede ejecutar la operación de incremento.");
+                }
+            } else {
+
+            }
+        } else {
+            semantic_error (cur_token);
+            System.err.println("La variable '" + id + "' no está definida.");
+        }
+    }
+
 :};
 
 
@@ -358,12 +378,13 @@ next_id_list ::= COMMA ID:id next_id_list {:
                ;
 
 
-asignacion ::= ID:id op_asignacion expr:valor{:
+asignacion ::= ID:id op_asignacion:op expr:valor{:
                 verificarVariableDefinida(id.toString(), valor);
                 // falta código adicional para manejo de asignación
              :} 
              | ID:id op_incremento:op{:
-                verificarVariableDefinida(id.toString(), null);
+                asignacion (id.toString(), op.toString(), null);
+
                 // falta código adicional para manejo de asignación
              :} 
              | ID op_asignacion error {: report_error("Invalid assignment expression."); :}
@@ -425,7 +446,7 @@ arit_exp ::= arit_exp:left PLUS arit_exp:right {: RESULT = new ExprValue(false, 
            | arit_exp:left MOD arit_exp:right {: RESULT = new ExprValue(false, null, null); :}
            | LPAREN arit_exp:exp RPAREN {: RESULT = exp; :}
            | ID:id {: 
-                verificarVariableDefinida(id.toString(),ambito);
+                verificarVariableDefinida(id.toString(), null);
                 Simbolo simbolo = ts.obtenerSimbolo(id.toString());
                 if (simbolo != null && simbolo.esConstante()) {
                     RESULT = new ExprValue(true, simbolo.getValor(), simbolo.getTipo_var());

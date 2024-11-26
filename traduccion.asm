@@ -6,5 +6,8 @@ e dd ?
 f dd ?
 
 mov ax, [a]
+inc ax
+mov [a], ax
+mov ax, [a]
 cmp ax, 0
 jl exit_Label_0

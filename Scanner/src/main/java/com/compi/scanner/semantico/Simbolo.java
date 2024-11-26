@@ -185,7 +185,7 @@ public class Simbolo {
                     tipo +
                     ", tipo_var='" + tipo_var + '\'' +
                     ", id='" + id + '\'' +
-                    ", valor=" + valor + '\''+
+                    ", valor=" + valor +
                     ", ambito=" + ambito +
                     " }";
             }

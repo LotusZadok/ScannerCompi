@@ -94,7 +94,7 @@ public class Generador {
     
     public void registrarDir (String registro, String id){
         traduccion += "mov ";
-        switch (registro) {
+        switch (registro.toUpperCase()) {
             case "A": 
                 traduccion += "ax"; break;
             case "B":
@@ -105,6 +105,20 @@ public class Generador {
                 traduccion += "dx"; break;
         }
         traduccion += ", [" + id + "]\n";
+    }
+
+    public String getDir (String registro){
+        switch (registro.toUpperCase()) {
+            case "A": 
+                return "ax";
+            case "B":
+                return "bx";
+            case "C":
+                return "cx";
+            case "D":
+                return "dx"; 
+        }
+        return "";
     }
 
     public String getSalto(String operador){
@@ -121,6 +135,22 @@ public class Generador {
 
     private String getNextNumLabel (){
         return "Label_" + numLabels++;
+    }
+
+    public void opIncremento (String id, String op) {
+        String registro = "A";
+        registrarDir(registro, id);
+        switch (op){
+            case "++":
+                traduccion += "inc ";
+                break;
+
+            case "--":
+                traduccion += "dec ";
+                break;
+        }
+        traduccion += getDir(registro) + "\n";
+        traduccion += "mov [" + id + "], " + getDir(registro) + "\n";
     }
 
 }

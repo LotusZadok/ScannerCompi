@@ -789,7 +789,27 @@ public class ParserCup extends java_cup.runtime.lr_parser {
             } else cantParametros ++;
         }
         Simbolo funcion = ts.obtenerSimbolo (ambito);
-        funcion.setValor (cantParametros);
+        if (funcion!=null)funcion.setValor (cantParametros);
+    }
+
+
+    public void asignacion (String id, String op, String expr) {
+        if (ts.contiene(id, ambito)) {   
+            Simbolo simbolo = ts.obtenerSimbolo (id);
+            if (expr == null){  // es una op_incremento, se valida que la var este inicializada
+                if (simbolo.getValor() != null){  // si esta inicializada
+                    generador.opIncremento (id, op);
+                } else {
+                    semantic_error (cur_token);
+                    System.err.println("La variable '" + id + "' no está inicializada por lo que no se puede ejecutar la operación de incremento.");
+                }
+            } else {
+
+            }
+        } else {
+            semantic_error (cur_token);
+            System.err.println("La variable '" + id + "' no está definida.");
+        }
     }
 
 
@@ -1727,6 +1747,9 @@ class CUP$ParserCup$actions {
 		int idleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-2)).left;
 		int idright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-2)).right;
 		Object id = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-2)).value;
+		int opleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).left;
+		int opright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).right;
+		Object op = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)).value;
 		int valorleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()).left;
 		int valorright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()).right;
 		Object valor = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.peek()).value;
@@ -1749,7 +1772,8 @@ class CUP$ParserCup$actions {
 		int opright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()).right;
 		Object op = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.peek()).value;
 		
-                verificarVariableDefinida(id.toString(), null);
+                asignacion (id.toString(), op.toString(), null);
+
                 // falta código adicional para manejo de asignación
              
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("asignacion",28, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
@@ -2175,7 +2199,7 @@ class CUP$ParserCup$actions {
 		int idright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()).right;
 		Object id = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.peek()).value;
 		 
-                verificarVariableDefinida(id.toString(),ambito);
+                verificarVariableDefinida(id.toString(), null);
                 Simbolo simbolo = ts.obtenerSimbolo(id.toString());
                 if (simbolo != null && simbolo.esConstante()) {
                     RESULT = new ExprValue(true, simbolo.getValor(), simbolo.getTipo_var());
