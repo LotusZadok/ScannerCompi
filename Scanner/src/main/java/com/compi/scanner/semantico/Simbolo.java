@@ -174,12 +174,20 @@ public class Simbolo {
 
     @Override
     public String toString() {
-        return "Simbolo { " +
-                "Es=" + tipo +
-                ", tipo_var='" + tipo_var + '\'' +
+        if (tipo.equals("FUNCION")) {
+            return "Simbolo { " +
+                "tipo_func='" + tipo_var + '\'' +
                 ", id='" + id + '\'' +
-                ", valor=" + valor + '\''+
-                ", ambito=" + ambito +
+                ", cantParametros=" + valor + 
                 " }";
+        } else {
+            return "Simbolo { " +
+                    tipo +
+                    ", tipo_var='" + tipo_var + '\'' +
+                    ", id='" + id + '\'' +
+                    ", valor=" + valor + '\''+
+                    ", ambito=" + ambito +
+                    " }";
+            }
     }
 }

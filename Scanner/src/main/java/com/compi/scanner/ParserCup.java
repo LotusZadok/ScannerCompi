@@ -776,15 +776,8 @@ public class ParserCup extends java_cup.runtime.lr_parser {
         } 
     }
 
-    public void verificarVariableDefinida(String id) {
-        /*
-        if (!ts.contiene(id)) {    // luego manejar lo del ambito   
-            semantic_error (cur_token);
-            System.err.println("La variable '" + id + "' no está definida.");
-        }*/
-    }
-
     public void insertarParametros (){
+        int cantParametros = 0;
         //System.out.println("dentro del insertarParametros, ambito> "+ambito);
         //pilaSemantica.print ();
         while (!pilaSemantica.isEmpty() && pilaSemantica.get(pilaSemantica.size() - 1).getTipo().equals("PARAMETRO")) {
@@ -793,8 +786,10 @@ public class ParserCup extends java_cup.runtime.lr_parser {
             if (mensaje != null){
                 semantic_error (cur_token);
                 System.err.println(mensaje);
-            } 
+            } else cantParametros ++;
         }
+        Simbolo funcion = ts.obtenerSimbolo (ambito);
+        funcion.setValor (cantParametros);
     }
 
 
@@ -2180,7 +2175,7 @@ class CUP$ParserCup$actions {
 		int idright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()).right;
 		Object id = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.peek()).value;
 		 
-                verificarVariableDefinida(id.toString());
+                verificarVariableDefinida(id.toString(),ambito);
                 Simbolo simbolo = ts.obtenerSimbolo(id.toString());
                 if (simbolo != null && simbolo.esConstante()) {
                     RESULT = new ExprValue(true, simbolo.getValor(), simbolo.getTipo_var());

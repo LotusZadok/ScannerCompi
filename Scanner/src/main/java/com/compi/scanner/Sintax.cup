@@ -151,15 +151,8 @@ parser code {:
         } 
     }
 
-    public void verificarVariableDefinida(String id) {
-        /*
-        if (!ts.contiene(id)) {    // luego manejar lo del ambito   
-            semantic_error (cur_token);
-            System.err.println("La variable '" + id + "' no está definida.");
-        }*/
-    }
-
     public void insertarParametros (){
+        int cantParametros = 0;
         //System.out.println("dentro del insertarParametros, ambito> "+ambito);
         //pilaSemantica.print ();
         while (!pilaSemantica.isEmpty() && pilaSemantica.get(pilaSemantica.size() - 1).getTipo().equals("PARAMETRO")) {
@@ -168,8 +161,10 @@ parser code {:
             if (mensaje != null){
                 semantic_error (cur_token);
                 System.err.println(mensaje);
-            } 
+            } else cantParametros ++;
         }
+        Simbolo funcion = ts.obtenerSimbolo (ambito);
+        if (funcion!=null)funcion.setValor (cantParametros);
     }
 
 :};
@@ -430,7 +425,7 @@ arit_exp ::= arit_exp:left PLUS arit_exp:right {: RESULT = new ExprValue(false, 
            | arit_exp:left MOD arit_exp:right {: RESULT = new ExprValue(false, null, null); :}
            | LPAREN arit_exp:exp RPAREN {: RESULT = exp; :}
            | ID:id {: 
-                verificarVariableDefinida(id.toString());
+                verificarVariableDefinida(id.toString(),ambito);
                 Simbolo simbolo = ts.obtenerSimbolo(id.toString());
                 if (simbolo != null && simbolo.esConstante()) {
                     RESULT = new ExprValue(true, simbolo.getValor(), simbolo.getTipo_var());
