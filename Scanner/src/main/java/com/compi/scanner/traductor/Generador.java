@@ -24,6 +24,8 @@ public class Generador {
     }
 
     public void declararGlobales (TablaSimbolos ts){
+        String global = traduccion;
+        traduccion = "";
         ArrayList<Simbolo> globales = ts.getGlobales();
         for (Simbolo sym : globales){
             String id = sym.getId();
@@ -48,22 +50,25 @@ public class Generador {
             if (sym.esConstante()) traduccion += sym.getValor().toString() + "\n";
             else traduccion += "?\n";
         }
+        traduccion += "\n" + global;
     }
 
     public void estructuraIf (PilaSemantica pila){
+        //System.out.println("dentro del estructura if");
+        //pila.print();
         RegistroSemantico registro = pila.pop_init();      //saca la primera expre
         RegistroSemantico operador = pila.pop_init();
         RegistroSemantico registro2 = pila.pop_init();     //saca segunda expre 
 
         // comparar expresiones
         if (registro.getTipo().equals("VAR") && registro2.getTipo().equals("VAR")){  // guardar en direccion
-            registrarDir("A", registro.getId()); registrarDir("B", registro2.getId());
+            registrarDir("A", registro.getValor()); registrarDir("B", registro2.getValor());
             traduccion += "cmp ax, bx\n";
         } else if (registro.getTipo().equals("VAR") && !registro2.getTipo().equals("VAR")){
-            registrarDir("A", registro.getId()); 
+            registrarDir("A", registro.getValor()); 
             traduccion += "cmp ax, "+ registro2.getValor() +"\n";
         } else if (!registro.getTipo().equals("VAR") && registro2.getTipo().equals("VAR")){
-            registrarDir("A", registro2.getId()); 
+            registrarDir("A", registro2.getValor()); 
             traduccion += "cmp "+ registro.getValor() +", ax\n";
         } else {
             traduccion += "cmp "+ registro.getValor() + registro2.getValor() +"\n";
@@ -79,7 +84,8 @@ public class Generador {
         // se debe esperar a que se traduzca el bloque antes de hacer el jump al exit
 
         // jump condicional al exit
-        traduccion += getSalto(operador.getId()) + "exit"+getNextNumLabel() + ":\n";
+        traduccion += getSalto(operador.getId()) + " exit_"+getNextNumLabel() + "\n";
+        pila.print();
     }
 
     public void estructuraIfElse (PilaSemantica pila){
@@ -114,7 +120,7 @@ public class Generador {
     }
 
     private String getNextNumLabel (){
-        return "Label" + numLabels++;
+        return "Label_" + numLabels++;
     }
 
 }

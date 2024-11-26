@@ -2,12 +2,13 @@ const int a = 4;
 const char c = 4;
 int b,d,e,f;
 
-int main(int a, int b) {
-for (i = 0; i < 10; i++) {
-		a = a + 1;
-		int z;
-		z = 9;
+int main(int b) {
+	if (a >=0){
+		a += 3;
 	}
+	int z;
 
-	return c;
 }
+
+
+
