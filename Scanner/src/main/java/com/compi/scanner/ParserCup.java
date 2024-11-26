@@ -707,20 +707,19 @@ public class ParserCup extends java_cup.runtime.lr_parser {
 
     public void imprimirTablasSimbolos() {
         ts.imprimirTablas();
-        
     }
 
     // Para manejo del ambito
     private String ambito = "global";
     public void setAmbito (String amb){
-        System.out.println("dentro del setAmbito" + amb);
+        //System.out.println("dentro del setAmbito" + amb);
         ambito = amb;
     }
 
     // Funciones adicionales
     public void insertarConstante (String tipo, String id, Object valor){
         //System.out.println("tipo> "+tipo+", id> "+id+", valor> "+valor);
-        String mensaje = ts.insertarConstante(new Simbolo(tipo, id, true, valor, ambito));
+        String mensaje = ts.insertarConstante(new Simbolo("CONST", tipo, id, valor, ambito));
         if (mensaje != null){
             semantic_error (cur_token);
             System.err.println(mensaje);
@@ -735,7 +734,7 @@ public class ParserCup extends java_cup.runtime.lr_parser {
         if (tipo!=null){
             while (!pilaSemantica.isEmpty() && pilaSemantica.get(pilaSemantica.size() - 1).getTipo().equals("")) {
                 RegistroSemantico registro = pilaSemantica.pop_end();
-                String mensaje = ts.insertarVar (new Simbolo (tipo, registro.getId(), ambito));
+                String mensaje = ts.insertarVar (new Simbolo ("VAR", tipo, registro.getId(), ambito));
                 if (mensaje != null){
                     semantic_error (cur_token);
                     System.err.println(mensaje);
@@ -750,7 +749,7 @@ public class ParserCup extends java_cup.runtime.lr_parser {
 
     public void insertarFuncion (String tipo, String id){
         if (!ts.existeFuncion (id)){
-            ts.insertarFuncion (new Simbolo (tipo, id));
+            ts.insertarFuncion (new Simbolo ("FUNCION", tipo, id));
             setAmbito (id);
         } else {
             semantic_error (cur_token);
@@ -760,18 +759,18 @@ public class ParserCup extends java_cup.runtime.lr_parser {
     }
 
     public void verificarVariableDefinida(String id, Object valor) {
-        System.out.println("dentro del verificar, id>" + id + ", ambito> "+ambito);
+        //System.out.println("dentro del verificar, id>" + id + ", ambito> "+ambito);
         if (!ts.contiene(id, ambito)) {   
             semantic_error (cur_token);
             System.err.println("La variable '" + id + "' no está definida.");
             String tipo = pilaSemantica.buscarTipoVar ();
             if (tipo!=null) {
                 if (valor != null) {
-                    if (ambito != null)  ts.insertarVar (new Simbolo (tipo, id, false, valor, ambito));
-                    else ts.insertarVar (new Simbolo (tipo, id, false, valor));
+                    if (ambito != null)  ts.insertarVar (new Simbolo ("VAR", tipo, id, valor, ambito));
+                    else ts.insertarVar (new Simbolo ("VAR", tipo, id, valor));
                 } else {
-                    if (ambito != null)  ts.insertarVar (new Simbolo (tipo, id, ambito));
-                    else ts.insertarVar (new Simbolo (tipo, id));
+                    if (ambito != null)  ts.insertarVar (new Simbolo ("VAR", tipo, id, ambito));
+                    else ts.insertarVar (new Simbolo ("VAR", tipo, id));
                 }
             }else System.err.println("La variable '" + id + "' no se pudo insertar a la tabla de simbolos porque no tiene un tipo especificado.");
         } 
@@ -786,8 +785,8 @@ public class ParserCup extends java_cup.runtime.lr_parser {
     }
 
     public void insertarParametros (){
-        System.out.println("dentro del insertarParametros, ambito> "+ambito);
-        pilaSemantica.print ();
+        //System.out.println("dentro del insertarParametros, ambito> "+ambito);
+        //pilaSemantica.print ();
         while (!pilaSemantica.isEmpty() && pilaSemantica.get(pilaSemantica.size() - 1).getTipo().equals("PARAMETRO")) {
             RegistroSemantico registro = pilaSemantica.pop_end();
             String mensaje = ts.insertarVar (new Simbolo (registro.getTipo(), registro.getTipo_Var(), registro.getId(), ambito));
@@ -1382,7 +1381,7 @@ class CUP$ParserCup$actions {
           case 52: // NT$3 ::= 
             {
               Object RESULT =null;
- System.out.println("getAmbito>"+ambito); generador.estructuraIf (pilaSemantica); 
+ /*System.out.println("getAmbito>"+ambito); */generador.estructuraIf (pilaSemantica); 
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("NT$3",44, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;

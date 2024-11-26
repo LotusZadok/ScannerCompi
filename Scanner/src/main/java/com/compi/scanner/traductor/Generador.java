@@ -47,7 +47,7 @@ public class Generador {
                     break;
             }
 
-            if (sym.esConstante()) traduccion += sym.getValor().toString() + "\n";
+            if (sym.getTipo().equals("CONST")) traduccion += sym.getValor().toString() + "\n";
             else traduccion += "?\n";
         }
         traduccion += "\n" + global;
