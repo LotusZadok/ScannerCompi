@@ -94,8 +94,8 @@ public class TablaSimbolos {
 
     // Retrieves a symbol by ID
     public Simbolo obtenerSimbolo(String id) {
-        Simbolo simbolo = findInList(variablesGlobales, id);
-        return (simbolo != null) ? simbolo : findInList(variables, id);
+        Simbolo simbolo = findInList(variables, id);
+        return (simbolo != null) ? simbolo : findInList(funciones, id);
     }
 
     // Private helper method to check if a list contains a symbol by ID
