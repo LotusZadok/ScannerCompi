@@ -1,6 +1,7 @@
 package com.compi.scanner.semantico;
 
 public class Simbolo {
+    private String tipo;    //CONST | VAR | PARAMETRO | FUNCION
     protected String tipo_var;
     protected String id;
     private boolean esConstante;
@@ -9,51 +10,42 @@ public class Simbolo {
 
     // Default constructor
     public Simbolo() {
+        this.tipo = "";
         this.tipo_var = "";
         this.id = "";
-        this.esConstante = false;
         this.valor = "";
         this.ambito = "";
     }
 
-    // Constructor with type and ID
-    public Simbolo(String tipo_var, String id) {
+    // Constructor with type, type_var and ID
+    public Simbolo(String tipo, String tipo_var, String id) {
+        this.tipo = tipo;
         this.tipo_var = tipo_var;
         this.id = id;
-        this.esConstante = false;
     }
 
-    // Constructor global constant
-    public Simbolo(String tipo_var, String id, boolean esConstante, Object valor) {
+    // Constructor without ambito
+    public Simbolo(String tipo, String tipo_var, String id, Object valor) {
+        this.tipo = tipo;
         this.tipo_var = tipo_var;
         this.id = id;
-        this.esConstante = esConstante;
         this.valor = valor;
     }
 
     // Constructor with all fields
-    public Simbolo(String tipo_var, String id, boolean esConstante, Object valor, String ambito) {
+    public Simbolo(String tipo, String tipo_var, String id, Object valor, String ambito) {
+        this.tipo = tipo;
         this.tipo_var = tipo_var;
         this.id = id;
-        this.esConstante = esConstante;
         this.valor = valor;
         this.ambito = ambito;
     }
 
     // Constructor with type, ID, ambit
-    public Simbolo(String tipo_var, String id, String ambito) {
-        this.tipo_var = tipo_var;
-        this.id = id;
-        this.esConstante = false;
-        this.ambito = ambito;
-    }
-
-    // Constructor for paremeters
     public Simbolo(String tipo, String tipo_var, String id, String ambito) {
-        this.valor = tipo;  // se usa para identificar que es un parametro
+        this.tipo = tipo;
         this.tipo_var = tipo_var;
         this.id = id;
-        this.esConstante = false;
         this.ambito = ambito;
     }
 
@@ -75,6 +67,16 @@ public class Simbolo {
     // Setter for id
     public void setId(String id) {
         this.id = id;
+    }
+
+    // Getter for tipo
+    public String getTipo (){
+        return tipo;
+    }
+
+    // Setter for tipo 
+    public void setTipo (String tipo){
+        this.tipo = tipo;
     }
 
     // Getter for esConstante
@@ -173,7 +175,7 @@ public class Simbolo {
     @Override
     public String toString() {
         return "Simbolo { " +
-                "esConstante=" + esConstante +
+                "Es=" + tipo +
                 ", tipo_var='" + tipo_var + '\'' +
                 ", id='" + id + '\'' +
                 ", valor=" + valor + '\''+

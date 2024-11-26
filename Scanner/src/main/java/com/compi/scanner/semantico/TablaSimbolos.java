@@ -31,7 +31,7 @@ public class TablaSimbolos {
         String ambito = simbolo.getAmbito();
         String mensaje =  idSimbolo + "' ya declarada.";
 
-        if (simbolo.getValor() != null && simbolo.getValor().equals("PARAMETRO")) {
+        if (simbolo.getTipo() != null && simbolo.getTipo().equals("PARAMETRO")) {
             mensaje = checkAmbitoParametro(idSimbolo, ambito);
         } else if (!containsInList(variables, idSimbolo, ambito)) {
             mensaje = checkAmbito(idSimbolo, ambito);
@@ -149,7 +149,7 @@ public class TablaSimbolos {
         return containsInList(funciones, id, null);
     }
 
-    // Set ambito global a variables
+    // Set ambito global a variable
     public void global (){
         variables.getLast().setAmbito("global");
     }
