@@ -51,10 +51,8 @@ public class TablaSimbolos {
         String mensaje =  "Constante '" + idSimbolo + "' ya declarada.";
 
         if (!containsInList(variables, idSimbolo, ambito)) {
-            //System.out.println("dentor del primer if");
             mensaje = checkAmbito(idSimbolo, ambito);
             if (mensaje == null) {
-                //System.out.println("dentro del segundo if");
                 if (simbolo.esValorCompatible()) {
                     variables.add(simbolo);
                     return null;
@@ -90,7 +88,7 @@ public class TablaSimbolos {
 
     // Checks if a variable or constant with the given ID exists
     public boolean contiene(String id, String ambito) {
-        System.out.println("esta en contiene");
+        //System.out.println("esta en contiene");
         return (containsInList(variables, id, ambito));
     }
 
@@ -102,19 +100,21 @@ public class TablaSimbolos {
 
     // Private helper method to check if a list contains a symbol by ID
     private boolean containsInList(ArrayList<Simbolo> list, String id, String ambito) {
-        System.out.println("dentro de containst in list");
+        //System.out.println("dentro de containst in list");
         for (Simbolo s : list) {
-            //if (s.getId().equals(id) && (s.getAmbito().equals(ambito) || s.getAmbito().equals("global"))) return true;
             if (s.getId().equals(id))
                 if (list == variables) if (s.getAmbito().equals(ambito) || s.getAmbito().equals("global")) return true;
-                else {System.out.println("es una funcion"); return true;}
+                else {
+                    //System.out.println("es una funcion"); 
+                    return true;
+                }
         }
         return false;
     }
 
-    // Private helper methor to check if theres two or more parametros for the same function
+    // Private helper methor to check if theres two or more parametros on the same function
     private String checkAmbitoParametro (String id, String ambito){
-        System.out.println("dentro de checkambitoparametros");
+        //System.out.println("dentro de checkambitoparametros");
         for (Simbolo s : variables) {
             if (s.getId().equals(id)) {
                 if (s.getAmbito().equals(ambito)) return id + "' ya declarada en el ámbito "+ ambito + ".";
