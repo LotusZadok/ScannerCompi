@@ -76,7 +76,7 @@ public class Generador {
 
         if (!pila.isEmpty()){   // verifica si el if no tiene que hacer mas comparaciones
             registro = pila.pop_init();
-            if (registro.getId().equals("&&") || registro.getId().equals("&&")){
+            if (registro.getId().equals("&&") || registro.getId().equals("||")){
                 estructuraIf(pila);
             }
         }
@@ -150,7 +150,7 @@ public class Generador {
                 break;
         }
         traduccion += getDir(registro) + "\n";
-        traduccion += "mov [" + id + "], " + getDir(registro) + "\n";
+        traduccion += "mov [" + id + "], " + getDir(registro) + "\n\n";
     }
 
 }

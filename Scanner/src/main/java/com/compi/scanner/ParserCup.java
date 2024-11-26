@@ -804,7 +804,7 @@ public class ParserCup extends java_cup.runtime.lr_parser {
                     System.err.println("La variable '" + id + "' no está inicializada por lo que no se puede ejecutar la operación de incremento.");
                 }
             } else {
-
+                // falta manejar lo de expresiones
             }
         } else {
             semantic_error (cur_token);
@@ -1773,8 +1773,6 @@ class CUP$ParserCup$actions {
 		Object op = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.peek()).value;
 		
                 asignacion (id.toString(), op.toString(), null);
-
-                // falta código adicional para manejo de asignación
              
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("asignacion",28, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
@@ -2020,10 +2018,10 @@ class CUP$ParserCup$actions {
 		int rightleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()).left;
 		int rightright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()).right;
 		Object right = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.peek()).value;
-		 /*
+		 
             System.out.println("l> "+left);
             System.out.println("operador> "+op);
-            System.out.println("r> "+right);*/
+            System.out.println("r> "+right);
             //pilaSemantica.print ();
             //System.out.println("DESPUESITO ");
         

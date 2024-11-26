@@ -179,7 +179,7 @@ parser code {:
                     System.err.println("La variable '" + id + "' no está inicializada por lo que no se puede ejecutar la operación de incremento.");
                 }
             } else {
-
+                // falta manejar lo de expresiones
             }
         } else {
             semantic_error (cur_token);
@@ -377,15 +377,12 @@ next_id_list ::= COMMA ID:id next_id_list {:
                | /* empty */
                ;
 
-
 asignacion ::= ID:id op_asignacion:op expr:valor{:
                 verificarVariableDefinida(id.toString(), valor);
                 // falta código adicional para manejo de asignación
              :} 
-             | ID:id op_incremento:op{:
+             | ID:id op_incremento:op {:
                 asignacion (id.toString(), op.toString(), null);
-
-                // falta código adicional para manejo de asignación
              :} 
              | ID op_asignacion error {: report_error("Invalid assignment expression."); :}
              ;
@@ -411,10 +408,10 @@ expr ::= expr:left PLUS:op expr:right
         :}
        | expr:left OR expr:right {:  :}
        | NOT expr:exp {: :}
-       | expr:left op_relacional:op expr:right {: /*
+       | expr:left op_relacional:op expr:right {: 
             System.out.println("l> "+left);
             System.out.println("operador> "+op);
-            System.out.println("r> "+right);*/
+            System.out.println("r> "+right);
             //pilaSemantica.print ();
             //System.out.println("DESPUESITO ");
         :}
