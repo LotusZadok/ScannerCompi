@@ -229,8 +229,13 @@ parser code {:
         generador.genJump(rs_while.getStartLabel());
     }
 
-    public void startFunc() {
+    public void startFunc() {   
         RS_FUNC rs_func = new RS_FUNC("FUNC" + generateLabel());
+        RS_ID rs_id = pilaSemantica.pop();
+        RS_TIPO rs_tipo = pilaSemantica.pop();
+
+        ts.insertar(rs_id.getValor(), rs_tipo.getTipo(), "global");
+
         pilaSemantica.push(rs_func);
     }
 
@@ -278,92 +283,88 @@ parser code {:
 
 
 /* Declaración de terminales*/
-terminal ID, MOD, STRING, CONST, WRITE, READ, TRUE, FALSE, EQ, PLUS, MINUS, TIMES, DIV, SEMI, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, COLON, EQ_EQ, GT_EQ, GT, LT_EQ, LT, NOT_EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ, PLUS_PLUS, MINUS_MINUS, OR, AND, NOT, IF, ELSE, FOR, WHILE, SWITCH, CASE, DEFAULT, TYPE_INT, TYPE_LONG, TYPE_SHORT, TYPE_CHAR, VOID, BREAK, CONTINUE, DO, RETURN, INT , FLOAT, CHAR;
-
+terminal ID, TRUE, FALSE, EQ, PLUS, MINUS, TIMES, DIV, SEMI, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, EQ_EQ, GT, LT, NOT_EQ, PLUS_PLUS, MINUS_MINUS, IF, ELSE, WHILE, TYPE_INT, TYPE_LONG, TYPE_SHORT, TYPE_CHAR, VOID, BREAK, CONTINUE, INT, FLOAT;
 /* No terminales con tipos */
 non terminal String tipo_var;
-non terminal ExprValue arit_exp;
 
 /* No terminales sin tipo específico */
-non terminal programa, expr, read, read_parameter, write_parameter, write, case_end, instruccion , global_decl_list, expr_list, global_decl, globales, bloque, estru_control, funciones, funcion, parametro_list, if, else, for, while, switch, case_list, constante, variable, id_list, asignacion, op_asignacion, op_incremento, literal, bool_expr, bool_term, bool_factor, rel_expr, op_relacional, term, factor, number, next_id_list;
+non terminal programa, expr, instruccion, global_decl_list, globales, bloque, estru_control, funciones, funcion, parametro_list, if, else, while, variable, id_list, asignacion, op_asignacion, op_incremento, literal, op_relacional, number, next_id_list, op_aritmetico;
+
 
 /* Precedence and associativity declarations */
-precedence left OR, AND;
 precedence left EQ_EQ, NOT_EQ;
-precedence left GT, LT, GT_EQ, LT_EQ;
+precedence left GT, LT;
 precedence left PLUS, MINUS;
-precedence left TIMES, DIV, MOD;
-precedence right NOT;
+precedence left TIMES, DIV;
 precedence left PLUS_PLUS, MINUS_MINUS;
-precedence left EQ, PLUS_EQ, MINUS_EQ, TIMES_EQ, DIV_EQ;
-
+precedence right EQ; // Added precedence for assignment operator
 
 /* Start with the programa non-terminal */
 start with programa;
 
 /* The grammar rules for C subset */
 
-programa ::= globales {: imprimirTablasSimbolos(); generador.generarArchivo(); :}
+programa ::= globales 
            ;
 
 globales ::= global_decl_list funciones
            ;
 
 
-global_decl_list ::= global_decl_list global_decl 
-                   | global_decl
+global_decl_list ::= global_decl_list variable 
+                   | variable
                    ;                 
-
-global_decl ::= variable {: ts.global (); :}
-              | error {: report_error("Error in global declaration."); :}
-              ;
 
 funciones ::= funciones funcion
               | funcion 
               ;
 
-instruccion ::= estru_control
-              | variable
-              | asignacion SEMI
-              | BREAK SEMI {: 
-                    testBreak();
-                :}
-              | CONTINUE SEMI {: 
-                    testContinue();
-                :}
-              | error {: report_error("Invalid instruction."); :}
-              ;
 
+tipo_var ::= TYPE_INT {: RESULT = "int"; :}
+           | TYPE_LONG {: RESULT = "long"; :}
+           | TYPE_SHORT {: RESULT = "short"; :}
+           | TYPE_CHAR {: RESULT = "char"; :}
+           ;
 
+variable ::= tipo_var:tipo {: recuerdaTipo(tipo) :} ID:id {: recuerdaID(id); :} next_id_list SEMI {: insertarTS() :}
+           | tipo_var id_list error {: report_error("Missing semicolon in variable declaration."); :}
+           ;
+
+next_id_list ::= COMMA ID:id {: recuerdaID(id); :} next_id_list 
+               | /* empty */
+               ;
+
+funcion ::= tipo_var:tipo {: recuerdaTipo(tipo) :} ID:id {: recuerdaID(id); :} LPAREN {: startFunc() :} parametro_list  RPAREN LBRACKET bloque RBRACKET {: endFunc() :}
+            | VOID {: recuerdaTipo('Void') :} ID:id {: recuerdaID(id); :} LPAREN {: startFunc() :} parametro_list  RPAREN LBRACKET bloque RBRACKET {: endFunc() :}
+            | tipo_var  error bloque RBRACKET {: report_error("Invalid function declaration."); :}
+            ;
+
+parametro_list ::= tipo_var:tipo {: recuerdaTipo(tipo):} ID:id {: recuerdaID(id):} COMMA {: insertarTS() :} parametro_list 
+                 | tipo_var:tipo {: recuerdaTipo(tipo):}  ID:id {: recuerdaID(id) :} {: insertarTS() :}
+                 | /* empty */
+                 | error {: report_error("Error in parameter list."); :}
+                 ;
 
 bloque ::= instruccion
          | instruccion bloque
          ;
 
 
+instruccion ::= estru_control
+              | variable
+              | asignacion SEMI
+              | BREAK SEMI {: testBreak(); :}
+              | CONTINUE SEMI {:testContinue(); :}
+              | error {: report_error("Invalid instruction."); :}
+              ;
+
 estru_control ::= if
                 | while
                 ;
 
-
-funcion ::= tipo_var:tipo ID:id LPAREN {: startFunc() :}
-parametro_list {: insertarTS() :} RPAREN LBRACKET bloque RBRACKET {: endFunc() :}
-            | tipo_var ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
-            | VOID ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
-            ;
-
-parametro_list ::= tipo_var:tipo {: recuerdaTipo(tipo):} ID:id {: recuerdaTipo(id):} COMMA {: insertarTS() :} parametro_list 
-                 | tipo_var:tipo {: recuerdaTipo(tipo):}  ID:id {: recuerdaTipo(id) :} 
-                 | /* empty */
-                 | error {: report_error("Error in parameter list."); :}
-                 ;
-
-
-
-
-if ::= IF {: startIF() :} LPAREN expr RPAREN {: testIF() :} LBRACKET bloque RBRACKET else {: startELSE() :}
+if ::= IF LPAREN expr RPAREN {: testIF() :} LBRACKET bloque RBRACKET else {: startELSE() :}
      | IF error bloque RBRACKET else {: report_error("Invalid expression in 'if' condition."); :}
-     | IF LPAREN expr RPAREN error {: report_error("Invalid 'if' statement."); :}
+
      ;
 
 else ::= ELSE LBRACKET bloque RBRACKET {: endIF() :}
@@ -377,31 +378,7 @@ while ::= WHILE {: startWHILE() :} LPAREN expr RPAREN {: testWHILE() :} LBRACKET
         ;
 
 
-
-variable ::= tipo_var:tipo {: recuerdaTipo(tipo) :} id_list SEMI {: insertarTS() :}
-           | tipo_var id_list error {: report_error("Missing semicolon in variable declaration."); :}
-           ;
-
-
-tipo_var ::= TYPE_INT {: RESULT = "int"; :}
-           | TYPE_LONG {: RESULT = "long"; :}
-           | TYPE_SHORT {: RESULT = "short"; :}
-           | TYPE_CHAR {: RESULT = "char"; :}
-           ;
-
-
-id_list ::= ID:id next_id_list{:
-                recuerdaID(id);
-            :}
-            ;
-
-next_id_list ::= COMMA ID:id next_id_list {:
-                    recuerdaID(id);
-                :}
-               | /* empty */
-               ;
-
-asignacion ::= ID:id {: recuerdaID(id) :} op_asignacion:op  expr {: asignarValor(); :}
+asignacion ::= ID:id {: recuerdaID(id) :} op_asignacion:op expr {: asignarValor(); :}
              | ID:id {: recuerdaID(id) :} op_incremento:op {: incrementarValor(op); :}
              | ID op_asignacion error {: report_error("Invalid assignment expression."); :}
              ;
@@ -414,8 +391,9 @@ op_incremento ::= PLUS_PLUS:op {: RESULT = op; :}
                 ;
 
 expr ::= literal
-    | literal op_aritmetico literal {: evalBinary(); :}
-    | literal op_relacional literal {: evalBinary(); :}
+    | literal op_aritmetico:op {: recuerdaOP(op) :} literal {: evalBinary(); :}
+    | literal op_relacional:op {: recuerdaOP(op) :} literal {: evalBinary(); :}
+    ;
 
 literal ::= TRUE {: recuerdaCONST('true'); :}
           | FALSE {: recuerdaCONST('false'); :}
@@ -423,17 +401,17 @@ literal ::= TRUE {: recuerdaCONST('true'); :}
           | ID:id {: recuerdaVAR(id); :}
           ;
 
-op_relacional ::= EQ_EQ:op {: recuerdaOP(op) :}
-                | GT:op {: recuerdaOP(op) :}
-                | LT:op {: recuerdaOP(op) :}
-                | NOT_EQ:op {: recuerdaOP(op) :}
+op_relacional ::= EQ_EQ
+                | GT
+                | LT
+                | NOT_EQ
                 ;
 
 
-op_aritmetico ::= PLUS:op {: recuerdaOP(op) :}
-                | MINUS:op {: recuerdaOP(op) :}
-                | TIMES:op {: recuerdaOP(op) :}
-                | DIV:op {: recuerdaOP(op) :}
+op_aritmetico ::= PLUS
+                | MINUS
+                | TIMES
+                | DIV
                 ;
 
 
