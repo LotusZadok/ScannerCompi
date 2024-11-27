@@ -288,7 +288,7 @@ terminal ID, TRUE, FALSE, EQ, PLUS, MINUS, TIMES, DIV, SEMI, LPAREN, RPAREN, LBR
 non terminal String tipo_var;
 
 /* No terminales sin tipo específico */
-non terminal programa, expr, instruccion, global_decl_list, globales, bloque, estru_control, funciones, funcion, parametro_list, if, else, while, variable, id_list, asignacion, op_asignacion, op_incremento, literal, op_relacional, number, next_id_list, op_aritmetico;
+non terminal programa, expr, instruccion, global_decl_list, globales, bloque, estru_control, funciones, funcion, parametro_list, if, else, while, while_condition, variable, id_list, asignacion, op_asignacion, op_incremento, literal, op_relacional, number, next_id_list, op_aritmetico, parametros, param_list_elements, param_element;
 
 
 /* Precedence and associativity declarations */
@@ -326,23 +326,42 @@ tipo_var ::= TYPE_INT {: RESULT = "int"; :}
            | TYPE_CHAR {: RESULT = "char"; :}
            ;
 
-variable ::= tipo_var:tipo {: recuerdaTipo(tipo) :} ID:id {: recuerdaID(id); :} next_id_list SEMI {: insertarTS() :}
+variable ::= tipo_var:tipo id_list SEMI {: 
+                recuerdaTipo(tipo); 
+                insertarTS(); 
+            :}
            | tipo_var id_list error {: report_error("Missing semicolon in variable declaration."); :}
            ;
 
-next_id_list ::= COMMA ID:id {: recuerdaID(id); :} next_id_list 
+id_list ::= ID next_id_list
+          ;
+
+next_id_list ::= COMMA ID next_id_list
                | /* empty */
                ;
+               
+funcion ::= tipo_var:tipo ID:id LPAREN parametros RPAREN LBRACKET bloque RBRACKET {: endFunc(); :}
+          | tipo_var ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
+          | VOID ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
+          ;
 
-funcion ::= tipo_var:tipo {: recuerdaTipo(tipo) :} ID:id {: recuerdaID(id); :} LPAREN {: startFunc() :} parametro_list  RPAREN LBRACKET bloque RBRACKET {: endFunc() :}
-            | VOID {: recuerdaTipo('Void') :} ID:id {: recuerdaID(id); :} LPAREN {: startFunc() :} parametro_list  RPAREN LBRACKET bloque RBRACKET {: endFunc() :}
-            | tipo_var  error bloque RBRACKET {: report_error("Invalid function declaration."); :}
-            ;
+parametros ::= {: startFunc(); :} parametro_list {: insertarTS(); :}
+             ;
 
-parametro_list ::= tipo_var:tipo {: recuerdaTipo(tipo):} ID:id {: recuerdaID(id):} COMMA {: insertarTS() :} parametro_list 
-                 | tipo_var:tipo {: recuerdaTipo(tipo):}  ID:id {: recuerdaID(id) :} {: insertarTS() :}
+parametro_list ::= param_list_elements
                  | /* empty */
                  | error {: report_error("Error in parameter list."); :}
+                 ;
+
+param_list_elements ::= param_list_elements COMMA param_element
+                      | param_element
+                      ;
+
+param_element ::= tipo_var:tipo ID:id {: 
+                      recuerdaTipo(tipo); 
+                      recuerdaTipo(id); 
+                      insertarTS(); 
+                  :}
                  ;
 
 bloque ::= instruccion
@@ -362,20 +381,26 @@ estru_control ::= if
                 | while
                 ;
 
-if ::= IF LPAREN expr RPAREN {: testIF() :} LBRACKET bloque RBRACKET else {: startELSE() :}
-     | IF error bloque RBRACKET else {: report_error("Invalid expression in 'if' condition."); :}
+if ::= IF LPAREN expr RPAREN LBRACKET bloque RBRACKET else {: 
+                    testIF(); 
+                    startELSE(); 
+                :}
+               | IF error bloque RBRACKET else {:
+                    report_error("Invalid expression in 'if' condition."); 
+                :}
+               ;
 
-     ;
+else ::= ELSE LBRACKET bloque RBRACKET
+            | ELSE error {: report_error("Invalid 'else' statement."); :}
+            | /* empty */
+            ;
 
-else ::= ELSE LBRACKET bloque RBRACKET {: endIF() :}
-       | ELSE error {: report_error("Invalid 'else' statement."); :}
-       | /* empty */
-       ;
-
-
-while ::= WHILE {: startWHILE() :} LPAREN expr RPAREN {: testWHILE() :} LBRACKET bloque RBRACKET {: endWHILE() :}
+while ::= WHILE while_condition LBRACKET bloque RBRACKET {: endWHILE(); :}
         | WHILE error bloque RBRACKET {: report_error("Invalid 'while' loop condition."); :}
         ;
+
+while_condition ::= {: startWHILE(); :} LPAREN expr RPAREN {: testWHILE(); :}
+                  ;
 
 
 asignacion ::= ID:id {: recuerdaID(id) :} op_asignacion:op expr {: asignarValor(); :}
