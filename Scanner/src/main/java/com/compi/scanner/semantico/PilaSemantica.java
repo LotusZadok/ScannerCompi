@@ -2,6 +2,7 @@ package com.compi.scanner.semantico;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class PilaSemantica {
     private List<RegistroSemantico> pilaSemantica;
@@ -89,4 +90,8 @@ public class PilaSemantica {
     private void logError(String methodName) {
         System.err.println("Error en la pila: " + methodName + "()");
     }
+
+    public Stream<RegistroSemantico> stream() {
+    return pilaSemantica.stream();
+}
 }

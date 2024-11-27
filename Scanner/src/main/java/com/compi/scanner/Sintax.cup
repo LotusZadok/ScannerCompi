@@ -197,6 +197,18 @@ parser code {:
         }
     }
 
+    public void iniciarContexto(String tipo) {
+    pilaSemantica.push_init(new RegistroSemantico(tipo, "", ""));
+}
+
+public void finalizarContexto() {
+    pilaSemantica.pop_init();
+}
+
+public boolean esContextoValido(String tipo) {
+    return pilaSemantica.stream().anyMatch(reg -> tipo.equals(reg.getTipo()));
+}
+
 :};
 
 
@@ -251,7 +263,12 @@ instruccion ::= estru_control
               | constante
               | variable
               | asignacion SEMI
-              | BREAK SEMI {: if (!dentroDeBucle()) semantic_error(cur_token); :}
+              | BREAK SEMI {: 
+                    if (!esContextoValido("LOOP") && !esContextoValido("SWITCH")) {
+                        semantic_error(cur_token); 
+                        System.err.println("'break' fuera de contexto válido (se requiere bucle o switch).");
+                    } 
+                :}
               | read SEMI
               | write SEMI
               | CONTINUE SEMI {: if (!dentroDeBucle()) semantic_error(cur_token); :}
@@ -335,15 +352,13 @@ for ::= FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN LBRACKET {: inici
         | FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN error {: report_error("Invalid 'for' loop condition."); :}
        ;
 
-while ::= WHILE LPAREN expr RPAREN LBRACKET {: iniciarBucle(); :}  bloque RBRACKET {: finalizarBucle(); :}
-        | WHILE error bloque RBRACKET {: report_error("Invalid 'while' loop condition."); finalizarBucle();  :}
-        | WHILE LPAREN expr RPAREN error {: report_error("Invalid 'while' loop condition."); :}
-         ;
+while ::= WHILE LPAREN expr RPAREN LBRACKET {: iniciarContexto("LOOP"); :} bloque RBRACKET {: finalizarContexto(); :}
+        | WHILE error bloque RBRACKET {: report_error("Invalid 'while' loop condition."); finalizarContexto(); :}
+        ;
 
-switch ::= SWITCH LPAREN arit_exp RPAREN LBRACKET case_list case_end RBRACKET
-        | SWITCH error case_list case_end RBRACKET {: report_error("Invalid 'switch' statement."); :}
-        | SWITCH LPAREN arit_exp RPAREN error {: report_error("Invalid 'switch' statement."); :}
-         ;
+switch ::= SWITCH LPAREN arit_exp RPAREN LBRACKET {: iniciarContexto("SWITCH"); :} case_list case_end RBRACKET {: finalizarContexto(); :}
+        | SWITCH error case_list case_end RBRACKET {: report_error("Invalid 'switch' statement."); finalizarContexto(); :}
+        ;
 
 case_list ::= CASE arit_exp COLON bloque
             | CASE arit_exp COLON bloque case_list
