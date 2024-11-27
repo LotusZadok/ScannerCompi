@@ -7,33 +7,6 @@ import java.util.List;
 import com.compi.scanner.semantico.*;
 import com.compi.scanner.traductor.*;
 
-/* Clases auxiliares */
-action code {:
-    public class ExprValue {
-        public boolean esConstante;
-        public Object valor;
-        public String tipo; // "int", "float", etc.
-
-        public ExprValue(boolean esConstante, Object valor, String tipo) {
-            this.esConstante = esConstante;
-            this.valor = valor;
-            this.tipo = tipo;
-        }
-    }
-
-    public class Pair<K, V> {
-        private K key;
-        private V value;
-
-        public Pair(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        public K getKey() { return key; }
-        public V getValue() { return value; }
-    }
-:}
 
 parser code {:
     private Symbol sym;
@@ -60,154 +33,245 @@ parser code {:
 
     public Generador generador = new Generador();
 
-    // Para manejo de bucles
-    private int contadorBucles = 0;
-
-    public void iniciarBucle() {
-        contadorBucles++;
-    }
-
-    public void finalizarBucle() {
-        contadorBucles--;
-    }
-
-    public boolean dentroDeBucle() {
-        return contadorBucles > 0;
-    }
-
     // Métodos para la tabla de símbolos
     private TablaSimbolos ts = new TablaSimbolos();
     public PilaSemantica pilaSemantica = new PilaSemantica();
-    public PilaSemantica pilaSemantica2 = new PilaSemantica();
 
     public void imprimirTablasSimbolos() {
         ts.imprimirTablas();
     }
 
-    // Para manejo del ambito
-    private String ambito = "global";
-    public void setAmbito (String amb){
-        //System.out.println("dentro del setAmbito" + amb);
-        ambito = amb;
+    // Acciones Semanticas
+
+    public void recuerdaTipo(String tipo) {
+        RS_TIPO rs_tipo = new RS_TIPO(tipo);
+        pilaSemantica.push(rs_tipo);
     }
 
-    // Funciones adicionales
-    public void insertarConstante (String tipo, String id, Object valor){
-        //System.out.println("tipo> "+tipo+", id> "+id+", valor> "+valor);
-        String mensaje = ts.insertarConstante(new Simbolo("CONST", tipo, id, valor, ambito));
-        if (mensaje != null){
-            semantic_error (cur_token);
-            System.err.println(mensaje);
-        } 
-        pilaSemantica.clear ();
-        //pilaSemantica.print ();
-        //System.out.println("despues del insert constante\n");
+    public void recuerdaID(String id) {
+        RS_ID rs_id = new RS_ID(id);
+        pilaSemantica.push(rs_id);
     }
 
-    public void insertarVariables () {
-    String tipo = pilaSemantica.buscarTipoVar();
-    if (tipo != null) {
-        while (!pilaSemantica.isEmpty() && pilaSemantica.get(pilaSemantica.size() - 1).getTipo().equals("")) {
-            RegistroSemantico registro = pilaSemantica.pop_end();
-            Simbolo simbolo = new Simbolo("VAR", tipo, registro.getId(), ambito);
-            
-            if (ambito.equals("global") && simbolo.getValor() == null) {
-                if (tipo.equals("int") || tipo.equals("long") || tipo.equals("short")) {
-                    simbolo.setValor(0);
-                } else if (tipo.equals("float") || tipo.equals("double")) {
-                    simbolo.setValor(0.0);
-                } else if (tipo.equals("char")) {
-                    simbolo.setValor('\0');
-                }
-            }
+    public void insertarTS() {
+        // buscar RS_TIPO
+        RS_TIPO rs_tipo = pilaSemantica.get("TIPO")
 
-            String mensaje = ts.insertarVar(simbolo);
-            if (mensaje != null) {
-                semantic_error(cur_token);
-                System.err.println(mensaje);
-            }
+        // obtener el ámbito
+        String ambito = "global";
+        if (pilasemantica.get("FUNCION") != null) {
+            ambito = pilaSemantica.get("FUNCION").getAmbito();
         }
-    }
-    pilaSemantica.pop_end();
-    pilaSemantica.clear();
-}
 
-    public void insertarFuncion (String tipo, String id){
-        if (!ts.existeFuncion (id)){
-            ts.insertarFuncion (new Simbolo ("FUNCION", tipo, id));
-            setAmbito (id);
-        } else {
-            semantic_error (cur_token);
-            System.err.println("La función'" + id + "' ya está definida.");
-            setAmbito (null);
+        // si ya esta en la tabla de símbolos, error
+        if (ts.contiene(rs_id.getValor(), ambito) || ts.contiene(rs_id.getValor(), "global")) {
+            semantic_error(cur_token);
+            System.err.println("La variable '" + rs_id.getValor() + "' ya está definida.");
+            return;
         }
+
+        // agregar a la tabla de símbolos
+        while (pilaSemantica.top() != rs_tipo) {
+            RS_ID rs_id = pilaSemantica.pop();
+            Simbolo simbolo = new Simbolo("VAR",  rs_tipo.getTipo_Var(), rs_id.getValor(), ambito);
+            ts.insertar();
+
+            // generar código para la declaración de la variable
+            generador.genVar(rs_id.getValor(), rs_tipo.getTipo_Var());
+        }
+        // pop RS_TIPO
+        pilaSemantica.pop()
     }
 
-    public void verificarVariableDefinida(String id, Object valor) {
-        //System.out.println("dentro del verificar, id>" + id + ", ambito> "+ambito);
-        if (!ts.contiene(id, ambito)) {   
-            semantic_error (cur_token);
+    public void recuerdaOP(String op) {
+        RS_OP rs_op = new RS_OP(op);
+        pilaSemantica.push(rs_op);
+    }
+
+    public void recuerdaVAR(String id) {
+        // Verificar si la variable está definida
+        if (!ts.contiene(id, ambito)) {
+            semantic_error(cur_token);
             System.err.println("La variable '" + id + "' no está definida.");
-            String tipo = pilaSemantica.buscarTipoVar ();
-            if (tipo!=null) {
-                if (valor != null) {
-                    if (ambito != null)  ts.insertarVar (new Simbolo ("VAR", tipo, id, valor, ambito));
-                    else ts.insertarVar (new Simbolo ("VAR", tipo, id, valor));
-                } else {
-                    if (ambito != null)  ts.insertarVar (new Simbolo ("VAR", tipo, id, ambito));
-                    else ts.insertarVar (new Simbolo ("VAR", tipo, id));
-                }
-            }else System.err.println("La variable '" + id + "' no se pudo insertar a la tabla de simbolos porque no tiene un tipo especificado.");
+            return;
         } 
+        // Obtener el tipo de la variable
+        String tipo = ts.getTipo(id, ambito);
+
+        // Agregar a la pila semántica
+        RS_DO rs_do = new RS_DO(id, tipo);
+
+        pilaSemantica.push(rs_do);
     }
 
-    public void insertarParametros (){
-        int cantParametros = 0;
-        //System.out.println("dentro del insertarParametros, ambito> "+ambito);
-        //pilaSemantica.print ();
-        while (!pilaSemantica.isEmpty() && pilaSemantica.get(pilaSemantica.size() - 1).getTipo().equals("PARAMETRO")) {
-            RegistroSemantico registro = pilaSemantica.pop_end();
-            String mensaje = ts.insertarVar (new Simbolo (registro.getTipo(), registro.getTipo_Var(), registro.getId(), ambito));
-            if (mensaje != null){
-                semantic_error (cur_token);
-                System.err.println(mensaje);
-            } else cantParametros ++;
+    public void recuerdaCONST(Object num) {
+        // Agregar a la pila semántica
+        RS_DO rs_const = new RS_DO(num, "int", true);
+        pilaSemantica.push(rs_const);
+    }
+
+    public void evalBinary()
+    {
+        RS_DO right = pilaSemantica.pop();
+        RS_OP op = pilaSemantica.pop();
+        RS_DO left = pilaSemantica.pop();
+
+        // Verificar que los tipos sean compatibles
+        if (!left.getTipo().equals(right.getTipo())) {
+            semantic_error(cur_token);
+            System.err.println("Tipos incompatibles en la operación binaria.");
+            return;
         }
-        Simbolo funcion = ts.obtenerSimbolo (ambito);
-        if (funcion!=null)funcion.setValor (cantParametros);
-    }
 
-
-    public void asignacion (String id, String op, String expr) {
-        if (ts.contiene(id, ambito)) {   
-            Simbolo simbolo = ts.obtenerSimbolo (id);
-            if (expr == null){  // es una op_incremento, se valida que la var este inicializada
-                if (simbolo.getValor() != null){  // si esta inicializada
-                    generador.opIncremento (id, op);
-                } else {
-                    semantic_error (cur_token);
-                    System.err.println("La variable '" + id + "' no está inicializada por lo que no se puede ejecutar la operación de incremento.");
-                }
-            } else {
-                // falta manejar lo de expresiones
+        // Los DO son constantes?
+        if (left.esConstante && right.esConstante) {
+            // Evaluar la operación
+            Object result = null;
+            switch (op.getOp()) {
+                case "+":
+                    result = (int)left.getValor() + (int)right.getValor();
+                    break;
+                case "-":
+                    result = (int)left.getValor() - (int)right.getValor();
+                    break;
+                case "*":
+                    result = (int)left.getValor() * (int)right.getValor();
+                    break;
+                case "/":
+                    result = (int)left.getValor() / (int)right.getValor();
+                    break;
             }
+
+            // Agregar el resultado a la pila semántica
+            RS_DO rs_result = new RS_DO(result, "int", true);
+            pilaSemantica.push(rs_result);
         } else {
-            semantic_error (cur_token);
-            System.err.println("La variable '" + id + "' no está definida.");
+            // generar el código para la operación 
+            String var = generador.genBinary(left, right, op);
+            // Crear RS_DO de tipo dirección con el lugar donde quedo el resultado, puede ser una variable temporal
+            RS_DO rs_result = new RS_DO(var, "int");
         }
+
+        // Guardar el resultado en la pila semántica
+        pilaSemantica.push(rs_result);
+
+    }   
+
+    public String generateLabel() {
+        return generador.generateLabel();
     }
 
-    public void iniciarContexto(String tipo) {
-    pilaSemantica.push_init(new RegistroSemantico(tipo, "", ""));
-}
+    public void startIF() {
+        RS_IF rs_if = new RS_IF("ELSE" + generateLabel(), "EXITIF" + generateLabel());
+        pilaSemantica.push(rs_if);
+    }
 
-public void finalizarContexto() {
-    pilaSemantica.pop_init();
-}
+    public void testIF() {
+        RS_DO rs_do = pilaSemantica.pop();
+        RS_IF rs_if = pilaSemantica.get("IF");
+        // Generar código para la condición
+        generador.genTest(rs_do);
+        // Generar código para el salto
+        generador.genJump(rs_if.getElseLabel())
+    }
 
-public boolean esContextoValido(String tipo) {
-    return pilaSemantica.stream().anyMatch(reg -> tipo.equals(reg.getTipo()));
-}
+    public void startELSE() {
+        RS_IF rs_if = pilaSemantica.get("IF");
+        generador.genJump(rs_if.getExitLabel());
+        generador.genLabel(rs_if.getElseLabel());
+    }
+
+    public void endIF() {
+        RS_IF rs_if = pilaSemantica.pop();
+        generador.genLabel(rs_if.getExitLabel());
+    }
+
+    public void startWHILE() {
+        RS_WHILE rs_while = new RS_WHILE("EXITWHILE" + generateLabel(), "STARTWHILE" + generateLabel());
+        pilaSemantica.push(rs_while);
+        generador.genLabel(rs_while.getStartLabel());
+    }
+
+    public void testWHILE() {
+        RS_DO rs_do = pilaSemantica.pop();
+        RS_WHILE rs_while = pilaSemantica.get("WHILE");
+        // Generar código para la condición
+        generador.genTest(rs_do);
+        // Generar código para el salto
+        generador.genJump(rs_while.getExitLabel())
+    }
+
+    public void endWHILE() {
+        RS_WHILE rs_while = pilaSemantica.pop();
+        generador.genJump(rs_while.getStartLabel());
+        generador.genLabel(rs_while.getExitLabel());
+    }
+
+    public void testBreak() {
+        // Verificar que esté dentro de un bucle
+        RS_WHILE rs_while = pilaSemantica.get("WHILE");
+        if (rs_while == null) {
+            semantic_error(cur_token);
+            System.err.println("'break' fuera de contexto válido (se requiere bucle).");
+        } 
+        // Generar código para el salto
+        generador.genJump(rs_while.getExitLabel());
+    }
+
+    public void testContinue() {
+        // Verificar que esté dentro de un bucle
+        RS_WHILE rs_while = pilaSemantica.get("WHILE");
+        if (rs_while == null) {
+            semantic_error(cur_token);
+            System.err.println("'continue' fuera de contexto válido (se requiere bucle).");
+        } 
+        // Generar código para el salto
+        generador.genJump(rs_while.getStartLabel());
+    }
+
+    public void startFunc() {
+        RS_FUNC rs_func = new RS_FUNC("FUNC" + generateLabel());
+        pilaSemantica.push(rs_func);
+    }
+
+    public void endFunc() {
+        RS_FUNC rs_func = pilaSemantica.pop();
+    }
+
+    public void incrementarValor() {
+        RS_DO rs_do = pilaSemantica.pop();
+        RS_OP rs_op = pilaSemantica.pop();
+        // Verificar que sea una variable
+        if (!rs_do.getTipo().equals("int")) {
+            semantic_error(cur_token);
+            System.err.println("Incremento/decremento solo aplicable a variables de tipo entero.");
+        }
+        // Generar código para la operación
+        generador.genIncrement(rs_do, rs_op);
+        // Crear RS_DO de tipo dirección con el lugar donde quedo el resultado, puede ser una variable temporal
+        RS_DO rs_result = new RS_DO(rs_do.getValor(), "int");
+        // Guardar el resultado en la pila semántica
+        pilaSemantica.push(rs_result);
+    }
+
+    public void asignarValor() {
+        RS_DO rs_do = pilaSemantica.pop();
+        RS_ID rs_id = pilaSemantica.pop();
+        // Verificar que la variable esté definida
+        if (!ts.contiene(rs_id.getValor(), ambito)) {
+            semantic_error(cur_token);
+            System.err.println("La variable '" + rs_id.getValor() + "' no está definida.");
+            return;
+        }
+        // Verificar que los tipos sean compatibles
+        if (!ts.getTipo(rs_id.getValor(), ambito).equals(rs_do.getTipo())) {
+            semantic_error(cur_token);
+            System.err.println("Tipos incompatibles en la asignación.");
+            return;
+        }
+        // Generar código para la asignación
+        generador.genAssign(rs_id.getValor(), rs_do);
+    }
 
 :};
 
@@ -251,50 +315,25 @@ global_decl_list ::= global_decl_list global_decl
                    ;                 
 
 global_decl ::= variable {: ts.global (); :}
-              | constante {: ts.global (); :}
               | error {: report_error("Error in global declaration."); :}
               ;
 
 funciones ::= funciones funcion
-              | funcion {: generador.declararGlobales(ts); :}
+              | funcion 
               ;
 
 instruccion ::= estru_control
-              | constante
               | variable
               | asignacion SEMI
               | BREAK SEMI {: 
-                    if (!esContextoValido("LOOP") && !esContextoValido("SWITCH")) {
-                        semantic_error(cur_token); 
-                        System.err.println("'break' fuera de contexto válido (se requiere bucle o switch).");
-                    } 
+                    testBreak();
                 :}
-              | read SEMI
-              | write SEMI
-              | CONTINUE SEMI {: if (!dentroDeBucle()) semantic_error(cur_token); :}
-              | DO SEMI 
-              | RETURN expr SEMI
-              | RETURN SEMI
+              | CONTINUE SEMI {: 
+                    testContinue();
+                :}
               | error {: report_error("Invalid instruction."); :}
               ;
 
-read ::= READ LPAREN read_parameter RPAREN 
-       | READ LPAREN RPAREN
-       | READ error {: report_error("Invalid 'read' parameters."); :}
-       ;
-
-read_parameter ::= ID COMMA read_parameter
-                 | ID
-                 ;
-
-write ::= WRITE LPAREN write_parameter RPAREN
-        | WRITE error {: report_error("Invalid 'write' parameters."); :}
-        ;
-
-
-write_parameter ::= expr COMMA write_parameter
-                  | expr
-                  ;
 
 
 bloque ::= instruccion
@@ -302,84 +341,44 @@ bloque ::= instruccion
          ;
 
 
-expr_list ::= expr COMMA expr_list
-            | expr
-            | /* empty */
-            | error {: report_error("Error in expression list."); :}
-            ;
-
 estru_control ::= if
-                | for
                 | while
-                | switch
                 ;
 
 
-funcion ::= tipo_var:tipo ID:id {: insertarFuncion (tipo.toString(), id.toString()); :} 
-                LPAREN parametro_list {: insertarParametros (); :} RPAREN LBRACKET bloque RBRACKET
-            | VOID:tipo ID:id LPAREN parametro_list RPAREN {: setAmbito (id.toString()); :}  LBRACKET bloque RBRACKET {:
-                //pilaSemantica.push_init(new RegistroSemantico ("FUNCION", tipo.toString(), id.toString()));
-                // falta meter funcion y sus parametros a ts
-                // pilaSemantica.print ();
-            :}
+funcion ::= tipo_var:tipo ID:id LPAREN {: startFunc() :}
+parametro_list {: insertarTS() :} RPAREN LBRACKET bloque RBRACKET {: endFunc() :}
             | tipo_var ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
             | VOID ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
             ;
 
-parametro_list ::= tipo_var:tipo ID:id COMMA parametro_list {: 
-                    pilaSemantica.push_end (new RegistroSemantico ("PARAMETRO", tipo, id.toString(), ambito)); 
-                :}
-                 | tipo_var:tipo ID:id {: 
-                    pilaSemantica.push_end (new RegistroSemantico ("PARAMETRO", tipo, id.toString(), ambito)); 
-                :}
+parametro_list ::= tipo_var:tipo {: recuerdaTipo(tipo):} ID:id {: recuerdaTipo(id):} COMMA {: insertarTS() :} parametro_list 
+                 | tipo_var:tipo {: recuerdaTipo(tipo):}  ID:id {: recuerdaTipo(id) :} 
                  | /* empty */
                  | error {: report_error("Error in parameter list."); :}
                  ;
 
 
-if ::= IF LPAREN expr RPAREN {: /*System.out.println("getAmbito>"+ambito); */generador.estructuraIf (pilaSemantica); :} LBRACKET bloque RBRACKET else
+
+
+if ::= IF {: startIF() :} LPAREN expr RPAREN {: testIF() :} LBRACKET bloque RBRACKET else {: startELSE() :}
      | IF error bloque RBRACKET else {: report_error("Invalid expression in 'if' condition."); :}
      | IF LPAREN expr RPAREN error {: report_error("Invalid 'if' statement."); :}
      ;
 
-else ::= ELSE LBRACKET bloque RBRACKET
+else ::= ELSE LBRACKET bloque RBRACKET {: endIF() :}
        | ELSE error {: report_error("Invalid 'else' statement."); :}
        | /* empty */
        ;
 
-for ::= FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN LBRACKET {: iniciarBucle(); :} bloque RBRACKET {: finalizarBucle(); :}
-        | FOR error bloque RBRACKET {: report_error("Invalid 'for' loop condition."); finalizarBucle();  :} 
-        | FOR LPAREN asignacion SEMI expr SEMI asignacion RPAREN error {: report_error("Invalid 'for' loop condition."); :}
-       ;
 
-while ::= WHILE LPAREN expr RPAREN LBRACKET {: iniciarContexto("LOOP"); :} bloque RBRACKET {: finalizarContexto(); :}
-        | WHILE error bloque RBRACKET {: report_error("Invalid 'while' loop condition."); finalizarContexto(); :}
+while ::= WHILE {: startWHILE() :} LPAREN expr RPAREN {: testWHILE() :} LBRACKET bloque RBRACKET {: endWHILE() :}
+        | WHILE error bloque RBRACKET {: report_error("Invalid 'while' loop condition."); :}
         ;
 
-switch ::= SWITCH LPAREN arit_exp RPAREN LBRACKET {: iniciarContexto("SWITCH"); :} case_list case_end RBRACKET {: finalizarContexto(); :}
-        | SWITCH error case_list case_end RBRACKET {: report_error("Invalid 'switch' statement."); finalizarContexto(); :}
-        ;
 
-case_list ::= CASE arit_exp COLON bloque
-            | CASE arit_exp COLON bloque case_list
-            | CASE error {: report_error("Invalid 'case' statement."); :}
-            ;
 
-case_end ::= DEFAULT COLON bloque
-           | DEFAULT error {: report_error("Invalid 'default' statement."); :}
-           | /* empty */
-           ;
-
-constante ::= CONST tipo_var:tipo ID:id EQ expr:valor SEMI {:
-                insertarConstante(tipo, id.toString(), valor);
-            :}
-            | CONST tipo_var ID EQ expr error {: report_error("Missing semicolon in constant declaration."); :}
-            ;
-
-variable ::= tipo_var:tipo id_list SEMI{:
-                pilaSemantica.push_init(new RegistroSemantico (tipo));
-                insertarVariables ();
-            :}
+variable ::= tipo_var:tipo {: recuerdaTipo(tipo) :} id_list SEMI {: insertarTS() :}
            | tipo_var id_list error {: report_error("Missing semicolon in variable declaration."); :}
            ;
 
@@ -392,107 +391,52 @@ tipo_var ::= TYPE_INT {: RESULT = "int"; :}
 
 
 id_list ::= ID:id next_id_list{:
-                pilaSemantica.push_end (new RegistroSemantico (id.toString()));
+                recuerdaID(id);
             :}
             ;
 
 next_id_list ::= COMMA ID:id next_id_list {:
-                    pilaSemantica.push_end (new RegistroSemantico (id.toString()));
+                    recuerdaID(id);
                 :}
                | /* empty */
                ;
 
-asignacion ::= ID:id op_asignacion:op expr:valor{:
-                verificarVariableDefinida(id.toString(), valor);
-                // falta código adicional para manejo de asignación
-             :} 
-             | ID:id op_incremento:op {:
-                asignacion (id.toString(), op.toString(), null);
-             :} 
+asignacion ::= ID:id {: recuerdaID(id) :} op_asignacion:op  expr {: asignarValor(); :}
+             | ID:id {: recuerdaID(id) :} op_incremento:op {: incrementarValor(op); :}
              | ID op_asignacion error {: report_error("Invalid assignment expression."); :}
              ;
 
 op_asignacion ::= EQ:op {: RESULT = op; :}
-                | PLUS_EQ:op {: RESULT = op; :}
-                | MINUS_EQ:op {: RESULT = op; :}
-                | TIMES_EQ:op {: RESULT = op; :}
-                | DIV_EQ:op {: RESULT = op; :}
                 ;
 
 op_incremento ::= PLUS_PLUS:op {: RESULT = op; :}
                 | MINUS_MINUS:op {: RESULT = op; :}
                 ;
 
-expr ::= expr:left PLUS:op expr:right 
-       | expr:left MINUS:op expr:right
-       | expr:left TIMES:op expr:right
-       | expr:left DIV:op expr:right
-       | expr:left MOD:op expr:right
-       | expr:left AND expr:right {: 
-            // Implementar lógica para operadores lógicos
-        :}
-       | expr:left OR expr:right {:  :}
-       | NOT expr:exp {: :}
-       | expr:left op_relacional:op expr:right {: 
-            System.out.println("l> "+left);
-            System.out.println("operador> "+op);
-            System.out.println("r> "+right);
-            //pilaSemantica.print ();
-            //System.out.println("DESPUESITO ");
-        :}
-       | LPAREN expr:exp RPAREN {: :}
-       | ID:id LPAREN expr_list RPAREN {: 
-            // Llamada a función
-           
-        :}
-       | ID:id {: 
-            verificarVariableDefinida(id.toString(), null);
-            pilaSemantica.push_end (new RegistroSemantico (true, "VAR", id.toString()));
-            RESULT = id;
-        :}
-       | literal:lit {: 
-            pilaSemantica.push_end (new RegistroSemantico (true, "CONST", lit.toString()));
-            RESULT = lit;
-        :}
-       | number:num {: 
-            pilaSemantica.push_end (new RegistroSemantico (true, "CONST", num.toString()));
-            RESULT = num;
-        :}
-       ;
+expr ::= literal
+    | literal op_aritmetico literal {: evalBinary(); :}
+    | literal op_relacional literal {: evalBinary(); :}
 
-// Implementar lógica similar a 'expr' para constant folding
-arit_exp ::= arit_exp:left PLUS arit_exp:right {: RESULT = new ExprValue(false, null, null); :} 
-           | arit_exp:left MINUS arit_exp:right {: RESULT = new ExprValue(false, null, null); :}
-           | arit_exp:left TIMES arit_exp:right {: RESULT = new ExprValue(false, null, null); :}
-           | arit_exp:left DIV arit_exp:right {: RESULT = new ExprValue(false, null, null); :}
-           | arit_exp:left MOD arit_exp:right {: RESULT = new ExprValue(false, null, null); :}
-           | LPAREN arit_exp:exp RPAREN {: RESULT = exp; :}
-           | ID:id {: 
-                verificarVariableDefinida(id.toString(), null);
-                Simbolo simbolo = ts.obtenerSimbolo(id.toString());
-                if (simbolo != null && simbolo.esConstante()) {
-                    RESULT = new ExprValue(true, simbolo.getValor(), simbolo.getTipo_var());
-                } else {
-                    RESULT = new ExprValue(false, null, null);
-                }
-            :}
-           | number:num {: RESULT = new ExprValue(true, num, "int"); :}
-           ;
-
-op_relacional ::= EQ_EQ:op {: pilaSemantica.push_end (new RegistroSemantico (op.toString())); RESULT = op; :}
-                | GT_EQ:op {: pilaSemantica.push_end (new RegistroSemantico (op.toString())); RESULT = op; :}
-                | GT:op {: pilaSemantica.push_end (new RegistroSemantico (op.toString())); RESULT = op; :}
-                | LT_EQ:op {: pilaSemantica.push_end (new RegistroSemantico (op.toString())); RESULT = op; :}
-                | LT:op {: pilaSemantica.push_end (new RegistroSemantico (op.toString())); RESULT = op; :}
-                | NOT_EQ:op {: pilaSemantica.push_end (new RegistroSemantico (op.toString())); RESULT = op; :}
-                ;
-
-literal ::= CHAR:c {: RESULT = c.toString(); :}
-          | STRING:s {: RESULT = s.toString(); :}
-          | TRUE {: RESULT = true; :}
-          | FALSE {: RESULT = false; :}
+literal ::= TRUE {: recuerdaCONST('true'); :}
+          | FALSE {: recuerdaCONST('false'); :}
+          | number:num {: recuerdaCONST(num); :}
+          | ID:id {: recuerdaVAR(id); :}
           ;
 
-number ::= INT:n {: RESULT = n; :}
-         | FLOAT:n {: RESULT = n; :}
+op_relacional ::= EQ_EQ:op {: recuerdaOP(op) :}
+                | GT:op {: recuerdaOP(op) :}
+                | LT:op {: recuerdaOP(op) :}
+                | NOT_EQ:op {: recuerdaOP(op) :}
+                ;
+
+
+op_aritmetico ::= PLUS:op {: recuerdaOP(op) :}
+                | MINUS:op {: recuerdaOP(op) :}
+                | TIMES:op {: recuerdaOP(op) :}
+                | DIV:op {: recuerdaOP(op) :}
+                ;
+
+
+number ::= INT
+         | FLOAT
          ;

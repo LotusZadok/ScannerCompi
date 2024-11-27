@@ -5,34 +5,20 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class PilaSemantica {
-    private List<RegistroSemantico> pilaSemantica;
+    private List<RS> pilaSemantica;
 
     // Constructor to initialize the stack
     public PilaSemantica() {
         pilaSemantica = new ArrayList<>();
     }
 
-    // Pushes a record to the start of the stack
-    public void push_init(RegistroSemantico registro) {
-        pilaSemantica.add(0, registro);
-    }
-
     // Pushes a record to the end of the stack
-    public void push_end(RegistroSemantico registro) {
+    public void push(RS registro) {
         pilaSemantica.add(registro);
     }
 
-    // Removes and returns the first record from the stack
-    public RegistroSemantico pop_init() {
-        if (!pilaSemantica.isEmpty()) {
-            return pilaSemantica.remove(0);
-        }
-        logError("pop_init");
-        return null;
-    }
-
     // Removes and returns the last record from the stack
-    public RegistroSemantico pop_end() {
+    public RS pop() {
         if (!pilaSemantica.isEmpty()) {
             return pilaSemantica.remove(pilaSemantica.size() - 1);
         }
@@ -40,13 +26,24 @@ public class PilaSemantica {
         return null;
     }
 
-    // Searches for the first record with "TIPO" and returns its tipo_var
-    public String buscarTipoVar() {
-        for (RegistroSemantico registro : pilaSemantica) {
-            if ("TIPO".equals(registro.getTipo())) {
-                return registro.getTipo_Var();
+    // Gets the last record from the stack
+    public RS top() {
+        if (!pilaSemantica.isEmpty()) {
+            return pilaSemantica.get(pilaSemantica.size() - 1);
+        }
+        logError("top");
+        return null;
+    }
+
+    // Searches for the first record with "TIPO"
+    public RS get(String tipo) {
+        for (int i = pilaSemantica.size() - 1; i >= 0; i--) {
+            RS registro = pilaSemantica.get(i);
+            if (registro.getTipo().equals(tipo)) {
+                return registro;
             }
         }
+        logError("buscarRS");
         return null;
     }
 
@@ -66,7 +63,7 @@ public class PilaSemantica {
     }
 
     // Retrieves a record at a specified index
-    public RegistroSemantico get(int index) {
+    public RS get(int index) {
         if (isValidIndex(index)) {
             return pilaSemantica.get(index);
         }
@@ -76,7 +73,7 @@ public class PilaSemantica {
 
     // Prints all records in the stack
     public void print() {
-        for (RegistroSemantico registro : pilaSemantica) {
+        for (RS registro : pilaSemantica) {
             System.out.println(registro);
         }
     }
@@ -91,7 +88,7 @@ public class PilaSemantica {
         System.err.println("Error en la pila: " + methodName + "()");
     }
 
-    public Stream<RegistroSemantico> stream() {
-    return pilaSemantica.stream();
-}
+    public Stream<RS> stream() {
+        return pilaSemantica.stream();
+    }
 }
