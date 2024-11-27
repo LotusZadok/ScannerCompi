@@ -1,14 +1,17 @@
-a dd 4
-c db 4
+x dd ?
+y dd ?
+a dd ?
 b dd ?
-d dd ?
-e dd ?
-f dd ?
+c dd ?
 
-mov ax, [a]
+mov ax, [x]
+cmp ax, 4
+jle exit_Label_0
+mov ax, [x]
+dec ax
+mov [x], ax
+
+mov ax, [x]
 inc ax
-mov [a], ax
+mov [x], ax
 
-mov ax, [a]
-cmp ax, 0
-jl exit_Label_0

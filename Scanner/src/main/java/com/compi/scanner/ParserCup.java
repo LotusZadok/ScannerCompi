@@ -729,23 +729,37 @@ public class ParserCup extends java_cup.runtime.lr_parser {
         //System.out.println("despues del insert constante\n");
     }
 
-    public void insertarVariables (){
-        String tipo = pilaSemantica.buscarTipoVar ();
-        if (tipo!=null){
-            while (!pilaSemantica.isEmpty() && pilaSemantica.get(pilaSemantica.size() - 1).getTipo().equals("")) {
-                RegistroSemantico registro = pilaSemantica.pop_end();
-                String mensaje = ts.insertarVar (new Simbolo ("VAR", tipo, registro.getId(), ambito));
-                if (mensaje != null){
-                    semantic_error (cur_token);
-                    System.err.println(mensaje);
-                } 
+    public void insertarVariables () {
+    System.out.println("insertarVariables: Insertando variables.");
+    String tipo = pilaSemantica.buscarTipoVar();
+    if (tipo != null) {
+        while (!pilaSemantica.isEmpty() && pilaSemantica.get(pilaSemantica.size() - 1).getTipo().equals("")) {
+            RegistroSemantico registro = pilaSemantica.pop_end();
+            System.out.println("insertarVariables: Procesando registro: " + registro);
+            Simbolo simbolo = new Simbolo("VAR", tipo, registro.getId(), ambito);
+
+            // If the symbol is a global variable without an explicit value, initialize it to 0
+            if (ambito.equals("global") && simbolo.getValor() == null) {
+                if (tipo.equals("int") || tipo.equals("long") || tipo.equals("short")) {
+                    simbolo.setValor(0);
+                } else if (tipo.equals("float") || tipo.equals("double")) {
+                    simbolo.setValor(0.0);
+                } else if (tipo.equals("char")) {
+                    simbolo.setValor('\0');
+                }
+            }
+
+            String mensaje = ts.insertarVar(simbolo);
+            if (mensaje != null) {
+                semantic_error(cur_token);
+                System.err.println(mensaje);
             }
         }
-        pilaSemantica.pop_end ();
-        pilaSemantica.clear ();
-        //pilaSemantica.print ();
-        //System.out.println("despues del insert variable\n");
     }
+    pilaSemantica.pop_end();
+    pilaSemantica.clear();
+    System.out.println("insertarVariables: Pila semántica limpiada.");
+}
 
     public void insertarFuncion (String tipo, String id){
         if (!ts.existeFuncion (id)){
