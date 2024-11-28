@@ -1,7 +1,7 @@
 package com.compi.scanner.semantico;
 
 public class Simbolo {
-    private String tipo;    //CONST | VAR | PARAMETRO | FUNCION
+    private String tipo; // CONST | VAR | PARAMETRO | FUNCION
     protected String tipo_var;
     protected String id;
     private boolean esConstante;
@@ -70,12 +70,12 @@ public class Simbolo {
     }
 
     // Getter for tipo
-    public String getTipo (){
+    public String getTipo() {
         return tipo;
     }
 
-    // Setter for tipo 
-    public void setTipo (String tipo){
+    // Setter for tipo
+    public void setTipo(String tipo) {
         this.tipo = tipo;
     }
 
@@ -108,6 +108,7 @@ public class Simbolo {
     public void setAmbito(String ambito) {
         this.ambito = ambito;
     }
+
     /**
      * Verifies if the current value is compatible with the specified variable type.
      *
@@ -176,10 +177,10 @@ public class Simbolo {
     public String toString() {
         if (tipo.equals("FUNCION")) {
             return "Simbolo { " +
-                "tipo_func='" + tipo_var + '\'' +
-                ", id='" + id + '\'' +
-                ", cantParametros=" + valor + 
-                " }";
+                    "tipo_func='" + tipo_var + '\'' +
+                    ", id='" + id + '\'' +
+                    ", cantParametros=" + valor +
+                    " }";
         } else {
             return "Simbolo { " +
                     tipo +
@@ -188,6 +189,6 @@ public class Simbolo {
                     ", valor=" + valor +
                     ", ambito=" + ambito +
                     " }";
-            }
+        }
     }
 }

@@ -167,7 +167,7 @@ public class TablaSimbolos {
     public String getTipo(String id, String ambito) {
         for (Simbolo s : variables) {
             if (s.getId().equals(id)) {
-                if (s.getAmbito().equals(ambito))
+                if (s.getAmbito().equals(ambito) || s.getAmbito().equals("global"))
                     return s.getTipo_var();
             }
         }

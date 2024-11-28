@@ -340,8 +340,8 @@ public class ParserCup extends java_cup.runtime.lr_parser {
 
   public String getAmbito() {
     String ambito = "global";
-    if (pilaSemantica.get("FUNCION") != null) {
-      RS_FUNC rs_func = (RS_FUNC) pilaSemantica.get("FUNCION");
+    if (pilaSemantica.get("FUNC") != null) {
+      RS_FUNC rs_func = (RS_FUNC) pilaSemantica.get("FUNC");
       ambito = rs_func.getAmbito();
     }
     return ambito;
@@ -359,6 +359,11 @@ public class ParserCup extends java_cup.runtime.lr_parser {
     RS_ID rs_id = new RS_ID(id);
     pilaSemantica.push(rs_id);
   }
+
+    public void recuerdaID(String id, String scope) {
+        RS_ID rs_id = new RS_ID(id, scope);
+        pilaSemantica.push(rs_id);
+    }
 
   public void insertarTS() {
     if (pilaSemantica.top().getTipo() == "FUNC") {
@@ -382,8 +387,7 @@ public class ParserCup extends java_cup.runtime.lr_parser {
         System.err.println("La variable '" + rs_id.getId() + "' ya está definida.");
         return;
       }
-
-      Simbolo simbolo = new Simbolo("VAR", rs_tipo.getTipo_Var(), rs_id.getId(), ambito);
+      Simbolo simbolo = new Simbolo("VAR", rs_tipo.getTipo_Var(), rs_id.getId(), rs_id.getScope(), ambito);
       ts.insertarVar(simbolo);
 
       // generar código para la declaración de la variable
@@ -572,6 +576,7 @@ public class ParserCup extends java_cup.runtime.lr_parser {
     RS_DO rs_do = (RS_DO) pilaSemantica.pop();
     RS_ID rs_id = (RS_ID) pilaSemantica.pop();
 
+
     // Obtener el ámbito
     String ambito = getAmbito();
 
@@ -635,6 +640,8 @@ class CUP$ParserCup$actions {
             {
               Object RESULT =null;
 		 generador.generarArchivo(); 
+                        ts.imprimirTablas();
+  
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("programa",1, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
           return CUP$ParserCup$result;
@@ -958,8 +965,8 @@ class CUP$ParserCup$actions {
 		Object id = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.peek()).value;
 		 
                       
-                      recuerdaID(id.toString()); 
-                      recuerdaTipo(tipo); 
+                      recuerdaID(id.toString(), "param"); 
+                      recuerdaTipo(tipo);
                       insertarTS(); 
                   
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("param_element",28, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
