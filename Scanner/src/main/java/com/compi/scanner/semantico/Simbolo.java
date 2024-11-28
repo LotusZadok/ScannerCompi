@@ -178,7 +178,7 @@ public class Simbolo {
         if (tipo.equals("FUNCION")) {
             return "Simbolo { " +
                     "id='" + tipo_var + '\'' +
-                    ", cantParametros=" + valor +
+                    ", cantParametros=" + (valor != null ? valor : 0) +
                     " }";
         } else {
             return "Simbolo { " +
