@@ -353,6 +353,7 @@ next_id_list ::= COMMA ID:id {: recuerdaID(id.toString()); :} next_id_list
                ;
                
 funcion ::= tipo_var:tipo ID:id  {: recuerdaID(id.toString()); :} LPAREN parametros RPAREN LBRACKET bloque RBRACKET {: endFunc(); :}
+| VOID ID:id  {: recuerdaID(id.toString()); :} LPAREN parametros RPAREN LBRACKET bloque RBRACKET {: endFunc(); :}
           | tipo_var ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
           | VOID ID LBRACKET error bloque RBRACKET {: report_error("Invalid function declaration."); :}
           ;
@@ -360,7 +361,7 @@ funcion ::= tipo_var:tipo ID:id  {: recuerdaID(id.toString()); :} LPAREN paramet
 parametros ::= {: startFunc(); :} parametro_list {: insertarTS(); :}
              ;
 
-parametro_list ::= param_list_elements
+parametro_list ::= param_list_elements 
                  | /* empty */
                  | error {: report_error("Error in parameter list."); :}
                  ;
@@ -370,8 +371,9 @@ param_list_elements ::= param_list_elements COMMA param_element
                       ;
 
 param_element ::= tipo_var:tipo ID:id {: 
-                      recuerdaTipo(tipo); 
+                      
                       recuerdaID(id.toString()); 
+                      recuerdaTipo(tipo); 
                       insertarTS(); 
                   :}
                  ;

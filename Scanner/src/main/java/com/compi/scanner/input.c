@@ -1,19 +1,11 @@
-int x;
-int y;
-int a, b,c;
+ int x,y;
+ int z;  // Variable doblemente definida
  
-int main(){
 
-	if (x > 4) { 
-		x = x - 2;
-	}
-	else
-	{
-	 x--;
-	}
+int funcion (int a) { 
+ int a, b, c;  // doblemente definida para la funcion
+ int y;   
 
-	while ( x != 10) {
-	  y = x + 5 * 4;
-	  x++;
-	}
+ y= z + 2; // z Variable no definida;
+
 }
