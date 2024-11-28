@@ -3,15 +3,13 @@ package com.compi.scanner.traductor;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-
 import com.compi.scanner.semantico.*;
 
 public class Generador {
 
-    private int numLabels = 0;
+    private int numLabels = 1;
     public String data = "section .data\n";
-    public String code = "section .code\n";
+    public String code = "\nsection .code\n";
 
     public Generador() {
     }
@@ -24,7 +22,7 @@ public class Generador {
     }
 
     public void registrarDir(String registro, String id) {
-        code += "mov ";
+        code += "\tmov ";
         switch (registro.toUpperCase()) {
             case "A":
                 code += "ax";
@@ -101,28 +99,28 @@ public class Generador {
         registrarDir(registro, id);
         switch (op) {
             case "++":
-                code += "inc ";
+                code += "\tinc ";
                 break;
 
             case "--":
-                code += "dec ";
+                code += "\tdec ";
                 break;
         }
         code += getDir(registro) + "\n";
-        code += "mov [" + id + "], " + getDir(registro) + "\n\n";
+        code += "\tmov [" + id + "], " + getDir(registro) + "\n";
     }
 
     public void genAssign(String id, String valor) {
-        code += "mov ax, " + valor + "\n";
-        code += "mov [" + id + "], ax\n";
+        code += "\tmov ax, " + valor + "\n";
+        code += "\tmov [" + id + "], ax\n";
     }
 
     public void genJump(String label) {
-        code += "jmp " + label + "\n";
+        code += "\tjmp " + label + "\n";
     }
 
     public void genLabel(String label) {
-        code += label + ":\n";
+        code += "\n" + label + ":\n";
     }
 
     public void genVar(String id, String tipo) {
@@ -131,17 +129,17 @@ public class Generador {
 
     public void genTest(RS_DO left, String op, RS_DO right, String label) {
         if (left.isConstante()) {
-            code += "mov ax, " + left.getId() + "\n";
+            code += "\tmov ax, " + left.getId() + "\n";
         } else {
             registrarDir("A", left.getId());
         }
         if (right.isConstante()) {
-            code += "cmp ax, " + right.getId() + "\n";
+            code += "\tcmp ax, " + right.getId() + "\n";
         } else {
             registrarDir("B", right.getId());
-            code += "cmp ax, bx\n";
+            code += "\tcmp ax, bx\n";
         }
-        code += getSalto(op) + " " + label + "\n";
+        code += "\t"+ getSalto(op) + " " + label + "\n";
     }
 
     public String genBinary(RS_DO left, String op, RS_DO right) {
@@ -150,17 +148,17 @@ public class Generador {
         genVar(temp, "int");
 
         if (left.isConstante()) {
-            code += "mov ax, " + left.getId() + "\n";
+            code += "\tmov ax, " + left.getId() + "\n";
         } else {
             registrarDir("A", left.getId());
         }
         if (right.isConstante()) {
-            code += "mov bx, " + right.getId() + "\n";
+            code += "\tmov bx, " + right.getId() + "\n";
         } else {
             registrarDir("B", right.getId());
         }
-        code += getOperator(op) + " ax, bx\n";
-        code += "mov [" + temp + "], ax\n";
+        code += "\t" + getOperator(op) + " ax, bx\n";
+        code += "\tmov [" + temp + "], ax\n";
         return temp;
     }
 

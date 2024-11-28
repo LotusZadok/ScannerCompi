@@ -173,4 +173,12 @@ public class TablaSimbolos {
         }
         return null;
     }
+
+    // returns last simbol of array funciones
+    public Simbolo getLastFuncion() {
+        if (funciones != null && !funciones.isEmpty()) {
+            return funciones.get(funciones.size() - 1);
+        }
+        return null; // O lanza una excepción si prefieres manejarlo de otra forma.
+    }
 }

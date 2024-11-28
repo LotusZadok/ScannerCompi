@@ -14,7 +14,7 @@ public class PilaSemantica {
 
     // Pushes a record to the end of the stack
     public void push(RS registro) {
-        print();
+        //print();
         pilaSemantica.add(registro);
     }
 
@@ -22,7 +22,7 @@ public class PilaSemantica {
     public RS pop() {
         if (!pilaSemantica.isEmpty()) {
             RS registro = pilaSemantica.remove(pilaSemantica.size() - 1);
-            print();
+            //print();
             return registro;
         }
         logError("pop_end");

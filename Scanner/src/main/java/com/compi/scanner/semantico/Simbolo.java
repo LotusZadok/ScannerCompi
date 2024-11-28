@@ -177,8 +177,7 @@ public class Simbolo {
     public String toString() {
         if (tipo.equals("FUNCION")) {
             return "Simbolo { " +
-                    "tipo_func='" + tipo_var + '\'' +
-                    ", id='" + id + '\'' +
+                    "id='" + tipo_var + '\'' +
                     ", cantParametros=" + valor +
                     " }";
         } else {
@@ -186,8 +185,8 @@ public class Simbolo {
                     tipo +
                     ", tipo_var='" + tipo_var + '\'' +
                     ", id='" + id + '\'' +
-                    ", valor=" + valor +
                     ", ambito=" + ambito +
+                    (valor.equals("param") ? ", tipo= parámetro" : "") +
                     " }";
         }
     }

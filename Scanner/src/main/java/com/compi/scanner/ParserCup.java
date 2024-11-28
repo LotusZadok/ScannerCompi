@@ -347,6 +347,18 @@ public class ParserCup extends java_cup.runtime.lr_parser {
     return ambito;
   }
 
+    private int cantParametros = 0;
+
+    public void sumParametros (){
+        cantParametros ++;
+    }
+
+    public void setCantParametros (){
+        Simbolo funcion = ts.getLastFuncion ();
+        if (funcion != null){
+            funcion.setValor (cantParametros);
+        }
+    }
 
   // Acciones Semanticas
 
@@ -367,8 +379,8 @@ public class ParserCup extends java_cup.runtime.lr_parser {
 
   public void insertarTS() {
     if (pilaSemantica.top().getTipo() == "FUNC") {
-    System.out.println("Funcion encontrada");
-      return;
+        //System.out.println("Funcion encontrada");
+        return;
     }
     // buscar RS_TIPO
     RS_TIPO rs_tipo = (RS_TIPO) pilaSemantica.pop();
@@ -548,8 +560,8 @@ public class ParserCup extends java_cup.runtime.lr_parser {
   }
 
   public void startFunc() {
-    RS_FUNC rs_func = new RS_FUNC("FUNC" + generateLabel());
     RS_ID rs_id = (RS_ID) pilaSemantica.pop();
+    RS_FUNC rs_func = new RS_FUNC("FUNC_" + rs_id.getId().toString());
 
     ts.insertarFuncion(new Simbolo("FUNCION", rs_id.getId().toString(), "Se cae", "global"));
 
@@ -963,11 +975,11 @@ class CUP$ParserCup$actions {
 		int idleft = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()).left;
 		int idright = ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()).right;
 		Object id = (Object)((java_cup.runtime.Symbol) CUP$ParserCup$stack.peek()).value;
-		 
-                      
+		         
                       recuerdaID(id.toString(), "param"); 
                       recuerdaTipo(tipo);
                       insertarTS(); 
+                      sumParametros (); setCantParametros ();
                   
               CUP$ParserCup$result = parser.getSymbolFactory().newSymbol("param_element",28, ((java_cup.runtime.Symbol)CUP$ParserCup$stack.elementAt(CUP$ParserCup$top-1)), ((java_cup.runtime.Symbol)CUP$ParserCup$stack.peek()), RESULT);
             }
