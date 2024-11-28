@@ -8,71 +8,44 @@ package com.compi.scanner;
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int DIV_EQ = 31;
-  public static final int LBRACKET = 18;
-  public static final int CHAR = 55;
-  public static final int CONST = 5;
-  public static final int MINUS_MINUS = 33;
-  public static final int CASE = 42;
-  public static final int CONTINUE = 50;
-  public static final int LPAREN = 16;
-  public static final int SEMI = 15;
-  public static final int INT = 53;
-  public static final int FOR = 39;
-  public static final int MINUS = 12;
-  public static final int WRITE = 6;
-  public static final int RPAREN = 17;
-  public static final int NOT = 36;
-  public static final int AND = 35;
-  public static final int TIMES_EQ = 30;
-  public static final int LT_EQ = 25;
-  public static final int LT = 26;
-  public static final int OR = 34;
-  public static final int COMMA = 20;
-  public static final int DIV = 14;
-  public static final int TYPE_LONG = 45;
-  public static final int TYPE_INT = 44;
-  public static final int PLUS = 11;
-  public static final int IF = 37;
+  public static final int TIMES = 8;
+  public static final int CONTINUE = 31;
+  public static final int LT = 18;
+  public static final int ELSE = 23;
+  public static final int PLUS = 6;
+  public static final int INT = 32;
+  public static final int TYPE_LONG = 26;
+  public static final int RPAREN = 12;
+  public static final int WHILE = 24;
+  public static final int SEMI = 10;
+  public static final int TYPE_INT = 25;
+  public static final int PLUS_PLUS = 20;
+  public static final int TYPE_CHAR = 28;
+  public static final int TRUE = 3;
+  public static final int IF = 22;
+  public static final int GT = 17;
+  public static final int LPAREN = 11;
+  public static final int LBRACKET = 13;
   public static final int ID = 2;
+  public static final int RBRACKET = 14;
+  public static final int COMMA = 15;
+  public static final int FLOAT = 33;
   public static final int EOF = 0;
-  public static final int RETURN = 52;
-  public static final int PLUS_PLUS = 32;
-  public static final int RBRACKET = 19;
-  public static final int TRUE = 8;
+  public static final int BREAK = 30;
+  public static final int DIV = 9;
+  public static final int FALSE = 4;
+  public static final int MINUS = 7;
   public static final int error = 1;
-  public static final int MOD = 3;
-  public static final int BREAK = 49;
-  public static final int VOID = 48;
-  public static final int EQ = 10;
-  public static final int TYPE_CHAR = 47;
-  public static final int SWITCH = 41;
-  public static final int TIMES = 13;
-  public static final int GT_EQ = 23;
-  public static final int COLON = 21;
-  public static final int ELSE = 38;
-  public static final int READ = 7;
-  public static final int NOT_EQ = 27;
-  public static final int WHILE = 40;
-  public static final int DEFAULT = 43;
-  public static final int FLOAT = 54;
-  public static final int STRING = 4;
-  public static final int PLUS_EQ = 28;
-  public static final int TYPE_SHORT = 46;
-  public static final int MINUS_EQ = 29;
-  public static final int FALSE = 9;
-  public static final int GT = 24;
-  public static final int DO = 51;
-  public static final int EQ_EQ = 22;
+  public static final int EQ = 5;
+  public static final int MINUS_MINUS = 21;
+  public static final int VOID = 29;
+  public static final int EQ_EQ = 16;
+  public static final int NOT_EQ = 19;
+  public static final int TYPE_SHORT = 27;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
   "ID",
-  "MOD",
-  "STRING",
-  "CONST",
-  "WRITE",
-  "READ",
   "TRUE",
   "FALSE",
   "EQ",
@@ -86,29 +59,15 @@ public class sym {
   "LBRACKET",
   "RBRACKET",
   "COMMA",
-  "COLON",
   "EQ_EQ",
-  "GT_EQ",
   "GT",
-  "LT_EQ",
   "LT",
   "NOT_EQ",
-  "PLUS_EQ",
-  "MINUS_EQ",
-  "TIMES_EQ",
-  "DIV_EQ",
   "PLUS_PLUS",
   "MINUS_MINUS",
-  "OR",
-  "AND",
-  "NOT",
   "IF",
   "ELSE",
-  "FOR",
   "WHILE",
-  "SWITCH",
-  "CASE",
-  "DEFAULT",
   "TYPE_INT",
   "TYPE_LONG",
   "TYPE_SHORT",
@@ -116,11 +75,8 @@ public class sym {
   "VOID",
   "BREAK",
   "CONTINUE",
-  "DO",
-  "RETURN",
   "INT",
-  "FLOAT",
-  "CHAR"
+  "FLOAT"
   };
 }
 

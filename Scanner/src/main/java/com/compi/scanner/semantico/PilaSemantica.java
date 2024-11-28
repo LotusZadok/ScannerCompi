@@ -14,12 +14,14 @@ public class PilaSemantica {
 
     // Pushes a record to the end of the stack
     public void push(RS registro) {
+        print();
         pilaSemantica.add(registro);
     }
 
     // Removes and returns the last record from the stack
     public RS pop() {
         if (!pilaSemantica.isEmpty()) {
+            print();
             return pilaSemantica.remove(pilaSemantica.size() - 1);
         }
         logError("pop_end");
@@ -43,7 +45,6 @@ public class PilaSemantica {
                 return registro;
             }
         }
-        logError("buscarRS");
         return null;
     }
 
@@ -74,8 +75,21 @@ public class PilaSemantica {
     // Prints all records in the stack
     public void print() {
         for (RS registro : pilaSemantica) {
-            System.out.println(registro);
+            if (registro.getTipo().equals("ID")) {
+                RS_ID id = (RS_ID) registro;
+                System.out.print(registro + "(" + id.getId() + ")");
+
+            } else if (registro.getTipo().equals("DO")) {
+                RS_DO rs_do = (RS_DO) registro;
+                System.out.print(registro + "(" + rs_do.getId() + ")");
+            } else if (registro.getTipo().equals("OP")) {
+                RS_OP rs_op = (RS_OP) registro;
+                System.out.print(registro + "(" + rs_op.getOP() + ")");
+            } else {
+                System.out.print(registro);
+            }
         }
+        System.out.println();
     }
 
     // Private helper method to check if an index is valid
@@ -91,4 +105,5 @@ public class PilaSemantica {
     public Stream<RS> stream() {
         return pilaSemantica.stream();
     }
+
 }

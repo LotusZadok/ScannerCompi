@@ -41,13 +41,8 @@ FLOAT           = {INT}({DECPART} {EXP}? | {OPTIONALDECPART}{EXP}) {FLOATSUFFIX}
 "/*"[^\n\r]* { reportError("Comentario no cerrado -> " + yytext()); }
 
 // 2. OPERADORES Y SIMBOLOS
-":"         { return new Symbol(sym.COLON, yyline, yycolumn, yytext()); }
 ";"         { return new Symbol(sym.SEMI, yyline, yycolumn, yytext()); }
 ","         { return new Symbol(sym.COMMA, yyline, yycolumn, yytext()); }
-"/="        { return new Symbol(sym.DIV_EQ, yyline, yycolumn, yytext()); }
-"*="        { return new Symbol(sym.TIMES_EQ, yyline, yycolumn, yytext()); }
-"+="        { return new Symbol(sym.PLUS_EQ, yyline, yycolumn, yytext()); }
-"-="        { return new Symbol(sym.MINUS_EQ, yyline, yycolumn, yytext()); }
 "++"        { return new Symbol(sym.PLUS_PLUS, yyline, yycolumn, yytext()); }
 "--"        { return new Symbol(sym.MINUS_MINUS, yyline, yycolumn, yytext()); }
 "{"         { return new Symbol(sym.LBRACKET, yyline, yycolumn, yytext()); }
@@ -59,16 +54,10 @@ FLOAT           = {INT}({DECPART} {EXP}? | {OPTIONALDECPART}{EXP}) {FLOATSUFFIX}
 "-"         { return new Symbol(sym.MINUS, yyline, yycolumn, yytext()); }
 "*"         { return new Symbol(sym.TIMES, yyline, yycolumn, yytext()); }
 "/"         { return new Symbol(sym.DIV, yyline, yycolumn, yytext()); }
-"%"         { return new Symbol(sym.MOD, yyline, yycolumn, yytext()); }
-"!"         { return new Symbol(sym.NOT, yyline, yycolumn, yytext()); }
-"&&"        { return new Symbol(sym.AND, yyline, yycolumn, yytext()); }
-"||"        { return new Symbol(sym.OR, yyline, yycolumn, yytext()); }
 "=="        { return new Symbol(sym.EQ_EQ, yyline, yycolumn, yytext()); }
 "!="        { return new Symbol(sym.NOT_EQ, yyline, yycolumn, yytext()); }
 "<"         { return new Symbol(sym.LT, yyline, yycolumn, yytext()); }
-"<="        { return new Symbol(sym.LT_EQ, yyline, yycolumn, yytext()); }
 ">"         { return new Symbol(sym.GT, yyline, yycolumn, yytext()); }
-">="        { return new Symbol(sym.GT_EQ, yyline, yycolumn, yytext()); }
 
 // 3. PALABRAS RESERVADAS
 "int"       { return new Symbol(sym.TYPE_INT, yyline, yycolumn, yytext()); }
@@ -80,25 +69,10 @@ FLOAT           = {INT}({DECPART} {EXP}? | {OPTIONALDECPART}{EXP}) {FLOATSUFFIX}
 "if"        { return new Symbol(sym.IF, yyline, yycolumn, yytext()); }
 "else"      { return new Symbol(sym.ELSE, yyline, yycolumn, yytext()); }
 
-"for"       { return new Symbol(sym.FOR, yyline, yycolumn, yytext()); }
-
 "while"     { return new Symbol(sym.WHILE, yyline, yycolumn, yytext()); }
-
-"switch"    { return new Symbol(sym.SWITCH, yyline, yycolumn, yytext()); }
-"case"      { return new Symbol(sym.CASE, yyline, yycolumn, yytext()); }
-"default"   { return new Symbol(sym.DEFAULT, yyline, yycolumn, yytext()); }
-
-"const"     { return new Symbol(sym.CONST, yyline, yycolumn, yytext()); }
-
-"true"      { return new Symbol(sym.TRUE, yyline, yycolumn, yytext()); }
-"false"     { return new Symbol(sym.FALSE, yyline, yycolumn, yytext()); }
 
 "continue"  { return new Symbol(sym.CONTINUE, yyline, yycolumn, yytext()); }
 "break"     { return new Symbol(sym.BREAK, yyline, yycolumn, yytext()); }
-"do"        { return new Symbol(sym.DO, yyline, yycolumn, yytext()); }
-"return"    { return new Symbol(sym.RETURN, yyline, yycolumn, yytext()); }
-"read"      { return new Symbol(sym.READ, yyline, yycolumn, yytext()); }
-"write"     { return new Symbol(sym.WRITE, yyline, yycolumn, yytext()); }
 
 //  4. NUMEROS
 {INT}("-")                     { reportError("Símbolo inválido después de número -> " + yytext()); }
@@ -112,16 +86,6 @@ FLOAT           = {INT}({DECPART} {EXP}? | {OPTIONALDECPART}{EXP}) {FLOATSUFFIX}
 ({DECIMAL}|{ZERO})[eE][^\+\-0-9] { reportError("Exponente mal formado -> " + yytext()); }
 {DECIMAL}\.[^0-9]+               { reportError("Flotante mal formado -> " + yytext()); } //casos como 123.
 
-
-// 5. STRINGS
-\'([^\'\\\n]|\\[\'\"\\ntr0])\' { return new Symbol(sym.CHAR, yyline, yycolumn, yytext()); }
-\"([^\"\\\n]|\\.)*\" { return new Symbol(sym.STRING, yyline, yycolumn, yytext()); }
-\"([^\"\\\n]|\\.)* { reportError("String no cerrado -> " + yytext()); }
-\'([^\'\\\n]|\\.)+\' { reportError("Caracter mal formado -> " + yytext()); }
-\'([^\'\\\n]|\\[\'\"\\ntr0]) { reportError("Caracter no cerrado -> " + yytext()); }
-
-"#"{DECIMAL} { return new Symbol(sym.CHAR, yyline, yycolumn, yytext()); }
-"#"[^ \t\n\r]* { reportError("Caracter invalido -> " + yytext()); }
 
 // 6. IDENTIFICADORES
 {DECIMAL}{Alfanumerico} { reportError("Identificador no puede empezar con un número -> " + yytext()); }

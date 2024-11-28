@@ -168,7 +168,7 @@ public class TablaSimbolos {
         for (Simbolo s : variables) {
             if (s.getId().equals(id)) {
                 if (s.getAmbito().equals(ambito))
-                    return s.getTipo();
+                    return s.getTipo_var();
             }
         }
         return null;

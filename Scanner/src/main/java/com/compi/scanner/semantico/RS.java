@@ -11,4 +11,11 @@ public class RS {
     public String getTipo() {
         return tipo;
     }
+
+    @Override
+    public String toString() {
+        return "RS{" +
+                "tipo='" + tipo + '\'' +
+                '}';
+    }
 }

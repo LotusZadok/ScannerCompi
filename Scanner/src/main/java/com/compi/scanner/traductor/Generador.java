@@ -75,11 +75,28 @@ public class Generador {
         }
     }
 
-    private String getNextNumLabel() {
+    public String getOperator(String op) {
+        switch (op) {
+            case "+":
+                return "add";
+            case "-":
+                return "sub";
+            case "*":
+                return "mul";
+            case "/":
+                return "div";
+            case "%":
+                return "mod";
+            default:
+                return "";
+        }
+    }
+
+    public String getNextNumLabel() {
         return "Label_" + numLabels++;
     }
 
-    public void opIncremento(String id, String op) {
+    public void genIncrement(String id, String op) {
         String registro = "A";
         registrarDir(registro, id);
         switch (op) {
@@ -93,6 +110,58 @@ public class Generador {
         }
         code += getDir(registro) + "\n";
         code += "mov [" + id + "], " + getDir(registro) + "\n\n";
+    }
+
+    public void genAssign(String id, String valor) {
+        code += "mov ax, " + valor + "\n";
+        code += "mov [" + id + "], ax\n";
+    }
+
+    public void genJump(String label) {
+        code += "jmp " + label + "\n";
+    }
+
+    public void genLabel(String label) {
+        code += label + ":\n";
+    }
+
+    public void genVar(String id, String tipo) {
+        data += id + " dw 0\n";
+    }
+
+    public void genTest(RS_DO left, String op, RS_DO right, String label) {
+        if (left.isConstante()) {
+            code += "mov ax, " + left.getId() + "\n";
+        } else {
+            registrarDir("A", left.getId());
+        }
+        if (right.isConstante()) {
+            code += "cmp ax, " + right.getId() + "\n";
+        } else {
+            registrarDir("B", right.getId());
+            code += "cmp ax, bx\n";
+        }
+        code += getSalto(op) + " " + label + "\n";
+    }
+
+    public String genBinary(RS_DO left, String op, RS_DO right) {
+        // Generar varinale temporal
+        String temp = "temp" + getNextNumLabel();
+        genVar(temp, "int");
+
+        if (left.isConstante()) {
+            code += "mov ax, " + left.getId() + "\n";
+        } else {
+            registrarDir("A", left.getId());
+        }
+        if (right.isConstante()) {
+            code += "mov bx, " + right.getId() + "\n";
+        } else {
+            registrarDir("B", right.getId());
+        }
+        code += getOperator(op) + " ax, bx\n";
+        code += "mov [" + temp + "], ax\n";
+        return temp;
     }
 
 }
